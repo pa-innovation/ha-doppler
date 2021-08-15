@@ -105,26 +105,37 @@ class DopplerDataUpdateCoordinator(DataUpdateCoordinator):
                     name=device.name,
                 )
                 device_data = data.setdefault(device.name, {})
+                await asyncio.sleep(0.5)
                 device_data[ATTR_BUTTON_COLOR] = await self.api.get_button_color(device)
+                await asyncio.sleep(0.5)
                 device_data[ATTR_DISPLAY_COLOR] = await self.api.get_display_color(
                     device
                 )
+                await asyncio.sleep(0.5)
                 device_data[
                     ATTR_DISPLAY_BRIGHTNESS
                 ] = await self.api.get_display_brightness(device)
+                await asyncio.sleep(0.5)
                 device_data[
                     ATTR_AUTO_BRIGHTNESS_ENABLED
                 ] = await self.api.is_automatic_brightness_enabled(device)
-                device_data[
-                    ATTR_DOTW_STATUS
-                ] = await self.api.get_day_of_the_week_status(device)
+                await asyncio.sleep(0.5)
+                # device_data[
+                #     ATTR_DOTW_STATUS
+                # ] = await self.api.get_day_of_the_week_status(device)
+                # await asyncio.sleep(0.5)
                 device_data[ATTR_VOLUME_LEVEL] = await self.api.get_volume_level(device)
+                await asyncio.sleep(0.5)
                 device_data[ATTR_TIME_MODE] = await self.api.get_time_mode(device)
-                device_data[ATTR_ALARMS] = await self.api.get_all_alarms(device)
-                device_data[ATTR_WEATHER] = await self.api.get_weather_configuration(
-                    device
-                )
-                device_data[ATTR_WIFI] = await self.api.get_wifi_status(device)
+                await asyncio.sleep(0.5)
+                # device_data[ATTR_ALARMS] = await self.api.get_all_alarms(device)
+                # await asyncio.sleep(0.5)
+                # device_data[ATTR_WEATHER] = await self.api.get_weather_configuration(
+                #     device
+                # )
+                # await asyncio.sleep(0.5)
+                # device_data[ATTR_WIFI] = await self.api.get_wifi_status(device)
+                # await asyncio.sleep(0.5)
         except Exception as exception:
             raise UpdateFailed() from exception
 

@@ -34,12 +34,12 @@ async def async_setup_entry(
 class DopplerTimeModeNumber(DopplerEntity, SelectEntity):
     """Doppler Time Mode Select class."""
 
-    _attr_options = [12, 24]
+    _attr_options = ["12", "24"]
 
     @property
-    def value(self) -> int:
-        """Return the current value."""
-        return self.coordinator.data[self.device.name][ATTR_TIME_MODE]
+    def current_option(self) -> str:
+        """Return the current option."""
+        return str(self.coordinator.data[self.device.name][ATTR_TIME_MODE])
 
     async def async_select_option(self, option: str) -> None:
         """Change the selected option."""

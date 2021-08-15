@@ -41,9 +41,9 @@ async def async_setup_entry(
             [
                 DopplerDisplayLight(coordinator, entry, device, "Display"),
                 DopplerButtonLight(coordinator, entry, device, "Button"),
-                DopplerDOTWLight(
-                    coordinator, entry, device, "Day of the Week Indicator"
-                ),
+                # DopplerDOTWLight(
+                #     coordinator, entry, device, "Day of the Week Indicator"
+                # ),
             ]
         )
     async_add_devices(entities)
