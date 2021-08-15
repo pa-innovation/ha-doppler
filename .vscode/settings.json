@@ -1,7 +1,7 @@
 {
     "python.linting.pylintEnabled": true,
     "python.linting.enabled": true,
-    "python.pythonPath": "/usr/local/bin/python",
+    "python.pythonPath": "/Users/raman.gupta/projects/personal/ha-doppler/venv/bin/python3.9",
     "files.associations": {
         "*.yaml": "home-assistant"
     }

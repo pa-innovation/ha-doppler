@@ -5,16 +5,16 @@
                 "title": "Blueprint",
                 "description": "Hvis du trenger hjep til konfigurasjon ta en titt her: https://github.com/custom-components/integration_blueprint",
                 "data": {
-                    "username": "Brukernavn",
+                    "email": "E-post",
                     "password": "Passord"
                 }
             }
         },
         "error": {
-            "auth": "Brukernavn/Passord er feil."
+            "auth": "E-post/Passord er feil."
         },
         "abort": {
-            "single_instance_allowed": "Denne integrasjonen kan kun konfigureres en gang."
+            "already_configured": "Kontoen er allerede konfigurert"
         }
     },
     "options": {

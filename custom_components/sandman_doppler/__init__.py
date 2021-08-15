@@ -1,0 +1,151 @@
+"""The Sandman Doppler integration."""
+from __future__ import annotations
+
+import asyncio
+from datetime import timedelta
+import logging
+from typing import Any
+from aiohttp.client import ClientTimeout, DEFAULT_TIMEOUT
+
+from doppyler.client import DopplerClient
+from doppyler.model.doppler import Doppler
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import CONF_EMAIL, CONF_PASSWORD
+from homeassistant.core import HomeAssistant
+from homeassistant.helpers.aiohttp_client import async_create_clientsession
+from homeassistant.helpers.device_registry import async_get
+from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
+
+from .const import (
+    ATTR_ALARM_SOUNDS,
+    ATTR_ALARMS,
+    ATTR_AUTO_BRIGHTNESS_ENABLED,
+    ATTR_BUTTON_COLOR,
+    ATTR_DISPLAY_BRIGHTNESS,
+    ATTR_DISPLAY_COLOR,
+    ATTR_DOTW_STATUS,
+    ATTR_TIME_MODE,
+    ATTR_VOLUME_LEVEL,
+    ATTR_WEATHER,
+    ATTR_WIFI,
+    DOMAIN,
+    PLATFORMS,
+    STARTUP_MESSAGE,
+)
+
+SCAN_INTERVAL = timedelta(seconds=30)
+
+_LOGGER: logging.Logger = logging.getLogger(__package__)
+
+
+async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
+    """Set up this integration using UI."""
+    if hass.data.get(DOMAIN) is None:
+        hass.data.setdefault(DOMAIN, {})
+        _LOGGER.info(STARTUP_MESSAGE)
+
+    email = entry.data.get(CONF_EMAIL)
+    password = entry.data.get(CONF_PASSWORD)
+
+    session = async_create_clientsession(hass, timeout=ClientTimeout(DEFAULT_TIMEOUT))
+    client = DopplerClient(email, password, client_session=session)
+
+    coordinator = DopplerDataUpdateCoordinator(hass, entry, client)
+    await coordinator.async_config_entry_first_refresh()
+
+    hass.data[DOMAIN][entry.entry_id] = coordinator
+
+    for platform in PLATFORMS:
+        if entry.options.get(platform, True):
+            coordinator.platforms.append(platform)
+            hass.async_add_job(
+                hass.config_entries.async_forward_entry_setup(entry, platform)
+            )
+
+    entry.add_update_listener(async_reload_entry)
+    return True
+
+
+class DopplerDataUpdateCoordinator(DataUpdateCoordinator):
+    """Class to manage fetching data from the API."""
+
+    def __init__(
+        self, hass: HomeAssistant, entry: ConfigEntry, client: DopplerClient
+    ) -> None:
+        """Initialize."""
+        self.api = client
+        self.platforms = []
+        self._dev_reg = None
+        self._entry = entry
+
+        super().__init__(hass, _LOGGER, name=DOMAIN, update_interval=SCAN_INTERVAL)
+
+    async def _async_update_data(self) -> dict[str, Any]:
+        """Update data via library."""
+        if not self._dev_reg:
+            self._dev_reg = async_get(self.hass)
+
+        data: dict[str, Any] = {}
+        devices: dict[str, Doppler] = {}
+        if self.api.devices:
+            devices = self.api.devices
+        await self.api.get_devices()
+        if devices != self.api.devices:
+            # TODO: Signal add entities for the new device
+            pass
+
+        try:
+            for device in self.api.devices.values():
+                self._dev_reg.async_get_or_create(
+                    config_entry_id=self._entry.entry_id,
+                    identifiers={(DOMAIN, device.id)},
+                    manufacturer=device.device_info.manufacturer,
+                    model=device.device_info.model_number,
+                    sw_version=device.device_info.software_version,
+                    name=device.name,
+                )
+                data.setdefault(device.name, {})
+                data[device.name] = {
+                    ATTR_BUTTON_COLOR: await self.api.get_button_color(device),
+                    ATTR_DISPLAY_COLOR: await self.api.get_display_color(device),
+                    ATTR_DISPLAY_BRIGHTNESS: await self.api.get_display_brightness(
+                        device
+                    ),
+                    ATTR_AUTO_BRIGHTNESS_ENABLED: await self.api.is_automatic_brightness_enabled(
+                        device
+                    ),
+                    ATTR_DOTW_STATUS: await self.api.get_day_of_the_week_status(device),
+                    ATTR_VOLUME_LEVEL: await self.api.get_volume_level(device),
+                    ATTR_TIME_MODE: await self.api.get_time_mode(device),
+                    ATTR_ALARMS: await self.api.get_all_alarms(device),
+                    ATTR_WEATHER: await self.api.get_weather_configuration(device),
+                    ATTR_WIFI: await self.api.get_wifi_status(device),
+                }
+        except Exception as exception:
+            raise UpdateFailed() from exception
+
+        return data
+
+
+async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    """Handle removal of an entry."""
+    coordinator = hass.data[DOMAIN][entry.entry_id]
+    unloaded = all(
+        await asyncio.gather(
+            *[
+                hass.config_entries.async_forward_entry_unload(entry, platform)
+                for platform in PLATFORMS
+                if platform in coordinator.platforms
+            ]
+        )
+    )
+    if unloaded:
+        hass.data[DOMAIN].pop(entry.entry_id)
+
+    return unloaded
+
+
+async def async_reload_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    """Reload config entry."""
+    await async_unload_entry(hass, entry)
+    await async_setup_entry(hass, entry)
