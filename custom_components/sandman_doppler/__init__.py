@@ -104,23 +104,17 @@ class DopplerDataUpdateCoordinator(DataUpdateCoordinator):
                     sw_version=device.device_info.software_version,
                     name=device.name,
                 )
-                data.setdefault(device.name, {})
-                data[device.name] = {
-                    ATTR_BUTTON_COLOR: await self.api.get_button_color(device),
-                    ATTR_DISPLAY_COLOR: await self.api.get_display_color(device),
-                    ATTR_DISPLAY_BRIGHTNESS: await self.api.get_display_brightness(
-                        device
-                    ),
-                    ATTR_AUTO_BRIGHTNESS_ENABLED: await self.api.is_automatic_brightness_enabled(
-                        device
-                    ),
-                    ATTR_DOTW_STATUS: await self.api.get_day_of_the_week_status(device),
-                    ATTR_VOLUME_LEVEL: await self.api.get_volume_level(device),
-                    ATTR_TIME_MODE: await self.api.get_time_mode(device),
-                    ATTR_ALARMS: await self.api.get_all_alarms(device),
-                    ATTR_WEATHER: await self.api.get_weather_configuration(device),
-                    ATTR_WIFI: await self.api.get_wifi_status(device),
-                }
+                device_data = data.setdefault(device.name, {})
+                device_data[ATTR_BUTTON_COLOR] = await self.api.get_button_color(device)
+                device_data[ATTR_DISPLAY_COLOR] = await self.api.get_display_color(device)
+                device_data[ATTR_DISPLAY_BRIGHTNESS] = await self.api.get_display_brightness(device)
+                device_data[ATTR_AUTO_BRIGHTNESS_ENABLED] = await self.api.is_automatic_brightness_enabled(device)
+                device_data[ATTR_DOTW_STATUS] = await self.api.get_day_of_the_week_status(device)
+                device_data[ATTR_VOLUME_LEVEL] = await self.api.get_volume_level(device)
+                device_data[ATTR_TIME_MODE] = await self.api.get_time_mode(device)
+                device_data[ATTR_ALARMS] = await self.api.get_all_alarms(device)
+                device_data[ATTR_WEATHER] = await self.api.get_weather_configuration(device)
+                device_data[ATTR_WIFI] = await self.api.get_wifi_status(device)
         except Exception as exception:
             raise UpdateFailed() from exception
 
