@@ -120,6 +120,9 @@ class DopplerButtonLight(BaseDopplerLight):
         """Turn the device on."""
         rgb_color = kwargs.get(ATTR_RGB_COLOR)
         if rgb_color is not None:
+
+            await self.coordinator.api.set_sync_button_display_color(
+                self.device,False)
             await self.coordinator.api.set_button_color(
                 self.device, Color(rgb_color[0], rgb_color[1], rgb_color[2])
             )
