@@ -220,7 +220,7 @@ class DopplerDOTWLight(BaseDopplerLight):
     @property
     def rgb_color(self) -> tuple[int, int, int] | None:
         """Return the rgb color value [int, int, int]."""
-        color: Color = self.coordinator.data[self.device.name][ATTR_DISPLAY_COLOR]
+        color: Color = self.coordinator.data[self.device.name][ATTR_DAY_DISPLAY_COLOR]
         return (color.red, color.green, color.blue)
 
     async def async_turn_off(self) -> None:
