@@ -43,9 +43,9 @@ class DopplerVolumeLevelNumber(DopplerEntity, NumberEntity):
         """Return the current value."""
         return self.coordinator.data[self.device.name][ATTR_VOLUME_LEVEL]
 
-    def set_native_value(self, value) -> None:
+    async def set_native_value(self, value) -> None:
         """Update the current volume value"""
         self._attr_native_value = value
-        self.coordinator.api.set_volume_level(self.device,value)
+        await self.coordinator.api.set_volume_level(self.device,value)
 
 
