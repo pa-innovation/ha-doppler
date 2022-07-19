@@ -22,7 +22,10 @@ from .const import (
     ATTR_AUTO_BRIGHTNESS_ENABLED,
     ATTR_DAY_BUTTON_COLOR,
     ATTR_NIGHT_BUTTON_COLOR,
-    ATTR_DISPLAY_BRIGHTNESS,
+    ATTR_DAY_DISPLAY_BRIGHTNESS,
+    ATTR_NIGHT_DISPLAY_BRIGHTNESS,
+    ATTR_DAY_BUTTON_BRIGHTNESS,
+    ATTR_NIGHT_BUTTON_BRIGHTNESS,
     ATTR_DAY_DISPLAY_COLOR,
     ATTR_NIGHT_DISPLAY_COLOR,
     ATTR_DOTW_STATUS,
@@ -122,9 +125,24 @@ class DopplerDataUpdateCoordinator(DataUpdateCoordinator):
                 )
                 await asyncio.sleep(0.5)
                 device_data[
-                    ATTR_DISPLAY_BRIGHTNESS
-                ] = await self.api.get_display_brightness(device)
+                    ATTR_DAY_DISPLAY_BRIGHTNESS
+                ] = await self.api.get_day_display_brightness(device)
                 await asyncio.sleep(0.5)
+                device_data[
+                    ATTR_NIGHT_DISPLAY_BRIGHTNESS
+                ] = await self.api.get_night_display_brightness(device)
+                await asyncio.sleep(0.5)
+                device_data[
+                    ATTR_DAY_BUTTON_BRIGHTNESS
+                ] = await self.api.get_day_button_brightness(device)
+                await asyncio.sleep(0.5)
+
+                device_data[
+                    ATTR_NIGHT_BUTTON_BRIGHTNESS
+                ] = await self.api.get_night_button_brightness(device)
+                await asyncio.sleep(0.5)
+
+                
                 device_data[
                     ATTR_AUTO_BRIGHTNESS_ENABLED
                 ] = await self.api.is_automatic_brightness_enabled(device)
