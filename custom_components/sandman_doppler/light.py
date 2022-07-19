@@ -89,7 +89,7 @@ class DopplerDisplayLightDay(BaseDopplerLight):
 
     async def async_turn_on(self, **kwargs: Any) -> None:
         """Turn the device on."""
-        brightness = kwargs.get(ATTR_DAY_DISPLAY_BRIGHTNESS)
+        brightness = kwargs.get(ATTR_BRIGHTNESS)
         rgb_color = kwargs.get(ATTR_RGB_COLOR)
         if brightness is not None:
             await self.coordinator.api.set_day_display_brightness(
@@ -128,7 +128,7 @@ class DopplerDisplayLightNight(BaseDopplerLight):
 
     async def async_turn_on(self, **kwargs: Any) -> None:
         """Turn the device on."""
-        brightness = kwargs.get(ATTR_NIGHT_DISPLAY_BRIGHTNESS)
+        brightness = kwargs.get(ATTR_BRIGHTNESS)
         rgb_color = kwargs.get(ATTR_RGB_COLOR)
         if brightness is not None:
             await self.coordinator.api.set_night_display_brightness(
@@ -165,7 +165,7 @@ class DopplerButtonLightDay(BaseDopplerLight):
 
     async def async_turn_on(self, **kwargs: Any) -> None:
         """Turn the device on."""
-        brightness = kwargs.get(ATTR_DAY_BUTTON_BRIGHTNESS)
+        brightness = kwargs.get(ATTR_BRIGHTNESS)
         rgb_color = kwargs.get(ATTR_RGB_COLOR)
         if brightness is not None:
             await self.coordinator.api.set_day_button_brightness(
@@ -206,7 +206,7 @@ class DopplerButtonLightNight(BaseDopplerLight):
 
     async def async_turn_on(self, **kwargs: Any) -> None:
         """Turn the device on."""
-        brightness = kwargs.get(ATTR_NIGHT_BUTTON_BRIGHTNESS)
+        brightness = kwargs.get(ATTR_BRIGHTNESS)
         rgb_color = kwargs.get(ATTR_RGB_COLOR)
         if brightness is not None:
             await self.coordinator.api.set_night_button_brightness(
