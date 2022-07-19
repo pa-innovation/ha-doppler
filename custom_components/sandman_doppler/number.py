@@ -34,9 +34,9 @@ async def async_setup_entry(
 class DopplerVolumeLevelNumber(DopplerEntity, NumberEntity):
     """Doppler Volume Level Number class."""
 
-    _attr_step = 1
-    _attr_min_value = 0
-    _attr_max_value = 100
+    _attr_native_step = 1
+    _attr_native_min_value = 0
+    _attr_native_max_value = 100
 
     @property
     def value(self) -> int:
