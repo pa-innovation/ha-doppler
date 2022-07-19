@@ -108,9 +108,16 @@ class DopplerDataUpdateCoordinator(DataUpdateCoordinator):
                 )
                 device_data = data.setdefault(device.name, {})
                 await asyncio.sleep(0.5)
-                device_data[ATTR_BUTTON_COLOR] = await self.api.get_button_color(device)
+                device_data[ATTR_DAY_BUTTON_COLOR] = await self.api.get_day_button_color(device)
                 await asyncio.sleep(0.5)
-                device_data[ATTR_DISPLAY_COLOR] = await self.api.get_display_color(
+                device_data[ATTR_NIGHT_BUTTON_COLOR] = await self.api.get_night_button_color(device)
+                await asyncio.sleep(0.5)
+
+                device_data[ATTR_DAY_DISPLAY_COLOR] = await self.api.get_day_display_color(
+                    device
+                )
+                await asyncio.sleep(0.5)
+                device_data[ATTR_NIGHT_DISPLAY_COLOR] = await self.api.get_night_display_color(
                     device
                 )
                 await asyncio.sleep(0.5)
