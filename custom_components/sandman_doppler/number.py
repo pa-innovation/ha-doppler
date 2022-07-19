@@ -45,4 +45,4 @@ class DopplerVolumeLevelNumber(DopplerEntity, NumberEntity):
 
     def set_native_value(self, value:float) -> None:
         """Update the current volume value"""
-        
+        coordinator.api.set_volume_level(self.device,value)
