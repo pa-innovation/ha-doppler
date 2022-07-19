@@ -40,7 +40,8 @@ async def async_setup_entry(
         entities.extend(
             [
                 DopplerDisplayLight(coordinator, entry, device, "Display"),
-                DopplerButtonLight(coordinator, entry, device, "Button"),
+                DopplerButtonLightDay(coordinator, entry, device, "Day Button"),
+                DopplerButtonLightNight(coordinator, entry, device, "Night Button"),
                 # DopplerDOTWLight(
                 #     coordinator, entry, device, "Day of the Week Indicator"
                 # ),
@@ -102,7 +103,7 @@ class DopplerDisplayLight(BaseDopplerLight):
             )
 
 
-class DopplerButtonLight(BaseDopplerLight):
+class DopplerButtonLightDay(BaseDopplerLight):
     """Doppler Button Light class."""
 
     _attr_is_on = True
@@ -127,6 +128,32 @@ class DopplerButtonLight(BaseDopplerLight):
                 self.device, Color(rgb_color[0], rgb_color[1], rgb_color[2])
             )
 
+class DopplerButtonLightNight(BaseDopplerLight):
+    """Doppler Button Light class."""
+
+    _attr_is_on = True
+    _attr_icon = "mdi:gesture-tap-button"
+
+    @property
+    def rgb_color(self) -> tuple[int, int, int] | None:
+        """Return the rgb color value [int, int, int]."""
+        color: Color | None = self.coordinator.data[self.device.name][ATTR_BUTTON_COLOR]
+        if not color:
+            return None
+        return (color.red, color.green, color.blue)
+
+    async def async_turn_on(self, **kwargs: Any) -> None:
+        """Turn the device on."""
+        rgb_color = kwargs.get(ATTR_RGB_COLOR)
+        if rgb_color is not None:
+
+            await self.coordinator.api.set_sync_button_display_color(
+                self.device,False)
+            await self.coordinator.api.set_button_color(
+                self.device, Color(rgb_color[0], rgb_color[1], rgb_color[2])
+            )
+
+            
 
 class DopplerDOTWLight(BaseDopplerLight):
     """Doppler Day of the Week Light class."""
