@@ -10,8 +10,10 @@ ISSUE_URL = "https://github.com/pa-innovation/ha-doppler/issues"
 PLATFORMS = ["light", "number", "select"]
 
 # Data keys
-ATTR_BUTTON_COLOR = "button_color"
-ATTR_DISPLAY_COLOR = "display_color"
+ATTR_DAY_BUTTON_COLOR = "day_button_color"
+ATTR_NIGHT_BUTTON_COLOR = "night_button_color"
+ATTR_DAY_DISPLAY_COLOR = "day_display_color"
+ATTR_NIGHT_DISPLAY_COLOR = "night_display_color"
 ATTR_DISPLAY_BRIGHTNESS = "display_brightness"
 ATTR_AUTO_BRIGHTNESS_ENABLED = "auto_brightness_enabled"
 ATTR_VOLUME_LEVEL = "volume_level"

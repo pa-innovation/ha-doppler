@@ -19,9 +19,11 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from . import DopplerDataUpdateCoordinator
 from .const import (
     ATTR_AUTO_BRIGHTNESS_ENABLED,
-    ATTR_BUTTON_COLOR,
+    ATTR_DAY_BUTTON_COLOR,
+    ATTR_NIGHT_BUTTON_COLOR,
     ATTR_DISPLAY_BRIGHTNESS,
-    ATTR_DISPLAY_COLOR,
+    ATTR_DAY_DISPLAY_COLOR,
+    ATTR_NIGHT_DISPLAY_COLOR,
     ATTR_DOTW_STATUS,
     DOMAIN,
 )
@@ -68,7 +70,7 @@ class DopplerDisplayLightDay(BaseDopplerLight):
     def rgb_color(self) -> tuple[int, int, int] | None:
         """Return the rgb color value [int, int, int]."""
         color: Color | None = self.coordinator.data[self.device.name][
-            ATTR_DISPLAY_COLOR
+            ATTR_DAY_DISPLAY_COLOR
         ]
         if not color:
             return None
@@ -114,7 +116,7 @@ class DopplerDisplayLightNight(BaseDopplerLight):
     def rgb_color(self) -> tuple[int, int, int] | None:
         """Return the rgb color value [int, int, int]."""
         color: Color | None = self.coordinator.data[self.device.name][
-            ATTR_DISPLAY_COLOR
+            ATTR_NIGHT_DISPLAY_COLOR
         ]
         if not color:
             return None
@@ -159,7 +161,7 @@ class DopplerButtonLightDay(BaseDopplerLight):
     @property
     def rgb_color(self) -> tuple[int, int, int] | None:
         """Return the rgb color value [int, int, int]."""
-        color: Color | None = self.coordinator.data[self.device.name][ATTR_BUTTON_COLOR]
+        color: Color | None = self.coordinator.data[self.device.name][ATTR_DAY_BUTTON_COLOR]
         if not color:
             return None
         return (color.red, color.green, color.blue)
@@ -184,7 +186,7 @@ class DopplerButtonLightNight(BaseDopplerLight):
     @property
     def rgb_color(self) -> tuple[int, int, int] | None:
         """Return the rgb color value [int, int, int]."""
-        color: Color | None = self.coordinator.data[self.device.name][ATTR_BUTTON_COLOR]
+        color: Color | None = self.coordinator.data[self.device.name][ATTR_NIGHT_BUTTON_COLOR]
         if not color:
             return None
         return (color.red, color.green, color.blue)
