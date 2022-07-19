@@ -38,11 +38,17 @@ class DopplerVolumeLevelNumber(DopplerEntity, NumberEntity):
     _attr_native_min_value = 0
     _attr_native_max_value = 100
 
-#    @property
-#    def value(self) -> int:
-#        """Return the current value."""
-#        return self.coordinator.data[self.device.name][ATTR_VOLUME_LEVEL]
+    # @property
+    # def value(self) -> int:
+    #     """Return the current value."""
+    #     return self.coordinator.data[self.device.name][ATTR_VOLUME_LEVEL]
 
+  
+    @property
+    def native_value(self) -> float |None:
+        """Return the current value"""
+        return self.coordinator.data[self.device.name][ATTR_VOLUME_LEVEL]
+    
     async def async_set_native_value(self, value:float) -> None:
         """Update the current volume value"""
         self._attr_native_value = value
