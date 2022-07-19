@@ -39,7 +39,8 @@ async def async_setup_entry(
     for device in coordinator.api.devices.values():
         entities.extend(
             [
-                DopplerDisplayLight(coordinator, entry, device, "Display"),
+                DopplerDisplayLightDay(coordinator, entry, device, "Day Display"),
+                DopplerDisplayLightNight(coordinator, entry, device, "Night Display"),
                 DopplerButtonLightDay(coordinator, entry, device, "Day Button"),
                 DopplerButtonLightNight(coordinator, entry, device, "Night Button"),
                 # DopplerDOTWLight(
@@ -50,7 +51,7 @@ async def async_setup_entry(
     async_add_devices(entities)
 
 
-class BaseDopplerLight(DopplerEntity, LightEntity):
+class BaseDopplerLightDay(DopplerEntity, LightEntity):
     """Base Doppler Light class."""
 
     _attr_color_mode = COLOR_MODE_RGB
@@ -58,6 +59,52 @@ class BaseDopplerLight(DopplerEntity, LightEntity):
 
 
 class DopplerDisplayLight(BaseDopplerLight):
+    """Doppler Display Light class."""
+
+    _attr_is_on = True
+    _attr_icon = "mdi:clock-digital"
+
+    @property
+    def rgb_color(self) -> tuple[int, int, int] | None:
+        """Return the rgb color value [int, int, int]."""
+        color: Color | None = self.coordinator.data[self.device.name][
+            ATTR_DISPLAY_COLOR
+        ]
+        if not color:
+            return None
+        return (color.red, color.green, color.blue)
+
+    @property
+    def brightness(self) -> int:
+        """Return the brightness of this light between 0..255."""
+        brightness = self.coordinator.data[self.device.name][ATTR_DISPLAY_BRIGHTNESS]
+        if brightness is not None:
+            return round((brightness / 100) * 255)
+        return 0
+
+    async def async_turn_on(self, **kwargs: Any) -> None:
+        """Turn the device on."""
+        brightness = kwargs.get(ATTR_BRIGHTNESS)
+        rgb_color = kwargs.get(ATTR_RGB_COLOR)
+        if brightness is not None:
+            if self.coordinator.data[self.device.name][ATTR_AUTO_BRIGHTNESS_ENABLED]:
+                _LOGGER.warning(
+                    "Diabling auto brightness since the brightness has been changed."
+                )
+                await self.coordinator.api.set_automatic_brightness_enabled(
+                    self.device, False
+                )
+            await self.coordinator.api.set_display_brightness(
+                self.device,
+                int(100 * brightness / 255 * max(rgb_color or self.rgb_color) / 255),
+            )
+        if rgb_color is not None:
+            await self.coordinator.api.set_display_color(
+                self.device, Color(rgb_color[0], rgb_color[1], rgb_color[2])
+            )
+
+
+class DopplerDisplayLightNight(BaseDopplerLight):
     """Doppler Display Light class."""
 
     _attr_is_on = True
