@@ -99,7 +99,7 @@ class DopplerDisplayLightDay(BaseDopplerLight):
                 int(100 * brightness / 255 * max(rgb_color or self.rgb_color) / 255),
             )
         if rgb_color is not None:
-            await self.coordinator.api.set_display_color(
+            await self.coordinator.api.set_day_display_color(
                 self.device, Color(rgb_color[0], rgb_color[1], rgb_color[2])
             )
 
@@ -145,7 +145,7 @@ class DopplerDisplayLightNight(BaseDopplerLight):
                 int(100 * brightness / 255 * max(rgb_color or self.rgb_color) / 255),
             )
         if rgb_color is not None:
-            await self.coordinator.api.set_display_color(
+            await self.coordinator.api.set_night_display_color(
                 self.device, Color(rgb_color[0], rgb_color[1], rgb_color[2])
             )
 
@@ -171,7 +171,7 @@ class DopplerButtonLightDay(BaseDopplerLight):
 
             await self.coordinator.api.set_sync_button_display_color(
                 self.device,False)
-            await self.coordinator.api.set_button_color(
+            await self.coordinator.api.set_day_button_color(
                 self.device, Color(rgb_color[0], rgb_color[1], rgb_color[2])
             )
 
@@ -196,7 +196,7 @@ class DopplerButtonLightNight(BaseDopplerLight):
 
             await self.coordinator.api.set_sync_button_display_color(
                 self.device,False)
-            await self.coordinator.api.set_button_color(
+            await self.coordinator.api.set_night_button_color(
                 self.device, Color(rgb_color[0], rgb_color[1], rgb_color[2])
             )
 
