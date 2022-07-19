@@ -51,14 +51,14 @@ async def async_setup_entry(
     async_add_devices(entities)
 
 
-class BaseDopplerLightDay(DopplerEntity, LightEntity):
+class BaseDopplerLight(DopplerEntity, LightEntity):
     """Base Doppler Light class."""
 
     _attr_color_mode = COLOR_MODE_RGB
     _attr_supported_color_modes = {COLOR_MODE_RGB}
 
 
-class DopplerDisplayLight(BaseDopplerLight):
+class DopplerDisplayLightDay(BaseDopplerLight):
     """Doppler Display Light class."""
 
     _attr_is_on = True
