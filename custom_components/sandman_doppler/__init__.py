@@ -68,6 +68,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             )
 
     entry.add_update_listener(async_reload_entry)
+
+    client.set_sync_button_display_color(False)
+
     return True
 
 
@@ -84,8 +87,7 @@ class DopplerDataUpdateCoordinator(DataUpdateCoordinator):
         self._entry = entry
 
         super().__init__(hass, _LOGGER, name=DOMAIN, update_interval=SCAN_INTERVAL)
-        await self.api.set_sync_button_display_color(False)
-
+        
         
     async def _async_update_data(self) -> dict[str, Any]:
         """Update data via library."""
