@@ -74,6 +74,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     mydevices= await client.get_devices();
     for device in mydevices.values():
         client.set_sync_button_display_color(device,False)
+        client.set_sync_day_night_color(device,False)
 
     
     return True
