@@ -33,6 +33,7 @@ from .const import (
     ATTR_VOLUME_LEVEL,
     ATTR_WEATHER,
     ATTR_WIFI,
+    ATTR_COLON_BLINK,
     DOMAIN,
     PLATFORMS,
     STARTUP_MESSAGE,
@@ -173,6 +174,9 @@ class DopplerDataUpdateCoordinator(DataUpdateCoordinator):
                 # await asyncio.sleep(0.5)
                 # device_data[ATTR_WIFI] = await self.api.get_wifi_status(device)
                 # await asyncio.sleep(0.5)
+
+                device_data[ATTR_COLON_BLINK]=await self.api.get_colon_blink_mode(device);
+                await(asyncio.sleep(0.5);
         except Exception as exception:
             raise UpdateFailed() from exception
 
