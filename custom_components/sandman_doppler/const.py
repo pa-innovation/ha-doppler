@@ -7,7 +7,7 @@ VERSION = "0.0.1"
 ISSUE_URL = "https://github.com/pa-innovation/ha-doppler/issues"
 
 # Platforms
-PLATFORMS = ["light", "number", "select"]
+PLATFORMS = ["light", "number", "select", "switch"]
 
 # Data keys
 ATTR_DAY_BUTTON_COLOR = "day_button_color"
