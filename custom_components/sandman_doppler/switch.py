@@ -10,7 +10,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import DopplerDataUpdateCoordinator
-from .const import ATTR_VOLUME_LEVEL, DOMAIN
+from .const import ATTR_COLON_BLINK, DOMAIN
 from .entity import DopplerEntity
 
 _LOGGER = logging.getLogger(__name__)
@@ -32,10 +32,18 @@ async def async_setup_entry(
 class ColonBlinkSwitch(DopplerEntity, SwitchEntity):
     """Doppler ColonBlink class."""
     _attr_device_class="switch"
+
+    @Property
+    def is_on(self) -> bool:
+        return self.coordinator.data[self.device.name][ATTR_COLON_BLINK]
+    
+    
     async def turn_on(self, **kwargs):
+         is_on = kwargs.get(ATTR_COLON_BLINK)
         """Turn Colon Blinking On"""
 
     async def turn_off(self, **kwargs):
+        is_on = kwargs.get(ATTR_COLON_BLINK)
         """Turn Colon Blink Off"""
 
 #    @property

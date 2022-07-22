@@ -26,7 +26,7 @@ ATTR_TIME_MODE = "time_mode"
 ATTR_DOTW_STATUS = "dotw_status"
 ATTR_WEATHER = "weather"
 ATTR_WIFI = "wifi"
-
+ATTR_COLON_BLINK ="colon_blink"
 
 # Configuration and options
 CONF_ENABLED = "enabled"
