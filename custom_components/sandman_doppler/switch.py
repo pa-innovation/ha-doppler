@@ -41,7 +41,7 @@ class ColonBlinkSwitch(DopplerEntity, SwitchEntity):
         is_on = kwargs.get(ATTR_COLON_BLINK)
         """Turn Colon Blink Off"""
 
-        @property
+    @property
     def is_on(self):
         """Return true if device is on."""
         return True
