@@ -72,7 +72,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 
 #    client.set_sync_button_display_color(False)
 
-    mydevices= await client.get_devices();
+    mydevices= await client.get_devices()
     for device in mydevices.values():
         await client.set_sync_button_display_color(device, False)
         await client.set_sync_day_night_color(device, False)
@@ -175,8 +175,8 @@ class DopplerDataUpdateCoordinator(DataUpdateCoordinator):
                 # device_data[ATTR_WIFI] = await self.api.get_wifi_status(device)
                 # await asyncio.sleep(0.5)
 
-                device_data[ATTR_COLON_BLINK]=await self.api.get_colon_blink_mode(device);
-                await(asyncio.sleep(0.5);
+                device_data[ATTR_COLON_BLINK]=await self.api.get_colon_blink_mode(device)
+                await asyncio.sleep(0.5)
         except Exception as exception:
             raise UpdateFailed() from exception
 
