@@ -44,7 +44,7 @@ class ColonBlinkSwitch(DopplerEntity, SwitchEntity):
     @property
     def is_on(self):
         """Return true if device is on."""
-        return True
+        return self.coordinator.data[self.device.name][ATTR_COLON_BLINK]
 #        return self._device["current_state"] > 0
 
 #    @property
