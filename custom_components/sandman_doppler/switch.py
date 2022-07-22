@@ -33,18 +33,19 @@ class ColonBlinkSwitch(DopplerEntity, SwitchEntity):
     """Doppler ColonBlink class."""
     _attr_device_class="switch"
 
-    @Property
-    def is_on(self) -> bool:
-        return self.coordinator.data[self.device.name][ATTR_COLON_BLINK]
-    
-    
     async def turn_on(self, **kwargs):
-         is_on = kwargs.get(ATTR_COLON_BLINK)
+        is_on = kwargs.get(ATTR_COLON_BLINK)
         """Turn Colon Blinking On"""
 
     async def turn_off(self, **kwargs):
         is_on = kwargs.get(ATTR_COLON_BLINK)
         """Turn Colon Blink Off"""
+
+        @property
+    def is_on(self):
+        """Return true if device is on."""
+        return True
+#        return self._device["current_state"] > 0
 
 #    @property
 #    def native_value(self) -> float |None:
