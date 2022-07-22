@@ -23,7 +23,7 @@ async def async_setup_entry(
     coordinator: DopplerDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]
     async_add_devices(
         [
-            ColonBlinkSwitch(coordinator, entry, device, "Volume Level")
+            ColonBlinkSwitch(coordinator, entry, device, "Blink Colon")
             for device in coordinator.api.devices.values()
         ]
     )
