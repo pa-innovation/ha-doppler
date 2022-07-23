@@ -35,13 +35,13 @@ class ColonBlinkSwitch(DopplerEntity, SwitchEntity):
 
     async def async_turn_on(self, **kwargs):
         """Turn Colon Blinking On"""
-        self.coordinator.data[self.device.name][ATTR_COLON_BLINK]=await self.coordinator.api.set_colon_blink_mode(
+        await self.coordinator.api.set_colon_blink_mode(
             self.device, True)
 
 
     async def async_turn_off(self, **kwargs):
         """Turn Colon Blink Off"""
-        self.coordinator.data[self.device.name][ATTR_COLON_BLINK]=await self.coordinator.api.set_colon_blink_mode(
+        await self.coordinator.api.set_colon_blink_mode(
             self.device, False)
         
 
