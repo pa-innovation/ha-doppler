@@ -25,13 +25,16 @@ async def async_setup_entry(
 ) -> None:
     """Setup sensor platform."""
     coordinator: DopplerDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]
-    async_add_devices(
-        [
-            ColonBlinkSwitch(coordinator, entry, device, "Blink Colon"),
-            UseColonSwitch(coordinator, entry, device, "Use Colon"),
-            for device in coordinator.api.devices.values()
-        ]
-    )
+    entities= []
+    for device in coordinator.api.devices.values():
+        entities.extend(
+            [
+                ColonBlinkSwitch(coordinator, entry, device, "Blink Colon"),
+                UseColonSwitch(coordinator, entry, device, "Use Colon"),
+    
+            ]
+        )
+    async_add_devices(entities)
 
 
 class ColonBlinkSwitch(DopplerEntity, SwitchEntity):
