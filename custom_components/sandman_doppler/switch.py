@@ -10,7 +10,11 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import DopplerDataUpdateCoordinator
-from .const import ATTR_COLON_BLINK, ATTR_USE_COLON, DOMAIN
+from .const import (
+    ATTR_COLON_BLINK,
+    ATTR_USE_COLON,
+    DOMAIN
+)
 from .entity import DopplerEntity
 
 _LOGGER = logging.getLogger(__name__)
@@ -23,8 +27,8 @@ async def async_setup_entry(
     coordinator: DopplerDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]
     async_add_devices(
         [
-            ColonBlinkSwitch(coordinator, entry, device, "Blink Colon")
-            UseColonSwitch(coordinator, entry, device, "Use Colon")
+            ColonBlinkSwitch(coordinator, entry, device, "Blink Colon"),
+            UseColonSwitch(coordinator, entry, device, "Use Colon"),
             for device in coordinator.api.devices.values()
         ]
     )
@@ -57,13 +61,13 @@ class UseColonSwitch(DopplerEntity, SwitchEntity):
     _attr_device_class="switch"
 
     async def async_turn_on(self, **kwargs):
-        """Turn Colon Blinking On"""
+        """Turn Colon On"""
         await self.coordinator.api.set_use_colon_mode(
             self.device, True)
 
 
     async def async_turn_off(self, **kwargs):
-        """Turn Colon Blink Off"""
+        """Turn Colon Off"""
         await self.coordinator.api.set_use_colon_mode(
             self.device, False)
         
