@@ -34,6 +34,7 @@ from .const import (
     ATTR_WEATHER,
     ATTR_WIFI,
     ATTR_COLON_BLINK,
+    ATTR_USE_COLON,
     DOMAIN,
     PLATFORMS,
     STARTUP_MESSAGE,
