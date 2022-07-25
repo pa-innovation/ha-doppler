@@ -138,13 +138,13 @@ class UseAscendingAlarmsSwitch(DopplerEntity, SwitchEntity):
     _attr_device_class="switch"
 
     async def async_turn_on(self, **kwargs):
-        """Turn Colon On"""
+        """Turn Ascending Alarms On"""
         await self.coordinator.api.set_alexa_ascending_alarms_mode(
             self.device, True)
 
 
     async def async_turn_off(self, **kwargs):
-        """Turn Colon Off"""
+        """Turn Ascending Alarms Off"""
         await self.coordinator.api.set_alexa_ascending_alarms_mode(
             self.device, False)
         
@@ -160,13 +160,13 @@ class UseTapTalkToneSwitch(DopplerEntity, SwitchEntity):
     _attr_device_class="switch"
 
     async def async_turn_on(self, **kwargs):
-        """Turn Colon On"""
+        """Turn TapTalk Tone On"""
         await self.coordinator.api.set_alexa_taptalk_tone_mode(
             self.device, True)
 
 
     async def async_turn_off(self, **kwargs):
-        """Turn Colon Off"""
+        """Turn TapTalk Tone Off"""
         await self.coordinator.api.set_alexa_taptalk_tone_mode(
             self.device, False)
         
@@ -174,6 +174,6 @@ class UseTapTalkToneSwitch(DopplerEntity, SwitchEntity):
     @property
     def is_on(self):
         """Return true if device is on."""
-        return self.coordinator.data[self.device.name][ATTR_ALEXA_USE_TAPTALK_TONE]
+        return self.coordinator.data[self.device.name][ATTR_ALEXA_TAPTALK_TONE]
 
     
