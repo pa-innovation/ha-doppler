@@ -14,6 +14,7 @@ from .const import (
     ATTR_COLON_BLINK,
     ATTR_USE_COLON,
     ATTR_USE_LEADING_ZERO,
+    ATTR_DISPLAY_SECONDS,
     DOMAIN
 )
 from .entity import DopplerEntity
@@ -33,6 +34,7 @@ async def async_setup_entry(
                 ColonBlinkSwitch(coordinator, entry, device, "Blink Colon"),
                 UseColonSwitch(coordinator, entry, device, "Use Colon"),
                 UseLeadingZeroSwitch(coordinator, entry, device, "Use Leading Zero"),
+                UseDisplaySecondsSwitch(coordinator, entry, device, "Display Seconds"),
     
             ]
         )
@@ -103,3 +105,27 @@ class UseLeadingZeroSwitch(DopplerEntity, SwitchEntity):
     def is_on(self):
         """Return true if device is on."""
         return self.coordinator.data[self.device.name][ATTR_USE_LEADING_ZERO]
+
+
+
+class UseDisplaySecondsSwitch(DopplerEntity, SwitchEntity):
+    """Doppler UseLeadingZero class."""
+    _attr_device_class="switch"
+
+    async def async_turn_on(self, **kwargs):
+        """Turn Colon On"""
+        await self.coordinator.api.set_display_seconds_mode(
+            self.device, True)
+
+
+    async def async_turn_off(self, **kwargs):
+        """Turn Colon Off"""
+        await self.coordinator.api.set_display_seconds_mode(
+            self.device, False)
+        
+
+    @property
+    def is_on(self):
+        """Return true if device is on."""
+        return self.coordinator.data[self.device.name][ATTR_DISPLAY_SECONDS]
+    

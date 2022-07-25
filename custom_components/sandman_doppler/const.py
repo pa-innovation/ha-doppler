@@ -29,6 +29,7 @@ ATTR_WIFI = "wifi"
 ATTR_COLON_BLINK = "colon_blink"
 ATTR_USE_COLON = "use_colon"
 ATTR_USE_LEADING_ZERO = "use_leading_zero"
+ATTR_DISPLAY_SECONDS = "display_seconds"
 
 # Configuration and options
 CONF_ENABLED = "enabled"

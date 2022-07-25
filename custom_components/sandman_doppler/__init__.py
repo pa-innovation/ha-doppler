@@ -36,6 +36,7 @@ from .const import (
     ATTR_COLON_BLINK,
     ATTR_USE_COLON,
     ATTR_USE_LEADING_ZERO,
+    ATTR_DISPLAY_SECONDS,
     DOMAIN,
     PLATFORMS,
     STARTUP_MESSAGE,
@@ -184,6 +185,9 @@ class DopplerDataUpdateCoordinator(DataUpdateCoordinator):
                 await asyncio.sleep(0.5)
 
                 device_data[ATTR_USE_LEADING_ZERO] = await self.api.get_use_leading_zero_mode(device)
+                await asyncio.sleep(0.5)
+
+                device_data[ATTR_DISPLAY_SECONDS] = await self.api.get_display_seconds_mode(device)
                 await asyncio.sleep(0.5)
                             
         except Exception as exception:
