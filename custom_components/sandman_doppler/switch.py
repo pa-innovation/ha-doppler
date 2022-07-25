@@ -38,7 +38,7 @@ async def async_setup_entry(
                 UseLeadingZeroSwitch(coordinator, entry, device, "Use Leading Zero"),
                 UseDisplaySecondsSwitch(coordinator, entry, device, "Display Seconds"),
                 UseAscendingAlarmsSwitch(coordinator, entry, device, "Alexa Use Ascending Alarms"),
-                UseTapTalkToneSwitch((coordinator, entry, device, "Alexa Tap to Talk Tone"),
+                UseTapTalkToneSwitch(coordinator, entry, device, "Alexa Tap to Talk Tone"),
             ]
         )
     async_add_devices(entities)
