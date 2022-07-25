@@ -28,6 +28,7 @@ ATTR_WEATHER = "weather"
 ATTR_WIFI = "wifi"
 ATTR_COLON_BLINK = "colon_blink"
 ATTR_USE_COLON = "use_colon"
+ATTR_USE_LEADING_ZERO = "use_leading_zero"
 
 # Configuration and options
 CONF_ENABLED = "enabled"

@@ -35,6 +35,7 @@ from .const import (
     ATTR_WIFI,
     ATTR_COLON_BLINK,
     ATTR_USE_COLON,
+    ATTR_USE_LEADING_ZERO,
     DOMAIN,
     PLATFORMS,
     STARTUP_MESSAGE,
@@ -180,6 +181,9 @@ class DopplerDataUpdateCoordinator(DataUpdateCoordinator):
                 await asyncio.sleep(0.5)
 
                 device_data[ATTR_USE_COLON] = await self.api.get_use_colon_mode(device)
+                await asyncio.sleep(0.5)
+
+                device_data[ATTR_USE_LEADING_ZERO] = await self.api.get_use_leading_zero_mode(device)
                 await asyncio.sleep(0.5)
                             
         except Exception as exception:
