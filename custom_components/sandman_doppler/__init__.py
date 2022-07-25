@@ -37,6 +37,7 @@ from .const import (
     ATTR_USE_COLON,
     ATTR_USE_LEADING_ZERO,
     ATTR_DISPLAY_SECONDS,
+    ATTR_ALEXA_USE_ASCENDING_ALARMS,
     DOMAIN,
     PLATFORMS,
     STARTUP_MESSAGE,
@@ -188,6 +189,9 @@ class DopplerDataUpdateCoordinator(DataUpdateCoordinator):
                 await asyncio.sleep(0.5)
 
                 device_data[ATTR_DISPLAY_SECONDS] = await self.api.get_display_seconds_mode(device)
+                await asyncio.sleep(0.5)
+
+                device_data[ATTR_ALEXA_USE_ASCENDING_ALARMS] = await self.api.get_alexa_ascending_alarms_mode(device)
                 await asyncio.sleep(0.5)
                             
         except Exception as exception:

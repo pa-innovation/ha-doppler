@@ -30,6 +30,7 @@ ATTR_COLON_BLINK = "colon_blink"
 ATTR_USE_COLON = "use_colon"
 ATTR_USE_LEADING_ZERO = "use_leading_zero"
 ATTR_DISPLAY_SECONDS = "display_seconds"
+ATTR_ALEXA_USE_ASCENDING_ALARMS = "alexa_ascending_alarms"
 
 # Configuration and options
 CONF_ENABLED = "enabled"

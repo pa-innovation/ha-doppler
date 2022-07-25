@@ -15,6 +15,7 @@ from .const import (
     ATTR_USE_COLON,
     ATTR_USE_LEADING_ZERO,
     ATTR_DISPLAY_SECONDS,
+    ATTR_ALEXA_USE_ASCENDING_ALARMS,
     DOMAIN
 )
 from .entity import DopplerEntity
@@ -35,6 +36,7 @@ async def async_setup_entry(
                 UseColonSwitch(coordinator, entry, device, "Use Colon"),
                 UseLeadingZeroSwitch(coordinator, entry, device, "Use Leading Zero"),
                 UseDisplaySecondsSwitch(coordinator, entry, device, "Display Seconds"),
+                UseAscendingAlarmsSwitch(coordinator, entry, device, "Alexa Use Ascending Alarms"),
     
             ]
         )
@@ -128,4 +130,27 @@ class UseDisplaySecondsSwitch(DopplerEntity, SwitchEntity):
     def is_on(self):
         """Return true if device is on."""
         return self.coordinator.data[self.device.name][ATTR_DISPLAY_SECONDS]
+
+
+class UseAscendingAlarmsSwitch(DopplerEntity, SwitchEntity):
+    """Doppler UseLeadingZero class."""
+    _attr_device_class="switch"
+
+    async def async_turn_on(self, **kwargs):
+        """Turn Colon On"""
+        await self.coordinator.api.set_alexa_ascending_alarms_mode(
+            self.device, True)
+
+
+    async def async_turn_off(self, **kwargs):
+        """Turn Colon Off"""
+        await self.coordinator.api.set_alexa_ascending_alarms_mode(
+            self.device, False)
+        
+
+    @property
+    def is_on(self):
+        """Return true if device is on."""
+        return self.coordinator.data[self.device.name][ATTR_ALEXA_USE_ASCENDING_ALARMS]
+
     
