@@ -175,8 +175,12 @@ class DopplerDataUpdateCoordinator(DataUpdateCoordinator):
                 # device_data[ATTR_WIFI] = await self.api.get_wifi_status(device)
                 # await asyncio.sleep(0.5)
 
-                device_data[ATTR_COLON_BLINK]=await self.api.get_colon_blink_mode(device)
+                device_data[ATTR_COLON_BLINK]= await self.api.get_colon_blink_mode(device)
                 await asyncio.sleep(0.5)
+
+                device_data[ATTR_USE_COLON] = await self.api.get_use_colon_mode(device)
+                await asyncio.sleep(0.5)
+                            
         except Exception as exception:
             raise UpdateFailed() from exception
 

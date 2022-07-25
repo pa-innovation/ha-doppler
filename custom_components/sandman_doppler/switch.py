@@ -24,6 +24,7 @@ async def async_setup_entry(
     async_add_devices(
         [
             ColonBlinkSwitch(coordinator, entry, device, "Blink Colon")
+            UseColonSwitch(coordinator, entry, device, "Use Colon")
             for device in coordinator.api.devices.values()
         ]
     )
@@ -49,16 +50,25 @@ class ColonBlinkSwitch(DopplerEntity, SwitchEntity):
     def is_on(self):
         """Return true if device is on."""
         return self.coordinator.data[self.device.name][ATTR_COLON_BLINK]
-#        return self._device["current_state"] > 0
-
-#    @property
-#    def native_value(self) -> float |None:
-#        """Return the current value"""
-#        return self.coordinator.data[self.device.name][ATTR_VOLUME_LEVEL]
-    
-#    async def async_set_native_value(self, value:float) -> None:
-#        """Update the current volume value"""
-#        self._attr_native_value = value
-#        await self.coordinator.api.set_volume_level(self.device,int(value))
 
 
+class UseColonSwitch(DopplerEntity, SwitchEntity):
+    """Doppler UseColon class."""
+    _attr_device_class="switch"
+
+    async def async_turn_on(self, **kwargs):
+        """Turn Colon Blinking On"""
+        await self.coordinator.api.set_use_colon_mode(
+            self.device, True)
+
+
+    async def async_turn_off(self, **kwargs):
+        """Turn Colon Blink Off"""
+        await self.coordinator.api.set_use_colon_mode(
+            self.device, False)
+        
+
+    @property
+    def is_on(self):
+        """Return true if device is on."""
+        return self.coordinator.data[self.device.name][ATTR_USE_COLON]
