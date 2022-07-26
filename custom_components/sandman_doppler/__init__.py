@@ -203,7 +203,20 @@ class DopplerDataUpdateCoordinator(DataUpdateCoordinator):
                 device_data[ATTR_ALEXA_WAKEWORD_TONE] = await self.api.get_alexa_wakeword_tone_mode(device)
                 await asyncio.sleep(0.5)
 
-                device_data[ATTR_SOUND_PRESET] = await self.api.get_sound_preset(device)
+                preset=await self.api.get_sound_preset(device)
+                if preset=="PRESET1":
+                    device_data[ATTR_SOUND_PRESET]="Preset 1"
+                elif preset=="PRESET2":
+                    device_data[ATTR_SOUND_PRESET]="Preset 2"
+                elif preset=="PRESET3":
+                    device_data[ATTR_SOUND_PRESET]="Preset 3"
+                elif preset=="PRESET4":
+                    device_data[ATTR_SOUND_PRESET]="Preset 4"
+                elif preset=="PRESET5":
+                    device_data[ATTR_SOUND_PRESET]="Preset 5 Untuned"
+
+
+                device_data[ATTR_SOUND_PRESET]
                 await asyncio.sleep(0.5)
                             
         except Exception as exception:

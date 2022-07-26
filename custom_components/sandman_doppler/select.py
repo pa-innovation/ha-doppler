@@ -54,7 +54,7 @@ class DopplerTimeModeNumber(DopplerEntity, SelectEntity):
 class DopplerSoundPresetSelect(DopplerEntity, SelectEntity):
     """Doppler Time Mode Select class."""
 
-    _attr_options = ["Preset 1", "Preset 2", "Preset 3", "Preset 4", "Preset 5"]
+    _attr_options = ["Preset 1", "Preset 2", "Preset 3", "Preset 4", "Preset 5 Untuned"]
 
     @property
     def current_option(self) -> str:
@@ -71,5 +71,5 @@ class DopplerSoundPresetSelect(DopplerEntity, SelectEntity):
             await self.coordinator.api.set_sound_preset(self.device, "PRESET3")
         elif option=="Preset 4":
             await self.coordinator.api.set_sound_preset(self.device, "PRESET4")        
-        elif option=="Preset 5":
+        elif option=="Preset 5 Untuned":
             await self.coordinator.api.set_sound_preset(self.device, "PRESET5")
