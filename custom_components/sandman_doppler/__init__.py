@@ -205,18 +205,16 @@ class DopplerDataUpdateCoordinator(DataUpdateCoordinator):
 
                 preset=await self.api.get_sound_preset(device)
                 if preset=="PRESET1":
-                    device_data[ATTR_SOUND_PRESET]="Preset 1"
+                    device_data[ATTR_SOUND_PRESET]="Preset 1 Balanced"
                 elif preset=="PRESET2":
-                    device_data[ATTR_SOUND_PRESET]="Preset 2"
+                    device_data[ATTR_SOUND_PRESET]="Preset 2 Bass Boost"
                 elif preset=="PRESET3":
-                    device_data[ATTR_SOUND_PRESET]="Preset 3"
+                    device_data[ATTR_SOUND_PRESET]="Preset 3 Treble Boost"
                 elif preset=="PRESET4":
-                    device_data[ATTR_SOUND_PRESET]="Preset 4"
+                    device_data[ATTR_SOUND_PRESET]="Preset 4 Mids Boost"
                 elif preset=="PRESET5":
                     device_data[ATTR_SOUND_PRESET]="Preset 5 Untuned"
 
-
-                device_data[ATTR_SOUND_PRESET]
                 await asyncio.sleep(0.5)
                             
         except Exception as exception:

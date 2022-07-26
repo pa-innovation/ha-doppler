@@ -63,13 +63,13 @@ class DopplerSoundPresetSelect(DopplerEntity, SelectEntity):
 
     async def async_select_option(self, option: str) -> None:
         """Change the selected option."""
-        if option=="Preset 1":
+        if option=="Preset 1 Balanced":
             await self.coordinator.api.set_sound_preset(self.device, "PRESET1")
-        elif option=="Preset 2":
+        elif option=="Preset 2 Bass Boost":
             await self.coordinator.api.set_sound_preset(self.device, "PRESET2")
-        elif option=="Preset 3":
+        elif option=="Preset 3 Treble Boost":
             await self.coordinator.api.set_sound_preset(self.device, "PRESET3")
-        elif option=="Preset 4":
+        elif option=="Preset 4 Mids Boost":
             await self.coordinator.api.set_sound_preset(self.device, "PRESET4")        
         elif option=="Preset 5 Untuned":
             await self.coordinator.api.set_sound_preset(self.device, "PRESET5")
