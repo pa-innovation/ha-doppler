@@ -41,6 +41,7 @@ from .const import (
     ATTR_ALEXA_TAPTALK_TONE,
     ATTR_ALEXA_WAKEWORD_TONE,
     ATTR_SOUND_PRESET,
+    ATTR_SOUND_PRSET_MODE,
     DOMAIN,
     PLATFORMS,
     STARTUP_MESSAGE,
@@ -215,6 +216,9 @@ class DopplerDataUpdateCoordinator(DataUpdateCoordinator):
                 elif preset=="PRESET5":
                     device_data[ATTR_SOUND_PRESET]="Preset 5 Untuned"
 
+                await asyncio.sleep(0.5)
+
+                device_data[ATTR_SOUND_PRESET_MODE] = await self.api.get_sound_preset_mode(device)
                 await asyncio.sleep(0.5)
                             
         except Exception as exception:

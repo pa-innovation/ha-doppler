@@ -18,6 +18,7 @@ from .const import (
     ATTR_ALEXA_USE_ASCENDING_ALARMS,
     ATTR_ALEXA_TAPTALK_TONE,
     ATTR_ALEXA_WAKEWORD_TONE,
+    ATTR_SOUND_PRSET_MODE,
     DOMAIN
 )
 from .entity import DopplerEntity
@@ -40,7 +41,8 @@ async def async_setup_entry(
                 UseDisplaySecondsSwitch(coordinator, entry, device, "Display Seconds"),
                 UseAscendingAlarmsSwitch(coordinator, entry, device, "Alexa Use Ascending Alarms"),
                 UseTapTalkToneSwitch(coordinator, entry, device, "Alexa Tap to Talk Tone"),
-                UseWakewordToneSwitch(coordinator, entry, device, "Alexa Wakeword Tone"),
+                SoundPresetModeSwitch(coordinator, entry, device, "Use Volume Dependent EQ"),
+                
             ]
         )
     async_add_devices(entities)
@@ -199,5 +201,30 @@ class UseWakewordToneSwitch(DopplerEntity, SwitchEntity):
     def is_on(self):
         """Return true if device is on."""
         return self.coordinator.data[self.device.name][ATTR_ALEXA_WAKEWORD_TONE]
+
+
+class SoundPresetModeSwitch(DopplerEntity, SwitchEntity):
+    """Doppler SoundPresetMode class."""
+    _attr_device_class="switch"
+
+    async def async_turn_on(self, **kwargs):
+        """Turn TapTalk Tone On"""
+        await self.coordinator.api.set_sound_preset_mode(
+            self.device, 1)
+
+
+    async def async_turn_off(self, **kwargs):
+        """Turn TapTalk Tone Off"""
+        await self.coordinator.api.set_sound_preset_mode(
+            self.device, 0)
+        
+
+    @property
+    def is_on(self):
+        """Return true if device is on."""
+        if self.coordinator.data[self.device.name][ATTR_ALEXA_WAKEWORD_TONE]==1:
+            return True
+        else:
+            return False
 
     
