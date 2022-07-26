@@ -16,7 +16,7 @@ from .const import (
     ATTR_USE_LEADING_ZERO,
     ATTR_DISPLAY_SECONDS,
     ATTR_ALEXA_USE_ASCENDING_ALARMS,
-    ATTR_ALEXA_USE_TAPTALK_TONE,
+    ATTR_ALEXA_TAPTALK_TONE,
     DOMAIN
 )
 from .entity import DopplerEntity
