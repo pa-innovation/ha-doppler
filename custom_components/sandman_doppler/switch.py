@@ -18,7 +18,7 @@ from .const import (
     ATTR_ALEXA_USE_ASCENDING_ALARMS,
     ATTR_ALEXA_TAPTALK_TONE,
     ATTR_ALEXA_WAKEWORD_TONE,
-    ATTR_SOUND_PRSET_MODE,
+    ATTR_SOUND_PRESET_MODE,
     DOMAIN
 )
 from .entity import DopplerEntity
