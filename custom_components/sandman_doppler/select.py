@@ -54,7 +54,13 @@ class DopplerTimeModeNumber(DopplerEntity, SelectEntity):
 class DopplerSoundPresetSelect(DopplerEntity, SelectEntity):
     """Doppler Time Mode Select class."""
 
-    _attr_options = ["Preset 1", "Preset 2", "Preset 3", "Preset 4", "Preset 5 Untuned"]
+    _attr_options = [
+        "Preset 1 Balanced",
+        "Preset 2 Bass Boost",
+        "Preset 3 Treble Boost",
+        "Preset 4 Mids Boost",
+        "Preset 5 Untuned"
+    ]
 
     @property
     def current_option(self) -> str:
