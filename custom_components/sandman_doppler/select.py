@@ -12,7 +12,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import DopplerDataUpdateCoordinator
-from .const import ATTR_TIME_MODE, ATTR_VOLUME_LEVEL, ATTR_AUDIO_PRESET, DOMAIN
+from .const import ATTR_TIME_MODE, ATTR_VOLUME_LEVEL, ATTR_SOUND_PRESET, DOMAIN
 from .entity import DopplerEntity
 
 _LOGGER = logging.getLogger(__name__)
