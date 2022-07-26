@@ -40,6 +40,7 @@ from .const import (
     ATTR_ALEXA_USE_ASCENDING_ALARMS,
     ATTR_ALEXA_TAPTALK_TONE,
     ATTR_ALEXA_WAKEWORD_TONE,
+    ATTR_SOUND_PRESET,
     DOMAIN,
     PLATFORMS,
     STARTUP_MESSAGE,
@@ -200,6 +201,9 @@ class DopplerDataUpdateCoordinator(DataUpdateCoordinator):
                 await asyncio.sleep(0.5)
 
                 device_data[ATTR_ALEXA_WAKEWORD_TONE] = await self.api.get_alexa_wakeword_tone_mode(device)
+                await asyncio.sleep(0.5)
+
+                device_data[ATTR_SOUND_PRESET] = await self.api.get_sound_preset(device)
                 await asyncio.sleep(0.5)
                             
         except Exception as exception:

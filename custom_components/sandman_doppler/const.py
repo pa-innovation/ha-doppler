@@ -33,6 +33,7 @@ ATTR_DISPLAY_SECONDS = "display_seconds"
 ATTR_ALEXA_USE_ASCENDING_ALARMS = "alexa_ascending_alarms"
 ATTR_ALEXA_TAPTALK_TONE = "alexa_taptalk_tone"
 ATTR_ALEXA_WAKEWORD_TONE = "alexa_wakeword_tone"
+ATTR_SOUND_PRESET = "sound_preset"
 
 # Configuration and options
 CONF_ENABLED = "enabled"
