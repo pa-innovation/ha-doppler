@@ -17,6 +17,7 @@ from .const import (
     ATTR_DISPLAY_SECONDS,
     ATTR_ALEXA_USE_ASCENDING_ALARMS,
     ATTR_ALEXA_TAPTALK_TONE,
+    ATTR_ALEXA_WAKEWORD_TONE,
     DOMAIN
 )
 from .entity import DopplerEntity
@@ -39,6 +40,7 @@ async def async_setup_entry(
                 UseDisplaySecondsSwitch(coordinator, entry, device, "Display Seconds"),
                 UseAscendingAlarmsSwitch(coordinator, entry, device, "Alexa Use Ascending Alarms"),
                 UseTapTalkToneSwitch(coordinator, entry, device, "Alexa Tap to Talk Tone"),
+                UseWakewordToneSwitch(coordinator, entry, device, "Alexa Tap to Talk Tone"),
             ]
         )
     async_add_devices(entities)
@@ -175,5 +177,27 @@ class UseTapTalkToneSwitch(DopplerEntity, SwitchEntity):
     def is_on(self):
         """Return true if device is on."""
         return self.coordinator.data[self.device.name][ATTR_ALEXA_TAPTALK_TONE]
+
+
+class UseWakewordToneSwitch(DopplerEntity, SwitchEntity):
+    """Doppler UseWakewordTone class."""
+    _attr_device_class="switch"
+
+    async def async_turn_on(self, **kwargs):
+        """Turn TapTalk Tone On"""
+        await self.coordinator.api.set_alexa_wakeword_tone_mode(
+            self.device, True)
+
+
+    async def async_turn_off(self, **kwargs):
+        """Turn TapTalk Tone Off"""
+        await self.coordinator.api.set_alexa_wakeword_tone_mode(
+            self.device, False)
+        
+
+    @property
+    def is_on(self):
+        """Return true if device is on."""
+        return self.coordinator.data[self.device.name][ATTR_ALEXA_WAKEWORD_TONE]
 
     
