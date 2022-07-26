@@ -23,13 +23,18 @@ async def async_setup_entry(
 ) -> None:
     """Setup sensor platform."""
     coordinator: DopplerDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]
-    async_add_devices(
-        [
-            DopplerTimeModeNumber(coordinator, entry, device, "Time Mode"),
-            DopplerSoundPresetSelect(coordinator, entry, device, "Audio Preset"),
-            for device in coordinator.api.devices.values()
-        ]
-    )
+
+    entities= []
+    for device in coordinator.api.devices.values():
+        entities.extend(
+            [
+                DopplerTimeModeNumber(coordinator, entry, device, "Time Mode"),
+                DopplerSoundPresetSelect(coordinator, entry, device, "Audio Preset"),
+            ]
+        )
+    async_add_devices(entities)
+
+    
 
 
 class DopplerTimeModeNumber(DopplerEntity, SelectEntity):
@@ -58,6 +63,13 @@ class DopplerSoundPresetSelect(DopplerEntity, SelectEntity):
 
     async def async_select_option(self, option: str) -> None:
         """Change the selected option."""
-        await self.coordinator.api.set_sound_preset(self.device, int(option))
-
-        
+        if option=="Preset 1":
+            await self.coordinator.api.set_sound_preset(self.device, "PRESET1")
+        elif option=="Preset 2":
+            await self.coordinator.api.set_sound_preset(self.device, "PRESET2")
+        elif option=="Preset 3":
+            await self.coordinator.api.set_sound_preset(self.device, "PRESET3")
+        elif option=="Preset 4":
+            await self.coordinator.api.set_sound_preset(self.device, "PRESET4")        
+        elif option=="Preset 5":
+            await self.coordinator.api.set_sound_preset(self.device, "PRESET5")
