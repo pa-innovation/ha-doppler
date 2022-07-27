@@ -1,7 +1,8 @@
 """Adds config flow for Blueprint."""
 from doppyler.client import DopplerClient
 from homeassistant import config_entries
-from homeassistant.const import CONF_EMAIL, CONF_PASSWORD
+from homeassistant.const import CONF_EMAIL, CONF_PASSWORD, CONF_LATITUDE, CONF_LONGITUDE
+from homeassistant.helpers import config_validation as cv
 from homeassistant.core import callback
 from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
@@ -48,7 +49,15 @@ class BlueprintFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id="user",
             data_schema=vol.Schema(
-                {vol.Required(CONF_EMAIL): str, vol.Required(CONF_PASSWORD): str}
+                {
+                    vol.Required(CONF_EMAIL): str,
+                    vol.Required(CONF_PASSWORD): str,
+                    vol.Required(CONF_LATITUDE,
+                                 default=self.hass.config.latitude): cv.latitude,
+                    vol.Required(CONF_LONGITUDE,
+                                 default=self.hass.config.longitude: cv.longitude
+                ): cv.longitude,
+                }
             ),
             errors=self._errors,
         )
