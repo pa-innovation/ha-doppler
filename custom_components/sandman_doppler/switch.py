@@ -41,6 +41,7 @@ async def async_setup_entry(
                 UseDisplaySecondsSwitch(coordinator, entry, device, "Display Seconds"),
                 UseAscendingAlarmsSwitch(coordinator, entry, device, "Alexa Use Ascending Alarms"),
                 UseTapTalkToneSwitch(coordinator, entry, device, "Alexa Tap to Talk Tone"),
+                UseWakewordToneSwitch(coordinator, entry, device, "Alexa Wakeword Tone"),
                 SoundPresetModeSwitch(coordinator, entry, device, "Use Volume Dependent EQ"),
                 
             ]
