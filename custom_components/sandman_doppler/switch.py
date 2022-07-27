@@ -208,13 +208,13 @@ class SoundPresetModeSwitch(DopplerEntity, SwitchEntity):
     _attr_device_class="switch"
 
     async def async_turn_on(self, **kwargs):
-        """Turn TapTalk Tone On"""
+        """Turn Volume Dependent EQ On"""
         await self.coordinator.api.set_sound_preset_mode(
             self.device, 1)
 
 
     async def async_turn_off(self, **kwargs):
-        """Turn TapTalk Tone Off"""
+        """Turn Volume Dependent EQ Off"""
         await self.coordinator.api.set_sound_preset_mode(
             self.device, 0)
         
@@ -222,7 +222,7 @@ class SoundPresetModeSwitch(DopplerEntity, SwitchEntity):
     @property
     def is_on(self):
         """Return true if device is on."""
-        if self.coordinator.data[self.device.name][ATTR_ALEXA_WAKEWORD_TONE]==1:
+        if self.coordinator.data[self.device.name][ATTR_SOUND_PRESET_MODE]==1:
             return True
         else:
             return False
