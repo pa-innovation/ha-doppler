@@ -55,8 +55,7 @@ class BlueprintFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                     vol.Required(CONF_LATITUDE,
                                  default=self.hass.config.latitude): cv.latitude,
                     vol.Required(CONF_LONGITUDE,
-                                 default=self.hass.config.longitude: cv.longitude
-                ): cv.longitude,
+                                 default=self.hass.config.longitude) : cv.longitude
                 }
             ),
             errors=self._errors,
