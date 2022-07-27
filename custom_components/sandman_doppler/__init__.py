@@ -42,6 +42,7 @@ from .const import (
     ATTR_ALEXA_WAKEWORD_TONE,
     ATTR_SOUND_PRESET,
     ATTR_SOUND_PRESET_MODE,
+    ATTR_WEATHER_ON,
     DOMAIN,
     PLATFORMS,
     STARTUP_MESSAGE,
@@ -219,6 +220,9 @@ class DopplerDataUpdateCoordinator(DataUpdateCoordinator):
                 await asyncio.sleep(0.5)
 
                 device_data[ATTR_SOUND_PRESET_MODE] = await self.api.get_sound_preset_mode(device)
+                await asyncio.sleep(0.5)
+
+                device_data[ATTR_WEATHER_ON] = await self.api.get_weather_status(device)
                 await asyncio.sleep(0.5)
                             
         except Exception as exception:

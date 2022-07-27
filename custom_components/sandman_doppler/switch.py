@@ -19,6 +19,7 @@ from .const import (
     ATTR_ALEXA_TAPTALK_TONE,
     ATTR_ALEXA_WAKEWORD_TONE,
     ATTR_SOUND_PRESET_MODE,
+    ATTR_WEATHER_ON,
     DOMAIN
 )
 from .entity import DopplerEntity
@@ -43,6 +44,7 @@ async def async_setup_entry(
                 UseTapTalkToneSwitch(coordinator, entry, device, "Alexa Tap to Talk Tone"),
                 UseWakewordToneSwitch(coordinator, entry, device, "Alexa Wakeword Tone"),
                 SoundPresetModeSwitch(coordinator, entry, device, "Use Volume Dependent EQ"),
+                DopplerWeatherSwitch(coordinator, entry, device, "Turn Weather Service ON/OFF"),
                 
             ]
         )
@@ -228,4 +230,24 @@ class SoundPresetModeSwitch(DopplerEntity, SwitchEntity):
         else:
             return False
 
+class DopplerWeatherSwitch(DopplerEntity, SwitchEntity):
+    """Doppler WeatherSwitch class."""
+    _attr_device_class="switch"
+
+    async def async_turn_on(self, **kwargs):
+        """Turn Colon On"""
+        await self.coordinator.api.set_weather_status(
+            self.device, True)
+
+
+    async def async_turn_off(self, **kwargs):
+        """Turn Colon Off"""
+        await self.coordinator.api.set_weather_status(
+            self.device, False)
+        
+
+    @property
+    def is_on(self):
+        """Return true if device is on."""
+        return self.coordinator.data[self.device.name][ATTR_WEATHER_ON]
     
