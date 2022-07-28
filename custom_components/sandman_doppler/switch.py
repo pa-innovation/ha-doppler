@@ -233,21 +233,12 @@ class SoundPresetModeSwitch(DopplerEntity, SwitchEntity):
 class DopplerWeatherSwitch(DopplerEntity, SwitchEntity):
     """Doppler WeatherSwitch class."""
     _attr_device_class="switch"
-    def __init__(
-        self,
-        coordinator: DopplerDataUpdateCoordinator,
-        config_entry: ConfigEntry,
-        device: Doppler,
-        name: str,
-    ):
-        self._latitude = config_entry[CONF_LATITUDE]
-        self._longitude = config_entry[CONF_LONGITUDE]
     
     async def async_turn_on(self, **kwargs):
         """Turn Colon On"""
         await self.coordinator.api.set_weather_status(
             self.device, True)
-        _LOGGER.warning(self._latitude)
+#        _LOGGER.warning(self._latitude)
 
     async def async_turn_off(self, **kwargs):
         """Turn Colon Off"""
