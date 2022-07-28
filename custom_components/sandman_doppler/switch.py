@@ -234,14 +234,14 @@ class DopplerWeatherSwitch(DopplerEntity, SwitchEntity):
     """Doppler WeatherSwitch class."""
     _attr_device_class="switch"
     def __init__(
-            self,
-            hass: HomeAssistant,
-            entry_data,
-            hass_data,
-            description: "Weather Service",
+        self,
+        coordinator: DopplerDataUpdateCoordinator,
+        config_entry: ConfigEntry,
+        device: Doppler,
+        name: str,
     ):
-        self._latitude = entry_data[CONF_LATITUDE]
-        self._longitude = entry_data[CONF_LONGITUDE]
+        self._latitude = config_entry[CONF_LATITUDE]
+        self._longitude = config_entry[CONF_LONGITUDE]
     
     async def async_turn_on(self, **kwargs):
         """Turn Colon On"""
