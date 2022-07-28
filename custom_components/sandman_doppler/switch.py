@@ -234,21 +234,11 @@ class DopplerWeatherSwitch(DopplerEntity, SwitchEntity):
     """Doppler WeatherSwitch class."""
     _attr_device_class="switch"
     
-    def __init__(
-            self,
-            coordinator: DopplerDataUpdateCoordinator,
-            config_entry: ConfigEntry,
-            device: Doppler,
-            name: str,
-    ):
-        self.entry=config_entry
-        super().init(coordinator,config_entry,device,name)
-    
     async def async_turn_on(self, **kwargs):
         """Turn Colon On"""
         await self.coordinator.api.set_weather_status(
             self.device, True)
-        _LOGGER.warning(self.entry[CONF_LATITUDE])
+        _LOGGER.warning(self.config_entry.data[CONF_LATITUDE])
 
     async def async_turn_off(self, **kwargs):
         """Turn Colon Off"""
