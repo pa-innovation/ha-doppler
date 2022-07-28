@@ -8,7 +8,7 @@ from homeassistant.components.switch import SwitchEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-
+from homeassistant.const import CONF_LATITUDE, CONF_LONGITUDE
 from . import DopplerDataUpdateCoordinator
 from .const import (
     ATTR_COLON_BLINK,
@@ -233,12 +233,21 @@ class SoundPresetModeSwitch(DopplerEntity, SwitchEntity):
 class DopplerWeatherSwitch(DopplerEntity, SwitchEntity):
     """Doppler WeatherSwitch class."""
     _attr_device_class="switch"
-
+    def __init__(
+            self,
+            hass: HomeAssistant,
+            entry_data,
+            hass_data,
+            description: "Weather Service",
+    ):
+        self._latitude = entry_data[CONF_LATITUDE]
+        self._longitude = entry_data[CONF_LONGITUDE]
+    
     async def async_turn_on(self, **kwargs):
         """Turn Colon On"""
         await self.coordinator.api.set_weather_status(
             self.device, True)
-
+        _LOGGER.warning(self._latitude)
 
     async def async_turn_off(self, **kwargs):
         """Turn Colon Off"""
