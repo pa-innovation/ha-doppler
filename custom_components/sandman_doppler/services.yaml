@@ -3,7 +3,6 @@ testservice:
   description: Test
   target:
     entity:
-      domain: test
       integration: sandman_doppler
   fields:
     test_field:
@@ -13,10 +12,10 @@ testservice:
       advanced: false
       example: "low"
       default: "high"
-      selector:
-        select:
-          options:
-            - "off"
-            - "low"
-            - "medium"
-            - "high"
+      time-selector:
+#        select:
+#          options:
+#            - "off"
+#            - "low"
+#            - "medium"
+#            - "high"
