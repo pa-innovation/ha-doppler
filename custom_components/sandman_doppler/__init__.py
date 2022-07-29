@@ -10,7 +10,7 @@ from aiohttp.client import ClientTimeout, DEFAULT_TIMEOUT
 from doppyler.client import DopplerClient
 from doppyler.model.doppler import Doppler
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_EMAIL, CONF_PASSWORD
+from homeassistant.const import CONF_EMAIL, CONF_PASSWORD, CONF_LATITUDE, CONF_LONGITUDE
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
 from homeassistant.helpers.device_registry import async_get
