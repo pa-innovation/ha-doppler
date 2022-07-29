@@ -5,18 +5,18 @@ testservice:
     entity:
       domain: test
       integration: sandman_doppler
-    fields:
-      test_field:
-        name: Testfield
-        description: Test
-        required: true
-        advanced: false
-        example: "low"
-        default: "high"
-        selector:
-          select:
-            options:
-              - "off"
-              - "low"
-              - "medium"
-              - "high"
+  fields:
+    test_field:
+      name: Testfield
+      description: Test
+      required: true
+      advanced: false
+      example: "low"
+      default: "high"
+      selector:
+        select:
+          options:
+            - "off"
+            - "low"
+            - "medium"
+            - "high"
