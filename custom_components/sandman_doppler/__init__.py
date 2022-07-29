@@ -79,7 +79,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             )
 
     entry.add_update_listener(async_reload_entry)
-    entry.async_on_unload(entry.add_update_listener(update_listener))
+    #entry.async_on_unload(entry.add_update_listener(update_listener))
+    entry.add_update_listener(update_listener)
 
     mydevices= await client.get_devices()
     for device in mydevices.values():
