@@ -80,14 +80,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 
     entry.add_update_listener(async_reload_entry)
     #entry.async_on_unload(entry.add_update_listener(update_listener))
-    entry.add_update_listener(update_listener)
+    #entry.add_update_listener(update_listener)
 
     mydevices= await client.get_devices()
     for device in mydevices.values():
         await client.set_sync_button_display_color(device, False)
         await client.set_sync_day_night_color(device, False)
         await client.set_sync_button_display_brightness(device, False)
-    
+        await client.set_weather_location(device, f"{entry.options.get(CONF_LATITUDE):.6f},{entry.options.get(CONF_LONGITUDE):.6f}")
     return True
 
 async def update_listener(hass,entry):
