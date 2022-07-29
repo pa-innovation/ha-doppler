@@ -1,0 +1,19 @@
+testservice:
+	name: Test Service
+	description: Test
+	target:
+	fields:
+		test_field:
+		name: Testfield
+		description: Test
+		required: true
+		advanced: false
+		example: "low"
+		default: "high"
+		selector:
+			select:
+				options:
+				  - "off"
+				  - "low"
+				  - "medium"
+				  - "high"
