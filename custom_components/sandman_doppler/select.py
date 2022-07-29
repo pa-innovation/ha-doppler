@@ -92,10 +92,10 @@ class DopplerWeatherModeSelect(DopplerEntity, SelectEntity):
                      "Daily Min F",        #5
                      "Daily Min C",        #6
                      "Daily Humidity Min", #7
-                     "Daily Humididy Max"  #8
+                     "Daily Humididy Max", #8
                      "Hourly F",           #9
                      "Hourly C",           #10
-                     "Hourly Humidity"     #11
+                     "Hourly Humidity",    #11
                      "Hourly AQI",         #12
                      ]
 
