@@ -90,6 +90,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     return True
 
 async def update_listener(hass,entry):
+    _LOGGER.warning("should be logging conf_latitude")
     _LOGGER.warning(entry.options.get(CONF_LATITUDE))
 
 
