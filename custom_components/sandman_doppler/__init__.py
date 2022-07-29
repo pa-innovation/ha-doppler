@@ -224,6 +224,9 @@ class DopplerDataUpdateCoordinator(DataUpdateCoordinator):
 
                 device_data[ATTR_WEATHER_ON] = await self.api.get_weather_status(device)
                 await asyncio.sleep(0.5)
+
+                device_data[ATTR_WEATHER_MODE] = await self.api.get_weather_mode(device)
+                await asyncio.sleep(0.5)
                             
         except Exception as exception:
             raise UpdateFailed() from exception
