@@ -79,7 +79,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             )
 
     entry.add_update_listener(async_reload_entry)
-
+    entry.async_on_unload(entry.add_update_listener(update_listener))
 
     mydevices= await client.get_devices()
     for device in mydevices.values():
@@ -88,6 +88,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         await client.set_sync_button_display_brightness(device, False)
     
     return True
+
+async def update_listener(hass,entry):
+    _LOGGER.warning(entry.options.get(CONF_LATITUDE))
 
 
 class DopplerDataUpdateCoordinator(DataUpdateCoordinator):
