@@ -4,6 +4,7 @@ from __future__ import annotations
 import asyncio
 from datetime import timedelta
 import logging
+import voluptuous as vol
 from typing import Any
 from aiohttp.client import ClientTimeout, DEFAULT_TIMEOUT
 
@@ -15,6 +16,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
 from homeassistant.helpers.device_registry import async_get
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
+from homeassistant.helpers import config_validation as cv
 
 from .const import (
     ATTR_ALARM_SOUNDS,
@@ -91,8 +93,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 
     def handle_test_service(call):
         _LOGGER.warning("Calling our test service")
+        
 
-    hass.services.async_register(DOMAIN,"testservice",handle_test_service)
+    hass.services.async_register(DOMAIN,"testservice",handle_test_service,
+                                 {
+                                     vol.Required("testfield"): cv.string
+                                 })
     
 
         
