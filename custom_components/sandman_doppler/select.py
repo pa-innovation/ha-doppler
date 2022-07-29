@@ -12,7 +12,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import DopplerDataUpdateCoordinator
-from .const import ATTR_TIME_MODE, ATTR_VOLUME_LEVEL, ATTR_SOUND_PRESET, DOMAIN
+from .const import ATTR_TIME_MODE, ATTR_VOLUME_LEVEL, ATTR_SOUND_PRESET, ATTR_WEATHER_MODE, DOMAIN
 from .entity import DopplerEntity
 
 _LOGGER = logging.getLogger(__name__)
@@ -30,6 +30,7 @@ async def async_setup_entry(
             [
                 DopplerTimeModeNumber(coordinator, entry, device, "Time Mode"),
                 DopplerSoundPresetSelect(coordinator, entry, device, "Audio Preset"),
+                DopplerWeatherModeSelect(coordinator, entry, device, "Weather Mode"),
             ]
         )
     async_add_devices(entities)
@@ -79,3 +80,33 @@ class DopplerSoundPresetSelect(DopplerEntity, SelectEntity):
             await self.coordinator.api.set_sound_preset(self.device, "PRESET4")        
         elif option=="Preset 5 Untuned":
             await self.coordinator.api.set_sound_preset(self.device, "PRESET5")
+
+class DopplerWeatherModeSelect(DopplerEntity, SelectEntity):
+    """Doppler Time Mode Select class."""
+
+    _attr_options = ["Off"                 #0
+                     "Daily Max F",        #1
+                     "Daily Max C",        #2
+                     "Daily Avg Humidity", #3
+                     "Daily AQI",          #4
+                     "Daily Min F",        #5
+                     "Daily Min C",        #6
+                     "Daily Humidity Min", #7
+                     "Daily Humididy Max"  #8
+                     "Hourly F",           #9
+                     "Hourly C",           #10
+                     "Hourly Humidity"     #11
+                     "Hourly AQI",         #12
+                     ]
+
+    @property
+    def current_option(self) -> str:
+        """Return the current option."""
+        return str(self.coordinator.data[self.device.name][ATTR_WEATHER_MODE])
+
+    async def async_select_option(self, option: str) -> str:
+        """Change the selected option."""
+        mode = await self.coordinator.api.set_weather_mode(self.device, _attr_options.index(option))
+        return _attr_options[mode]
+
+            

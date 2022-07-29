@@ -36,6 +36,7 @@ ATTR_ALEXA_WAKEWORD_TONE = "alexa_wakeword_tone"
 ATTR_SOUND_PRESET = "sound_preset"
 ATTR_SOUND_PRESET_MODE = "sound_preset_mode"
 ATTR_WEATHER_ON= "weather_on"
+ATTR_WEATHER_MODE = "weather_mode"
 
 # Configuration and options
 CONF_ENABLED = "enabled"

@@ -43,6 +43,7 @@ from .const import (
     ATTR_SOUND_PRESET,
     ATTR_SOUND_PRESET_MODE,
     ATTR_WEATHER_ON,
+    ATTR_WEATHER_MODE,
     DOMAIN,
     PLATFORMS,
     STARTUP_MESSAGE,
@@ -79,7 +80,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 
     entry.add_update_listener(async_reload_entry)
 
-#    client.set_sync_button_display_color(False)
 
     mydevices= await client.get_devices()
     for device in mydevices.values():
