@@ -2,6 +2,9 @@ testservice:
   name: Test Service
   description: Test
   target:
+    entity:
+      domain: test
+      integration: sandman_doppler
     fields:
       test_field:
         name: Testfield
