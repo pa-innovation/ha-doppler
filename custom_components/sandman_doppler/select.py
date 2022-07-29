@@ -84,7 +84,7 @@ class DopplerSoundPresetSelect(DopplerEntity, SelectEntity):
 class DopplerWeatherModeSelect(DopplerEntity, SelectEntity):
     """Doppler Time Mode Select class."""
 
-    _attr_options = ["Off"                 #0
+    _attr_options = ["Off" ,               #0
                      "Daily Max F",        #1
                      "Daily Max C",        #2
                      "Daily Avg Humidity", #3
@@ -106,7 +106,7 @@ class DopplerWeatherModeSelect(DopplerEntity, SelectEntity):
 
     async def async_select_option(self, option: str) -> str:
         """Change the selected option."""
-        mode = await self.coordinator.api.set_weather_mode(self.device, _attr_options.index(option))
-        return _attr_options[mode]
+        mode = await self.coordinator.api.set_weather_mode(self.device, self._attr_options.index(option))
+        return self._attr_options[mode]
 
             
