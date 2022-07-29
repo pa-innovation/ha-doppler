@@ -97,7 +97,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 
     hass.services.async_register(DOMAIN,"testservice",handle_test_service,
                                  {
-                                     vol.Required("testfield"): cv.string
+                                     vol.Required("test_field"): cv.string
                                  })
     
 

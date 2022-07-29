@@ -12,7 +12,8 @@ testservice:
       advanced: false
       example: "low"
       default: "high"
-      time-selector:
+      selector:
+        time:
 #        select:
 #          options:
 #            - "off"
