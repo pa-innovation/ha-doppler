@@ -91,8 +91,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         await client.set_sync_button_display_brightness(device, False)
         await client.set_weather_location(device, f"{entry.data.get(CONF_LATITUDE):.6f},{entry.data.get(CONF_LONGITUDE):.6f}")
 
-    def handle_test_service(call, test_field: str):
-        _LOGGER.warning(f"Calling our test service with {test_field}")
+    async def handle_test_service(call):
+        _LOGGER.warning(f"Calling our test service with {call[test_field]}")
         
 
     hass.services.async_register(DOMAIN,"testservice",handle_test_service,
