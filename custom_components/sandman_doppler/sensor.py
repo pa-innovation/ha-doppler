@@ -43,3 +43,6 @@ async def async_setup_entry(
 class DopplerLightSensor(SensorEntity):
     
     _attr_state_class = SensorStateClass(MEASURMENT)
+
+    def native_value(self):
+         return self.coordinator.data[self.device.name][ATTR_LIGHTSENSOR_VALUE]
