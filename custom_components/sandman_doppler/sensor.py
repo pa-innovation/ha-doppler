@@ -19,6 +19,7 @@ from . import DopplerDataUpdateCoordinator
 from .const import (
     ATTR_LIGHTSENSOR_VALUE,
     ATTR_DAYNIGHTMODE_VALUE,
+    ATTR_WIFI,
     DOMAIN,
 )
 from .entity import DopplerEntity
@@ -37,6 +38,9 @@ async def async_setup_entry(
             [
                 DopplerLightSensor(coordinator, entry, device, "Light Sensor Value"),
                 DopplerDayNightSensor(coordinator, entry, device, "Day/Night Mode"),
+                DopplerWifiUptimeSensor(coordinator, entry, device, "Wifi Uptime"),
+                DopplerWifiSSIDSensor(coordinator, entry, device, "Wifi SSID"),
+                DopplerWifiSignalStrengthSensor(coordinator, entry, device, "Wifi Signal Strength"),
             ]
         )
     async_add_devices(entities)
@@ -57,3 +61,30 @@ class DopplerDayNightSensor(DopplerEntity,SensorEntity):
     @property
     def native_value(self):
          return self.coordinator.data[self.device.name][ATTR_DAYNIGHTMODE_VALUE]
+
+
+class DopplerWifiUptimeSensor(DopplerEntity,SensorEntity):
+    
+    _attr_state_class = SensorStateClass.MEASUREMENT
+
+    @property
+    def native_value(self):
+         return self.coordinator.data[self.device.name][ATTR_WIFI].uptime
+
+     
+class DopplerWifiSSIDSensor(DopplerEntity,SensorEntity):
+    
+    _attr_state_class = SensorStateClass.MEASUREMENT
+
+    @property
+    def native_value(self):
+         return self.coordinator.data[self.device.name][ATTR_WIFI].ssid
+
+class DopplerWifiSignalStrengthSensor(DopplerEntity,SensorEntity):
+    
+    _attr_state_class = SensorStateClass.MEASUREMENT
+
+    @property
+    def native_value(self):
+        return "Unimplemented"
+#         return self.coordinator.data[self.device.name][ATTR_WIFI]

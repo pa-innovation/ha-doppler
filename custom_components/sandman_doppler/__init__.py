@@ -199,8 +199,8 @@ class DopplerDataUpdateCoordinator(DataUpdateCoordinator):
                 #     device
                 # )
                 # await asyncio.sleep(0.5)
-                # device_data[ATTR_WIFI] = await self.api.get_wifi_status(device)
-                # await asyncio.sleep(0.5)
+                device_data[ATTR_WIFI] = await self.api.get_wifi_status(device)
+                await asyncio.sleep(0.5)
 
                 device_data[ATTR_COLON_BLINK]= await self.api.get_colon_blink_mode(device)
                 await asyncio.sleep(0.5)
