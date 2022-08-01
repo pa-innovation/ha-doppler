@@ -39,7 +39,7 @@ async def async_setup_entry(
         )
     async_add_devices(entities)
 
-class DopplerLightSensor(SensorEntity):
+class DopplerLightSensor(DopplerEntity,SensorEntity):
     
     _attr_state_class = SensorStateClass.MEASUREMENT
 
