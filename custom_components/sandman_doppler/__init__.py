@@ -46,6 +46,7 @@ from .const import (
     ATTR_SOUND_PRESET_MODE,
     ATTR_WEATHER_ON,
     ATTR_WEATHER_MODE,
+    ATTR_LIGHTSENSOR_VALUE,
     DOMAIN,
     PLATFORMS,
     STARTUP_MESSAGE,
@@ -95,9 +96,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         _LOGGER.warning(f"Calling our test service {call.data['test_field']}")
 
     hass.services.async_register(DOMAIN,"testservice",handle_test_service)
-#                                 {
-#                                     vol.Required("test_field"): cv.string
-#                                 })
+
     
 
         
