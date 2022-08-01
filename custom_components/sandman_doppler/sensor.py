@@ -86,5 +86,4 @@ class DopplerWifiSignalStrengthSensor(DopplerEntity,SensorEntity):
 
     @property
     def native_value(self):
-        return "Unimplemented"
-#         return self.coordinator.data[self.device.name][ATTR_WIFI]
+        return self.coordinator.data[self.device.name][ATTR_WIFI].signalstrength
