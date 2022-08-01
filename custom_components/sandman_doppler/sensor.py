@@ -18,6 +18,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from . import DopplerDataUpdateCoordinator
 from .const import (
     ATTR_LIGHTSENSOR_VALUE,
+    ATTR_DAYNIGHTMODE_VALUE,
     DOMAIN,
 )
 from .entity import DopplerEntity
@@ -46,3 +47,12 @@ class DopplerLightSensor(DopplerEntity,SensorEntity):
     @property
     def native_value(self):
          return self.coordinator.data[self.device.name][ATTR_LIGHTSENSOR_VALUE]
+
+
+class DopplerDayNightSensor(DopplerEntity,SensorEntity):
+    
+    _attr_state_class = SensorStateClass.MEASUREMENT
+
+    @property
+    def native_value(self):
+         return self.coordinator.data[self.device.name][ATTR_DAYNIGHTMODE_VALUE]

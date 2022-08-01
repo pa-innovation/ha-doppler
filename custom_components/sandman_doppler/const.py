@@ -38,6 +38,7 @@ ATTR_SOUND_PRESET_MODE = "sound_preset_mode"
 ATTR_WEATHER_ON= "weather_on"
 ATTR_WEATHER_MODE = "weather_mode"
 ATTR_LIGHTSENSOR_VALUE = "lightsensor"
+ATTR_DAYNIGHTMODE_VALUE = "daynight"
 
 # Configuration and options
 CONF_ENABLED = "enabled"
