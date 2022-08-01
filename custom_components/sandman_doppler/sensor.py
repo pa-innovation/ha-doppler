@@ -42,4 +42,4 @@ async def async_setup_entry(
 
 class DopplerLightSensor(SensorEntity):
     
-    
+    _attr_state_class = SensorStateClass(MEASURMENT)
