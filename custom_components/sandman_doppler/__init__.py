@@ -245,7 +245,7 @@ class DopplerDataUpdateCoordinator(DataUpdateCoordinator):
                 device_data[ATTR_WEATHER_MODE] = await self.api.get_weather_mode(device)
                 await asyncio.sleep(0.5)
 
-                device_data[ATTR_LIGHTSESNOR_VALUE] = await self.api.get_lightsensor_value(device)
+                device_data[ATTR_LIGHTSENSOR_VALUE] = await self.api.get_lightsensor_value(device)
                 await asyncio.sleep(0.5)
                             
         except Exception as exception:
