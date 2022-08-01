@@ -92,7 +92,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         await client.set_weather_location(device, f"{entry.data.get(CONF_LATITUDE):.6f},{entry.data.get(CONF_LONGITUDE):.6f}")
 
     async def handle_test_service(call):
-        _LOGGER.warning(f"Calling our test service {call.data['test_field'}")
+        _LOGGER.warning(f"Calling our test service {call.data['test_field']}")
 
     hass.services.async_register(DOMAIN,"testservice",handle_test_service)
 #                                 {
@@ -244,6 +244,9 @@ class DopplerDataUpdateCoordinator(DataUpdateCoordinator):
                 await asyncio.sleep(0.5)
 
                 device_data[ATTR_WEATHER_MODE] = await self.api.get_weather_mode(device)
+                await asyncio.sleep(0.5)
+
+                device_data[ATTR_LIGHTSESNOR_VALUE] = await self.api.get_lightsensor_value(device)
                 await asyncio.sleep(0.5)
                             
         except Exception as exception:

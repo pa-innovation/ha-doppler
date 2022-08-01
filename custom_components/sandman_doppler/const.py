@@ -7,7 +7,7 @@ VERSION = "0.0.1"
 ISSUE_URL = "https://github.com/pa-innovation/ha-doppler/issues"
 
 # Platforms
-PLATFORMS = ["light", "number", "select", "switch"]
+PLATFORMS = ["light", "number", "select", "switch", "sensor"]
 
 # Data keys
 ATTR_DAY_BUTTON_COLOR = "day_button_color"
@@ -37,6 +37,7 @@ ATTR_SOUND_PRESET = "sound_preset"
 ATTR_SOUND_PRESET_MODE = "sound_preset_mode"
 ATTR_WEATHER_ON= "weather_on"
 ATTR_WEATHER_MODE = "weather_mode"
+ATTR_LIGHTSENSOR_VALUE = "lightsensor"
 
 # Configuration and options
 CONF_ENABLED = "enabled"
