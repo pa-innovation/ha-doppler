@@ -43,5 +43,6 @@ class DopplerLightSensor(DopplerEntity,SensorEntity):
     
     _attr_state_class = SensorStateClass.MEASUREMENT
 
+    @property
     def native_value(self):
          return self.coordinator.data[self.device.name][ATTR_LIGHTSENSOR_VALUE]
