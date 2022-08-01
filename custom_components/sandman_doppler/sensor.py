@@ -36,6 +36,7 @@ async def async_setup_entry(
         entities.extend(
             [
                 DopplerLightSensor(coordinator, entry, device, "Light Sensor Value"),
+                DopplerDayNightSensor(coordinator, entry, device, "Day/Night Mode"),
             ]
         )
     async_add_devices(entities)
