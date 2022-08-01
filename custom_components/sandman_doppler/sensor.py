@@ -5,7 +5,6 @@ import logging
 from typing import Any
 
 from homeassistant.components.sensor import (
-    DOMAIN,
     SensorDeviceClass,
     SensorEntity,
     SensorEntityDescription,
@@ -18,7 +17,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import DopplerDataUpdateCoordinator
 from .const import (
-    ATTR_LIGHTSENSOR_VALUE
+    ATTR_LIGHTSENSOR_VALUE,
     DOMAIN,
 )
 from .entity import DopplerEntity
