@@ -14,9 +14,20 @@ testservice:
       default: "high"
       selector:
         time:
-#        select:
-#          options:
-#            - "off"
-#            - "low"
-#            - "medium"
-#            - "high"
+timezoneservice:
+  name: Timezone
+  description: Sets Timezone
+  target:
+    entity:
+      integration: sandman_doppler
+  fields:
+    timezone:
+      name: timezone
+      description: Timezone to set
+      required: true
+      advanced: false
+      example: "America/Los_Angeles"
+      default: "UTC"
+      selector:
+        text:
+

@@ -95,8 +95,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 
     async def handle_test_service(call):
         _LOGGER.warning(f"Calling our test service {call.data['test_field']}")
+    async def handle_timezone_service(call):
+        _LOGGER.warning(f"Calling our test service {call.data['timezone']}")
+        
 
     hass.services.async_register(DOMAIN,"testservice",handle_test_service)
+    hass.services.async_register(DOMAIN,"timezoneservice",handle_timezone_service)
 
     
 
