@@ -1,33 +1,14 @@
-testservice:
-  name: Test Service
-  description: Test
+setalarmservice:
+  name: Set Alarm
+  description: Sets an Alarm on the Doppler
   target:
     entity:
       integration: sandman_doppler
   fields:
-    test_field:
-      name: Testfield
-      description: Test
+    alarm_time:
+      name: Alarm Time
+      description: The time of the alarm to set
       required: true
       advanced: false
-      example: "low"
-      default: "high"
       selector:
         time:
-timezoneservice:
-  name: Timezone
-  description: Sets Timezone
-  target:
-    entity:
-      integration: sandman_doppler
-  fields:
-    timezone:
-      name: Timezone
-      description: Timezone to set
-      required: true
-      advanced: false
-      example: "America/Los_Angeles"
-      default: "UTC"
-      selector:
-        text:
-

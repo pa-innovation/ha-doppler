@@ -96,14 +96,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         await client.set_sync_button_display_brightness(device, False)
         await client.set_weather_location(device, f"{entry.data.get(CONF_LATITUDE):.6f},{entry.data.get(CONF_LONGITUDE):.6f}")
 
-    async def handle_test_service(call):
-        _LOGGER.warning(f"Calling our test service {call.data['test_field']}")
-    async def handle_timezone_service(call):
-        _LOGGER.warning(f"Calling our test service {call.data['timezone']}")
+    async def handle_set_alarm_service(call):
+        _LOGGER.warning(f"Calling our test service {call.data['alarm_time']}")
         
 
-    hass.services.async_register(DOMAIN,"testservice",handle_test_service)
-    hass.services.async_register(DOMAIN,"timezoneservice",handle_timezone_service)
+    hass.services.async_register(DOMAIN,"setalarmservice",handle_set_alarm_service)
+
 
     
 
