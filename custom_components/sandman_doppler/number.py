@@ -12,7 +12,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import DopplerDataUpdateCoordinator
-from .const import ATTR_VOLUME_LEVEL, DOMAIN
+from .const import ATTR_VOLUME_LEVEL, ATTR_TIMEOFFSET,DOMAIN
 from .entity import DopplerEntity
 
 _LOGGER = logging.getLogger(__name__)
