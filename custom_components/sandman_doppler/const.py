@@ -39,6 +39,7 @@ ATTR_WEATHER_ON= "weather_on"
 ATTR_WEATHER_MODE = "weather_mode"
 ATTR_LIGHTSENSOR_VALUE = "lightsensor"
 ATTR_DAYNIGHTMODE_VALUE = "daynight"
+ATTR_TIMEOFFSET = "timeoffset"
 
 # Configuration and options
 CONF_ENABLED = "enabled"

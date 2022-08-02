@@ -48,6 +48,7 @@ from .const import (
     ATTR_WEATHER_MODE,
     ATTR_LIGHTSENSOR_VALUE,
     ATTR_DAYNIGHTMODE_VALUE,
+    ATTR_TIMEOFFSET,
     DOMAIN,
     PLATFORMS,
     STARTUP_MESSAGE,
@@ -255,7 +256,11 @@ class DopplerDataUpdateCoordinator(DataUpdateCoordinator):
 
                 device_data[ATTR_DAYNIGHTMODE_VALUE] = await self.api.get_daynightmode_value(device)
                 await asyncio.sleep(0.5)
-                            
+
+                device_data[ATTR_TIMEOFFSET] = await self.api.get_offset(device)
+                await asyncio.sleep(0.5)
+
+                
         except Exception as exception:
             raise UpdateFailed() from exception
 

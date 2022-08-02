@@ -22,7 +22,7 @@ timezoneservice:
       integration: sandman_doppler
   fields:
     timezone:
-      name: timezone
+      name: Timezone
       description: Timezone to set
       required: true
       advanced: false

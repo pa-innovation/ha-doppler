@@ -25,7 +25,8 @@ async def async_setup_entry(
     coordinator: DopplerDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]
     async_add_devices(
         [
-            DopplerVolumeLevelNumber(coordinator, entry, device, "Volume Level")
+            DopplerVolumeLevelNumber(coordinator, entry, device, "Volume Level"),
+            DopplerTimeOffsetNumber(coordinator, entry, device, "Time Offset"),
             for device in coordinator.api.devices.values()
         ]
     )
@@ -53,5 +54,23 @@ class DopplerVolumeLevelNumber(DopplerEntity, NumberEntity):
         """Update the current volume value"""
         self._attr_native_value = value
         await self.coordinator.api.set_volume_level(self.device,int(value))
+
+
+class DopplerTimeOffsetNumber(DopplerEntity, NumberEntity):
+    """Doppler Volume Level Number class."""
+
+    _attr_native_step = 1
+    _attr_native_min_value = -128
+    _attr_native_max_value = +127
+
+    @property
+    def native_value(self) -> float |None:
+        """Return the current value"""
+        return self.coordinator.data[self.device.name][ATTR_TIMEOFFSET]
+    
+    async def async_set_native_value(self, value:float) -> None:
+        """Update the current volume value"""
+        self._attr_native_value = value
+        await self.coordinator.api.set_offset(self.device,int(value))
 
 
