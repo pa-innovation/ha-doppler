@@ -50,6 +50,7 @@ from .const import (
     ATTR_DAYNIGHTMODE_VALUE,
     ATTR_TIMEOFFSET,
     ATTR_TIMEZONE,
+    WEATHER_OPTIONS,
     DOMAIN,
     PLATFORMS,
     STARTUP_MESSAGE,
@@ -249,7 +250,7 @@ class DopplerDataUpdateCoordinator(DataUpdateCoordinator):
                 device_data[ATTR_WEATHER_ON] = await self.api.get_weather_status(device)
                 await asyncio.sleep(0.5)
 
-                device_data[ATTR_WEATHER_MODE] = await self.api.get_weather_mode(device)
+                device_data[ATTR_WEATHER_MODE] = WEATHER_OPTIONS[await self.api.get_weather_mode(device)]
                 await asyncio.sleep(0.5)
 
                 device_data[ATTR_LIGHTSENSOR_VALUE] = await self.api.get_lightsensor_value(device)

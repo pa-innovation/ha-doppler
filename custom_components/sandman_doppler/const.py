@@ -58,3 +58,20 @@ If you have any issues with this you need to open an issue here:
 {ISSUE_URL}
 -------------------------------------------------------------------
 """
+
+
+#Weather modes
+WEATHER_OPTIONS = ["Off" ,               #0
+                   "Daily Max F",        #1
+                   "Daily Max C",        #2
+                   "Daily Avg Humidity", #3
+                   "Daily AQI",          #4
+                   "Daily Min F",        #5
+                   "Daily Min C",        #6
+                   "Daily Humidity Min", #7
+                   "Daily Humididy Max", #8
+                   "Hourly F",           #9
+                   "Hourly C",           #10
+                   "Hourly Humidity",    #11
+                   "Hourly AQI",         #12
+                   ]

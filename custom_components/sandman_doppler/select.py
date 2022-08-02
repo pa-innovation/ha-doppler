@@ -12,7 +12,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import DopplerDataUpdateCoordinator
-from .const import ATTR_TIME_MODE, ATTR_VOLUME_LEVEL, ATTR_SOUND_PRESET, ATTR_WEATHER_MODE,ATTR_TIMEZONE, DOMAIN
+from .const import ATTR_TIME_MODE, ATTR_VOLUME_LEVEL, ATTR_SOUND_PRESET, ATTR_WEATHER_MODE,ATTR_TIMEZONE, WEATHER_OPTIONS, DOMAIN
 from .entity import DopplerEntity
 
 _LOGGER = logging.getLogger(__name__)
@@ -85,20 +85,7 @@ class DopplerSoundPresetSelect(DopplerEntity, SelectEntity):
 class DopplerWeatherModeSelect(DopplerEntity, SelectEntity):
     """Doppler Time Mode Select class."""
 
-    _attr_options = ["Off" ,               #0
-                     "Daily Max F",        #1
-                     "Daily Max C",        #2
-                     "Daily Avg Humidity", #3
-                     "Daily AQI",          #4
-                     "Daily Min F",        #5
-                     "Daily Min C",        #6
-                     "Daily Humidity Min", #7
-                     "Daily Humididy Max", #8
-                     "Hourly F",           #9
-                     "Hourly C",           #10
-                     "Hourly Humidity",    #11
-                     "Hourly AQI",         #12
-                     ]
+    _attr_options = WEATHER_OPTIONS
 
     @property
     def current_option(self) -> str:
