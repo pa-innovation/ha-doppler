@@ -91,10 +91,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 
     mydevices= await client.get_devices()
     for device in mydevices.values():
-        await client.set_sync_button_display_color(device, False)
-        await client.set_sync_day_night_color(device, False)
-        await client.set_sync_button_display_brightness(device, False)
-        await client.set_weather_location(device, f"{entry.data.get(CONF_LATITUDE):.6f},{entry.data.get(CONF_LONGITUDE):.6f}")
+    await client.set_sync_button_display_color(device, False)
+    await client.set_sync_day_night_color(device, False)
+    await client.set_sync_button_display_brightness(device, False)
+    await client.set_weather_location(device, f"{entry.data.get(CONF_LATITUDE):.6f},{entry.data.get(CONF_LONGITUDE):.6f}")
 
     async def handle_test_service(call):
         _LOGGER.warning(f"Calling our test service {call.data['test_field']}")
@@ -149,6 +149,7 @@ class DopplerDataUpdateCoordinator(DataUpdateCoordinator):
                 self._dev_reg.async_get_or_create(
                     config_entry_id=self._entry.entry_id,
                     identifiers={(DOMAIN, device.id)},
+                    dsn=device.device_info.dsn,
                     manufacturer=device.device_info.manufacturer,
                     model=device.device_info.model_number,
                     sw_version=device.device_info.software_version,
