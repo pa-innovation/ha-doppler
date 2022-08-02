@@ -12,7 +12,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import DopplerDataUpdateCoordinator
-from .const import ATTR_TIME_MODE, ATTR_VOLUME_LEVEL, ATTR_SOUND_PRESET, ATTR_WEATHER_MODE, DOMAIN
+from .const import ATTR_TIME_MODE, ATTR_VOLUME_LEVEL, ATTR_SOUND_PRESET, ATTR_WEATHER_MODE,ATTR_TIMEZONE, DOMAIN
 from .entity import DopplerEntity
 
 _LOGGER = logging.getLogger(__name__)
@@ -31,6 +31,7 @@ async def async_setup_entry(
                 DopplerTimeModeNumber(coordinator, entry, device, "Time Mode"),
                 DopplerSoundPresetSelect(coordinator, entry, device, "Audio Preset"),
                 DopplerWeatherModeSelect(coordinator, entry, device, "Weather Mode"),
+                DopplerTimezoneSelect(coordinator, entry, device, "Timezone"),
             ]
         )
     async_add_devices(entities)
@@ -108,5 +109,68 @@ class DopplerWeatherModeSelect(DopplerEntity, SelectEntity):
         """Change the selected option."""
         mode = await self.coordinator.api.set_weather_mode(self.device, self._attr_options.index(option))
         return self._attr_options[mode]
+    
+
+class DopplerTimezoneSelect(DopplerEntity, SelectEntity):
+    """Doppler Timezone Select class."""
+
+    _attr_options = [
+        "UTC",
+        "US/Samoa",
+        "US/Hawaii",
+        "US/Aleutian",
+        "Pacific/Marquesas",
+        "Pacific/Gambier",
+        "US/Alaska",
+        "US/Pacific",
+        "US/Arizona",
+        "US/Mountain",
+        "Canada/Saskatchewan",
+        "US/Central",
+        "America/Panama",
+        "US/Eastern",
+        "America/Puerto_Rico",
+        "America/Caracas",
+        "Canada/Newfoundland",
+        "Canada/Atlantic",
+        "Brazil", 
+        "Brazil/DeNoronha",
+        "Atlantic/Cape_Verde",
+        "Europe/London",
+        "Europe/Prague",
+        "Africa/Harare",
+        "Asia/Jerusalem",
+        "Asia/Baghdad",
+        "Asia/Muscat",
+        "Asia/Tehran",
+        "Asia/Kabul",
+        "Asia/Tashkent",
+        "Asia/Kolkata",
+        "Asia/Kathmandu",
+        "Asia/Dhaka",
+        "Asia/Rangoon",
+        "Asia/Bangkok",
+        "Australia/Perth",
+        "Australia/Eucla",
+        "Asia/Seoul",
+        "Australia/Darwin",
+        "Australia/Queensland",
+        "Australia/Adelaide",
+        "Asia/Magadan",
+        "Australia/Sydney",
+        "Pacific/Auckland",
+        "Pacific/Tongatapu",
+        "Pacific/Chatham",
+    ]
+
+    @property
+    def current_option(self) -> str:
+        """Return the current option."""
+        return str(self.coordinator.data[self.device.name][ATTR_TIMEZONE])
+
+    async def async_select_option(self, option: str) -> str:
+        """Change the selected option."""
+        mode = await self.coordinator.api.set_timezone(self.device,option)
+        return str(mode)
 
             

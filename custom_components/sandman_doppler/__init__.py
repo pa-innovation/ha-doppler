@@ -49,6 +49,7 @@ from .const import (
     ATTR_LIGHTSENSOR_VALUE,
     ATTR_DAYNIGHTMODE_VALUE,
     ATTR_TIMEOFFSET,
+    ATTR_TIMEZONE,
     DOMAIN,
     PLATFORMS,
     STARTUP_MESSAGE,
@@ -258,6 +259,9 @@ class DopplerDataUpdateCoordinator(DataUpdateCoordinator):
                 await asyncio.sleep(0.5)
 
                 device_data[ATTR_TIMEOFFSET] = await self.api.get_offset(device)
+                await asyncio.sleep(0.5)
+
+                device_data[ATTR_TIMEZONE] = await self.api.get_timezone(device)
                 await asyncio.sleep(0.5)
 
                 
