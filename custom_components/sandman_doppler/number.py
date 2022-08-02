@@ -23,13 +23,26 @@ async def async_setup_entry(
 ) -> None:
     """Setup sensor platform."""
     coordinator: DopplerDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]
-    async_add_devices(
-        [
-            DopplerVolumeLevelNumber(coordinator, entry, device, "Volume Level"),
-            DopplerTimeOffsetNumber(coordinator, entry, device, "Time Offset"),
-            for device in coordinator.api.devices.values()
-        ]
-    )
+    entities = []
+    for device in coordinator.api.devices.values():
+        entities.extend(
+            [
+                DopplerVolumeLevelNumber(coordinator, entry, device, "Volume Level"),
+                DopplerTimeOffsetNumber(coordinator, entry, device, "Time Offset"),
+            ]
+        )
+    async_add_devices(entities)
+
+
+
+    
+#    async_add_devices(
+#        [
+#            DopplerVolumeLevelNumber(coordinator, entry, device, "Volume Level"),
+#            DopplerTimeOffsetNumber(coordinator, entry, device, "Time Offset"),
+#            for device in coordinator.api.devices.values()
+#        ]
+#    )
 
 
 class DopplerVolumeLevelNumber(DopplerEntity, NumberEntity):
