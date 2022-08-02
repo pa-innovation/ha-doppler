@@ -70,18 +70,19 @@ class DopplerVolumeLevelNumber(DopplerEntity, NumberEntity):
 
 
 class DopplerTimeOffsetNumber(DopplerEntity, NumberEntity):
-    """Doppler Volume Level Number class."""
+    """Doppler Time Offset class."""
 
     _attr_native_step = 1
     _attr_native_min_value = -128
     _attr_native_max_value = +127
-
+    _attr_mode = "box"
+    
     @property
-    def native_value(self) -> float |None:
+    def native_value(self) -> int:
         """Return the current value"""
         return self.coordinator.data[self.device.name][ATTR_TIMEOFFSET]
     
-    async def async_set_native_value(self, value:float) -> None:
+    async def async_set_native_value(self, value:int) -> None:
         """Update the current volume value"""
         self._attr_native_value = value
         await self.coordinator.api.set_offset(self.device,int(value))
