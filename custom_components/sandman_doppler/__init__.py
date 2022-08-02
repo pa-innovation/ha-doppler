@@ -149,11 +149,10 @@ class DopplerDataUpdateCoordinator(DataUpdateCoordinator):
                 self._dev_reg.async_get_or_create(
                     config_entry_id=self._entry.entry_id,
                     identifiers={(DOMAIN, device.id)},
-                    dsn=device.device_info.dsn,
                     manufacturer=device.device_info.manufacturer,
                     model=device.device_info.model_number,
                     sw_version=device.device_info.software_version,
-                    name=device.name,
+                    name=device.dsn,
                 )
                 device_data = data.setdefault(device.name, {})
                 await asyncio.sleep(0.5)
