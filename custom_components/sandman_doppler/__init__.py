@@ -102,6 +102,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         deviceentry=deviceregistry.async_get(call.data['doppler_device_id'])
         _LOGGER.warning(f"Calling setalarm {call.data['alarm_time']} {deviceentry.identifiers}")
         _LOGGER.warning(f"printing config entries{deviceentry.config_entries}")
+        for device in self.mydevices.values():
+            if ('sandman_doppler',device.id) in deviceentry.config_entries:
+                _LOGGER.warning(f"managed to locate the device id")
         
         
 
