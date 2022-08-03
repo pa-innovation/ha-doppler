@@ -1,16 +1,18 @@
 setalarmservice:
   name: Set Alarm
   description: Sets an Alarm on the Doppler
-  target:
-    device:
-      integration: sandman_doppler
   fields:
+    doppler_device_id:
+      name: Doppler ID
+      description: ID of doppler to set alarm
+      selector:
+        device:
+          integration: sandman_doppler
     alarm_time:
       name: Alarm Time
       description: The time of the alarm to set
       required: true
       advanced: false
-      default: true
       selector:
         time:
     sunday:
