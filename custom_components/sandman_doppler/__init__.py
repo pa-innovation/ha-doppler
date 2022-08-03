@@ -14,9 +14,10 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_EMAIL, CONF_PASSWORD, CONF_LATITUDE, CONF_LONGITUDE
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
-from homeassistant.helpers.device_registry import async_get
+#from homeassistant.helpers.device_registry import async_get
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from homeassistant.helpers import config_validation as cv
+from homeassistant.helpers import device_registry as dr
 
 from .const import (
     ATTR_ALARM_SOUNDS,
@@ -91,14 +92,15 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 
     mydevices= await client.get_devices()
     for device in mydevices.values():
-        _LOGGER.warning(f"printing id {device.id}")
         await client.set_sync_button_display_color(device, False)
         await client.set_sync_day_night_color(device, False)
         await client.set_sync_button_display_brightness(device, False)
         await client.set_weather_location(device, f"{entry.data.get(CONF_LATITUDE):.6f},{entry.data.get(CONF_LONGITUDE):.6f}")
 
     async def handle_set_alarm_service(call):
-        _LOGGER.warning(f"Calling our test service {call.data['alarm_time']}")
+        deviceregistry=dr.async_get(hass)
+        deviceentry=deviceregistry.async_get(call.target['device_id'])
+        _LOGGER.warning(f"Calling setalarm {call.data['alarm_time']} {deviceentry.identifiers}")
         
 
     hass.services.async_register(DOMAIN,"setalarmservice",handle_set_alarm_service)
@@ -132,7 +134,7 @@ class DopplerDataUpdateCoordinator(DataUpdateCoordinator):
     async def _async_update_data(self) -> dict[str, Any]:
         """Update data via library."""
         if not self._dev_reg:
-            self._dev_reg = async_get(self.hass)
+            self._dev_reg = dr.async_get(self.hass)
 
         data: dict[str, Any] = {}
         devices: dict[str, Doppler] = {}
