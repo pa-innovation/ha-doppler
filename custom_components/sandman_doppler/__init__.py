@@ -101,6 +101,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         deviceregistry=dr.async_get(hass)
         deviceentry=deviceregistry.async_get(call.data['doppler_device_id'])
         _LOGGER.warning(f"Calling setalarm {call.data['alarm_time']} {deviceentry.identifiers}")
+        _LOGGER.warning(f"printing config entries{deviceentry.config_entries}")
+        
         
 
     hass.services.async_register(DOMAIN,"setalarmservice",handle_set_alarm_service)
