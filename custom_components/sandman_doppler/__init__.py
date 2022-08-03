@@ -109,7 +109,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
                 mydevice=device
                 break
         if mydevice != "":
-            result=client.set_alarm(mydevice,1,"Get Up",12,30,"Mo",{'red': 255, 'green': 0,'blue': 255}, 100, 1, 1, "Harp.mp3")
+            result=await client.set_alarm(mydevice,1,"Get Up",12,30,"Mo",{'red': 255, 'green': 0,'blue': 255}, 100, 1, 1, "Harp.mp3")
         _LOGGER.warning(f"alarm result was {result}")
 
     hass.services.async_register(DOMAIN,"setalarmservice",handle_set_alarm_service)
