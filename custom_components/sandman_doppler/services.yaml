@@ -1,15 +1,19 @@
 setalarmservice:
   name: Set Alarm
   description: Sets an Alarm on the Doppler
-  target:
-    entity:
-      integration: sandman_doppler
   fields:
+    device_id:
+      name: Doppler ID
+      description: ID of doppler to set alarm
+      selector:
+        device:
+          integration: sandman_doppler
     alarm_time:
       name: Alarm Time
       description: The time of the alarm to set
       required: true
       advanced: false
+      default: true
       selector:
         time:
     sunday:
@@ -17,6 +21,7 @@ setalarmservice:
       description: Is alarm active on Sunday
       required: true
       advanced: false
+      default: true
       selector:
         boolean:
     monday:
@@ -24,6 +29,7 @@ setalarmservice:
       description: Is alarm active on Monday
       required: true
       advanced: false
+      default: true
       selector:
         boolean:
     tuesday:
@@ -31,6 +37,7 @@ setalarmservice:
       description: Is alarm active on Tuesday
       required: true
       advanced: false
+      default: true
       selector:
         boolean:
     wednesday:
@@ -38,6 +45,7 @@ setalarmservice:
       description: Is alarm active on Wednesday
       required: true
       advanced: false
+      default: true
       selector:
         boolean:
     thursday:
@@ -45,6 +53,7 @@ setalarmservice:
       description: Is alarm active on Thursday
       required: true
       advanced: false
+      default: true
       selector:
         boolean:
     friday:
@@ -52,6 +61,7 @@ setalarmservice:
       description: Is alarm active on Friday
       required: true
       advanced: false
+      default: true
       selector:
         boolean:
     saturday:
@@ -59,5 +69,6 @@ setalarmservice:
       description: Is alarm active on Saturday
       required: true
       advanced: false
+      default: true
       selector:
         boolean:
