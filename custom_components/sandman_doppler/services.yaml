@@ -2,7 +2,7 @@ setalarmservice:
   name: Set Alarm
   description: Sets an Alarm on the Doppler
   fields:
-    device_id:
+    doppler_device_id:
       name: Doppler ID
       description: ID of doppler to set alarm
       selector:
