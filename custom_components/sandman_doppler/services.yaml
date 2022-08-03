@@ -12,3 +12,52 @@ setalarmservice:
       advanced: false
       selector:
         time:
+    monday:
+      name: Monday
+      description: Is alarm active on Monday
+      required: true
+      advanced: false
+      selector:
+        boolean:
+    tuesday:
+      name: Tuesday
+      description: Is alarm active on Tuesday
+      required: true
+      advanced: false
+      selector:
+        boolean:
+    wednesday:
+      name: Wednesday
+      description: Is alarm active on Wednesday
+      required: true
+      advanced: false
+      selector:
+        boolean:
+    thursday:
+      name: Thursday
+      description: Is alarm active on Thursday
+      required: true
+      advanced: false
+      selector:
+        boolean:
+    friday:
+      name: Friday 
+      description: Is alarm active on Friday
+      required: true
+      advanced: false
+      selector:
+        boolean:
+    saturday:
+      name: Saturday
+      description: Is alarm active on Saturday
+      required: true
+      advanced: false
+      selector:
+        boolean:
+    sunday:
+      name: Sunday
+      description: Is alarm active on Sunday
+      required: true
+      advanced: false
+      selector:
+        boolean:
