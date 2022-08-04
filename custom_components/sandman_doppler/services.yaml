@@ -8,6 +8,23 @@ setalarmservice:
       selector:
         device:
           integration: sandman_doppler
+    alarm_id:
+      name: Alarm ID
+      description: ID of the alarm to be set
+      required: true
+      advanced: false
+      selector:
+        number:
+          min: 1
+          max: 255
+          mode: box
+    alarm_name:
+      name: Alarm Name
+      description: Name of the Alarm
+      required: true
+      advanced: false
+      selector:
+        text:          
     alarm_time:
       name: Alarm Time
       description: The time of the alarm to set
@@ -15,59 +32,79 @@ setalarmservice:
       advanced: false
       selector:
         time:
-    sunday:
-      name: Sunday
-      description: Is alarm active on Sunday
+    repeat:
+      name: Repeat Days
+      description: Alarm goes off on these days
       required: true
       advanced: false
-      default: true
       selector:
-        boolean:
-    monday:
-      name: Monday
-      description: Is alarm active on Monday
+        select:
+          multiple: true
+          options:
+            - label: Monday
+              value: Mo
+            - label: Tuesday
+              value: Tu
+            - label: Wednesday
+              value: We
+            - label: Thursday
+              value: Th
+            - label: Friday
+              value: Fr
+            - label: Saturday
+              value: Sa
+            - label: Sunday
+              value: Su
+    color:
+      name: Alarm Color
+      desciption: Color of the Alarm on the clock
       required: true
       advanced: false
-      default: true
       selector:
-        boolean:
-    tuesday:
-      name: Tuesday
-      description: Is alarm active on Tuesday
+        color_rgb:
+    volume:
+      name: Alarm Volume
+      description: Volume for alarm separate from master volume
+      required: true
+      advanced: true
+      selector:
+        number:
+          min: 0
+          max: 100
+          mode: slider
+    status:
+      name: Alarm Status
+      description: Whether alarm is set or unset
       required: true
       advanced: false
-      default: true
       selector:
         boolean:
-    wednesday:
-      name: Wednesday
-      description: Is alarm active on Wednesday
+    sound:
+      name: Alarm Sound
+      description: mp3 file to play for alarm
       required: true
       advanced: false
-      default: true
       selector:
-        boolean:
-    thursday:
-      name: Thursday
-      description: Is alarm active on Thursday
-      required: true
-      advanced: false
-      default: true
-      selector:
-        boolean:
-    friday:
-      name: Friday 
-      description: Is alarm active on Friday
-      required: true
-      advanced: false
-      default: true
-      selector:
-        boolean:
-    saturday:
-      name: Saturday
-      description: Is alarm active on Saturday
-      required: true
-      advanced: false
-      default: true
-      selector:
-        boolean:
+        select:
+          options:
+            - 1980.mp3
+            - Alarming.mp3
+            - Classic.mp3
+            - Dance.mp3
+            - Dialup.mp3
+            - Gentle.mp3
+            - Harp.mp3
+            - Jazz.mp3
+            - Jungle.mp3
+            - Playful.mp3
+            - Purite.mp3
+            - Rainforest.mp3
+            - Ripples.mp3
+            - Rooster.mp3
+            - Sandman.mp3
+            - Stream.mp3
+            - Sub.mp3
+            - Trek.mp3
+            - Violin.mp3
+            - Waves.mp3
+
