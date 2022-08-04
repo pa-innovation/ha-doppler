@@ -134,23 +134,24 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
                                 
             alarm=Alarm(mydevice, alarmdict);
             result= await client.append_new_alarm(mydevice,alarm)
-            # result=await client.set_alarm(mydevice,
-            #                               int(call.data['alarm_id']),
-            #                               call.data['alarm_name'],
-            #                               int(call.data['alarm_time'].split(':')[0]),
-            #                               int(call.data['alarm_time'].split(':')[1]),
-            #                               ''.join(call.data['repeat']),
-            #                               {'red': int(call.data['color'][0]),
-            #                                'green': int(call.data['color'][1]),
-            #                                'blue': int(call.data['color'][2])
-            #                                },
-            #                               int(call.data['volume']),
-            #                               1 if bool(call.data['status'])==True else 10,
-            #                               1,
-            #                               call.data['sound'])
-        _LOGGER.warning(f"alarm result was {result}")
+            _LOGGER.warning(f"alarm result was {result}")
 
+    async def handle_delete_alarm_service(call):
+        deviceregistry=dr.async_get(hass)
+        deviceentry=deviceregistry.async_get(call.data['doppler_device_id'])
+        _LOGGER.warning(f"Calling setalarm {call.data['alarm_time']} {deviceentry.identifiers}")
+        _LOGGER.warning(f"printing config entries{deviceentry.config_entries}")
+        mydevice=""
+        for device in mydevices.values():
+            if ('sandman_doppler',device.id) in deviceentry.identifiers:
+                _LOGGER.warning(f"managed to locate the device id")
+                mydevice=device
+                break
+        if mydevice != "":
+            await client.delete_alarm(mydevice,int(call.data['alarm_id'])
+        
     hass.services.async_register(DOMAIN,"setalarmservice",handle_set_alarm_service)
+    hass.services.async_register(DOMAIN,"deletealarmservice",handle_delete_alarm_service)
 
 
     
