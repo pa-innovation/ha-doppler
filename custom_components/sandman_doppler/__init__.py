@@ -110,17 +110,17 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
                 break
         if mydevice != "":
             result=await client.set_alarm(mydevice,
-                                          call.data['alarm_id'],
+                                          int(call.data['alarm_id']),
                                           call.data['alarm_name'],
-                                          call.data['alarm_time'].split(':')[0],
-                                          call.data['alarm_time'].split(':')[1],
+                                          int(call.data['alarm_time'].split(':')[0]),
+                                          int(call.data['alarm_time'].split(':')[1]),
                                           ''.join(call.data['repeat']),
-                                          {'red': call.data['color'][0],
-                                           'green': call.data['color'][1],
-                                           'blue': call.data['color'][2]
+                                          {'red': int(call.data['color'][0]),
+                                           'green': int(call.data['color'][1]),
+                                           'blue': int(call.data['color'][2])
                                            },
-                                          call.data['volume'],
-                                          1 if call.data['status']==1 else 10,
+                                          int(call.data['volume']),
+                                          1 if int(call.data['status'])==1 else 10,
                                           1,
                                           call.data['sound'])
         _LOGGER.warning(f"alarm result was {result}")
