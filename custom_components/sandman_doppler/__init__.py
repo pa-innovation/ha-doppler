@@ -127,8 +127,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
                                                 green=int(call.data['color'][1]),
                                                 blue= int(call.data['color'][2])),
                                 volume=int(call.data['volume']),
-                                status=AlarmStatus(SET),
-                                src=AlarmSource(APP),
+                                status=AlarmStatus.SET,
+                                src=AlarmSource.APP,
                                 sound=call.data['sound']
                                 )
                                 
