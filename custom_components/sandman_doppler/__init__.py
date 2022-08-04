@@ -120,7 +120,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
                                            'blue': int(call.data['color'][2])
                                            },
                                           int(call.data['volume']),
-                                          1 if int(call.data['status'])==1 else 10,
+                                          1 if bool(call.data['status'])==True else 10,
                                           1,
                                           call.data['sound'])
         _LOGGER.warning(f"alarm result was {result}")
