@@ -87,24 +87,24 @@ setalarmservice:
       selector:
         select:
           options:
-            - 1980.mp3
-            - Alarming.mp3
-            - Classic.mp3
-            - Dance.mp3
-            - Dialup.mp3
-            - Gentle.mp3
-            - Harp.mp3
-            - Jazz.mp3
-            - Jungle.mp3
-            - Playful.mp3
-            - Purite.mp3
-            - Rainforest.mp3
-            - Ripples.mp3
-            - Rooster.mp3
-            - Sandman.mp3
-            - Stream.mp3
-            - Sub.mp3
-            - Trek.mp3
-            - Violin.mp3
-            - Waves.mp3
+            - '1980.mp3'
+            - 'Alarming.mp3'
+            - 'Classic.mp3'
+            - 'Dance.mp3'
+            - 'Dialup.mp3'
+            - 'Gentle.mp3'
+            - 'Harp.mp3'
+            - 'Jazz.mp3'
+            - 'Jungle.mp3'
+            - 'Playful.mp3'
+            - 'Purite.mp3'
+            - 'Rainforest.mp3'
+            - 'Ripples.mp3'
+            - 'Rooster.mp3'
+            - 'Sandman.mp3'
+            - 'Stream.mp3'
+            - 'Sub.mp3'
+            - 'Trek.mp3'
+            - 'Violin.mp3'
+            - 'Waves.mp3'
 
