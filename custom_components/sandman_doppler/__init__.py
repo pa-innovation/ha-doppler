@@ -10,6 +10,14 @@ from aiohttp.client import ClientTimeout, DEFAULT_TIMEOUT
 
 from doppyler.client import DopplerClient
 from doppyler.model.doppler import Doppler
+from doppyler.model.alarm import Alarm
+from doppyler.model.alarm import RepeatDayOfWeek
+from doppyler.model.alarm import AlarmStatus
+from doppyler.model.alarm import AlarmSource
+from doppyler.model.alarm import AlarmDict
+from doppyler.model.color import Color
+from doppyler.model.color import ColorDict
+
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_EMAIL, CONF_PASSWORD, CONF_LATITUDE, CONF_LONGITUDE
 from homeassistant.core import HomeAssistant
@@ -18,6 +26,7 @@ from homeassistant.helpers.aiohttp_client import async_create_clientsession
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers import device_registry as dr
+
 
 from .const import (
     ATTR_ALARM_SOUNDS,
@@ -109,20 +118,36 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
                 mydevice=device
                 break
         if mydevice != "":
-            result=await client.set_alarm(mydevice,
-                                          int(call.data['alarm_id']),
-                                          call.data['alarm_name'],
-                                          int(call.data['alarm_time'].split(':')[0]),
-                                          int(call.data['alarm_time'].split(':')[1]),
-                                          ''.join(call.data['repeat']),
-                                          {'red': int(call.data['color'][0]),
-                                           'green': int(call.data['color'][1]),
-                                           'blue': int(call.data['color'][2])
-                                           },
-                                          int(call.data['volume']),
-                                          1 if bool(call.data['status'])==True else 10,
-                                          1,
-                                          call.data['sound'])
+            alarmdict=AlarmDict(id= int(call.data['alarm_id']),
+                                name=call.data['alarm_name'],
+                                time_hr=int(call.data['alarm_time'].split(':')[0]),
+                                time_min=int(call.data['alarm_time'].split(':')[1]),
+                                repeat=''.join(call.data['repeat']),
+                                color=ColorDict(red=int(call.data['color'][0]),
+                                                green=int(call.data['color'][1]),
+                                                blue= int(call.data['color'][2])),
+                                volume=int(call.data['volume']),
+                                status=AlarmStatus(SET),
+                                src=AlarmSource(APP),
+                                sound=call.data['sound']
+                                )
+                                
+            alarm=Alarm(mydevice, alarmdict);
+            result= await client.append_new_alarm(mydevice,alarm)
+            # result=await client.set_alarm(mydevice,
+            #                               int(call.data['alarm_id']),
+            #                               call.data['alarm_name'],
+            #                               int(call.data['alarm_time'].split(':')[0]),
+            #                               int(call.data['alarm_time'].split(':')[1]),
+            #                               ''.join(call.data['repeat']),
+            #                               {'red': int(call.data['color'][0]),
+            #                                'green': int(call.data['color'][1]),
+            #                                'blue': int(call.data['color'][2])
+            #                                },
+            #                               int(call.data['volume']),
+            #                               1 if bool(call.data['status'])==True else 10,
+            #                               1,
+            #                               call.data['sound'])
         _LOGGER.warning(f"alarm result was {result}")
 
     hass.services.async_register(DOMAIN,"setalarmservice",handle_set_alarm_service)

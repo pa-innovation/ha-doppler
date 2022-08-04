@@ -108,3 +108,23 @@ setalarmservice:
             - 'Violin.mp3'
             - 'Waves.mp3'
 
+deletealarmservice:
+  name: Delete Alarm
+  description: Deletes the selected Alarm
+  fields:
+    doppler_device_id:
+      name: Doppler ID
+      description: ID of doppler to set alarm
+      selector:
+        device:
+          integration: sandman_doppler
+    alarm_id:
+      name: Alarm ID
+      description: ID of the alarm to be set
+      required: true
+      advanced: false
+      selector:
+        number:
+          min: 1
+          max: 255
+          mode: box
