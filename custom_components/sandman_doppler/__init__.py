@@ -122,7 +122,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
                                           call.data['volume'],
                                           1 if call.data['status']==1 else 10,
                                           1,
-                                          call.data['sound')
+                                          call.data['sound'])
         _LOGGER.warning(f"alarm result was {result}")
 
     hass.services.async_register(DOMAIN,"setalarmservice",handle_set_alarm_service)
