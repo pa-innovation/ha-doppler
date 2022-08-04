@@ -139,8 +139,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     async def handle_delete_alarm_service(call):
         deviceregistry=dr.async_get(hass)
         deviceentry=deviceregistry.async_get(call.data['doppler_device_id'])
-        _LOGGER.warning(f"Calling setalarm {call.data['alarm_time']} {deviceentry.identifiers}")
-        _LOGGER.warning(f"printing config entries{deviceentry.config_entries}")
         mydevice=""
         for device in mydevices.values():
             if ('sandman_doppler',device.id) in deviceentry.identifiers:
