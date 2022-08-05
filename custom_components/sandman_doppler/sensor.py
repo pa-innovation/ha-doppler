@@ -42,6 +42,7 @@ async def async_setup_entry(
                 DopplerWifiUptimeSensor(coordinator, entry, device, "Wifi Uptime"),
                 DopplerWifiSSIDSensor(coordinator, entry, device, "Wifi SSID"),
                 DopplerWifiSignalStrengthSensor(coordinator, entry, device, "Wifi Signal Strength"),
+                DopplerAlarmsSensor(coordinator, entry, device, "Alarms"),
             ]
         )
     async_add_devices(entities)
@@ -89,7 +90,7 @@ class DopplerWifiSignalStrengthSensor(DopplerEntity,SensorEntity):
     def native_value(self):
         return self.coordinator.data[self.device.name][ATTR_WIFI].signalstrength
 
-class DopplerAlarmsSensor(DopplerEntiry,SensorEntity):
+class DopplerAlarmsSensor(DopplerEntity,SensorEntity):
     
     _attr_state_class = SensorStateClass.MEASUREMENT
 
