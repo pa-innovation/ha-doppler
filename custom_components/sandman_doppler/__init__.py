@@ -118,11 +118,15 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
                 mydevice=device
                 break
         if mydevice != "":
+            if 'repeat' in call.data:
+                r=call.data['repeat']
+            else:
+                r=""
             alarmdict=AlarmDict(id= int(call.data['alarm_id']),
                                 name=call.data['alarm_name'],
                                 time_hr=int(call.data['alarm_time'].split(':')[0]),
                                 time_min=int(call.data['alarm_time'].split(':')[1]),
-                                repeat=''.join(call.data['repeat']),
+                                repeat=r,
                                 color=ColorDict(red=int(call.data['color'][0]),
                                                 green=int(call.data['color'][1]),
                                                 blue= int(call.data['color'][2])),
