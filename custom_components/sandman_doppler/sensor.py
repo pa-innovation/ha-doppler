@@ -4,6 +4,14 @@ from __future__ import annotations
 import logging
 from typing import Any
 
+from doppyler.model.alarm import Alarm
+from doppyler.model.alarm import RepeatDayOfWeek
+from doppyler.model.alarm import AlarmStatus
+from doppyler.model.alarm import AlarmSource
+from doppyler.model.alarm import AlarmDict
+from doppyler.model.color import Color
+from doppyler.model.color import ColorDict
+
 from homeassistant.components.sensor import (
     SensorDeviceClass,
     SensorEntity,
