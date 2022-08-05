@@ -34,8 +34,8 @@ setalarmservice:
         time:
     repeat:
       name: Repeat Days
-      description: Alarm goes off on these days
-      required: true
+      description: Alarm Repeats on these days
+      required: false
       advanced: false
       selector:
         select:
