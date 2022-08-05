@@ -19,6 +19,7 @@ from . import DopplerDataUpdateCoordinator
 from .const import (
     ATTR_LIGHTSENSOR_VALUE,
     ATTR_DAYNIGHTMODE_VALUE,
+    ATTR_ALARMS,
     ATTR_WIFI,
     DOMAIN,
 )
@@ -87,3 +88,11 @@ class DopplerWifiSignalStrengthSensor(DopplerEntity,SensorEntity):
     @property
     def native_value(self):
         return self.coordinator.data[self.device.name][ATTR_WIFI].signalstrength
+
+class DopplerAlarmsSensor(DopplerEntiry,SensorEntity):
+    
+    _attr_state_class = SensorStateClass.MEASUREMENT
+
+    @property
+    def native_value(self):
+        return self.coordinator.data[self.device.name][ATTR_ALARMS]

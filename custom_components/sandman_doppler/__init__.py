@@ -251,8 +251,10 @@ class DopplerDataUpdateCoordinator(DataUpdateCoordinator):
                 await asyncio.sleep(0.5)
                 device_data[ATTR_TIME_MODE] = await self.api.get_time_mode(device)
                 await asyncio.sleep(0.5)
-                # device_data[ATTR_ALARMS] = await self.api.get_all_alarms(device)
-                # await asyncio.sleep(0.5)
+
+                device_data[ATTR_ALARMS] = await self.api.get_all_alarms(device)
+                await asyncio.sleep(0.5)
+
                 # device_data[ATTR_WEATHER] = await self.api.get_weather_configuration(
                 #     device
                 # )
