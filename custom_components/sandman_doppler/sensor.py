@@ -96,4 +96,6 @@ class DopplerAlarmsSensor(DopplerEntity,SensorEntity):
 
     @property
     def native_value(self):
-        return self.coordinator.data[self.device.name][ATTR_ALARMS]
+        mylist =[Alarm.to_dict(alarm) for alarm in self.coordinator.data[self.device.name][ATTR_ALARMS]]
+            
+        return mylist
