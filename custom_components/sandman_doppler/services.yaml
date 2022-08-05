@@ -5,6 +5,8 @@ setalarmservice:
     doppler_device_id:
       name: Doppler ID
       description: ID of doppler to set alarm
+      required: true
+      advanced: false
       selector:
         device:
           integration: sandman_doppler
@@ -115,6 +117,8 @@ deletealarmservice:
     doppler_device_id:
       name: Doppler ID
       description: ID of doppler to set alarm
+      required: true
+      advanced: false
       selector:
         device:
           integration: sandman_doppler
