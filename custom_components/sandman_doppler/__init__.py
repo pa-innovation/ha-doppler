@@ -151,9 +151,22 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
                 break
         if mydevice != "":
             await client.delete_alarm(mydevice,int(call.data['alarm_id']))
-        
+
+    async def handle_set_main_display_service(call):
+        deviceregistry=dr.async_get(hass)
+        deviceentry=deviceregistry.async_get(call.data['doppler_device_id'])
+        mydevice=""
+        for device in mydevices.values():
+            if ('sandman_doppler',device.id) in deviceentry.identifiers:
+                _LOGGER.warning(f"got device id in handle_set_main_display")
+                mydevice=device
+                break
+        if mydevice != "":
+            _LOGGER.warning(f"Called handle_set_main_display_service")
+            
     hass.services.async_register(DOMAIN,"setalarmservice",handle_set_alarm_service)
     hass.services.async_register(DOMAIN,"deletealarmservice",handle_delete_alarm_service)
+    hass.services.async_register(DOMAIN,"displaytextmainservice",handle_set_main_display_service)
 
 
     
