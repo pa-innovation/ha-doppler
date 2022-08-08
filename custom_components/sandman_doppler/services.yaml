@@ -179,4 +179,4 @@ displaytextmainservice:
       required: true
       advanced: false
       selector:
-        rgb_color:
+        color_rgb:
