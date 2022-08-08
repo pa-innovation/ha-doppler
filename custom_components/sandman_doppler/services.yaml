@@ -132,3 +132,51 @@ deletealarmservice:
           min: 1
           max: 255
           mode: box
+displaytextmainservice:
+  name: Main Display Text
+  description: Display Text on Main Display
+  fields:
+    doppler_device_id:
+      name: Doppler ID
+      description: ID of doppler whose display to write to
+      required: true
+      advanced: false
+      selector:
+        device:
+          integration: sandman_doppler
+    display_text:
+      name: Text to Display
+      description: Text to Display
+      required: true
+      advanced: false
+      selector:
+        text:
+          type: text
+    display_duration:
+      name: Display Duration
+      description: Length of time text is displayed
+      required: true
+      advanced: false
+      selector:
+        number:
+          min: 0
+          max: 8675309
+          unit_of_measurement: seconds
+          mode: box
+    display_speed:
+      name: Display Speed
+      description: How fast the text scrolls
+      required: true
+      advanced: false
+      selector:
+        number:
+          min: 0
+          max: 10000
+          mode: box
+    display_color:
+      name: Display Color
+      description: Color of Displayed Text
+      required: true
+      advanced: false
+      selector:
+        rgb_color:
