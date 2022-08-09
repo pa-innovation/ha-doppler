@@ -169,7 +169,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             mdt_dict=MainDisplayTextDict({"text": call.data['display_text'],
                                          "duration": call.data['display_duration'],
                                          "speed": call.data['display_speed'],
-                                          "color": call.data['display_color']})
+                                          "color": {'red':call.data['display_color'][0],
+                                                    'green':call.data['display_color'][1],
+                                                    'blue':call.data['display_color'][2],
+                                                    }})
             
             await client.set_main_display_text(mydevice, MainDisplayText(mydevice,mdt_dict))
             
