@@ -19,6 +19,8 @@ from doppyler.model.color import Color
 from doppyler.model.color import ColorDict
 from doppyler.model.maindisplaytext import MainDisplayText
 from doppyler.model.maindisplaytext import MainDisplayTextDict
+from doppyler.model.minidisplaynumber import MiniDisplayNumber
+from doppyler.model.minidisplaynumber import MiniDisplayNumberDict
 
 
 from homeassistant.config_entries import ConfigEntry
@@ -177,10 +179,33 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             m=MainDisplayText(mydevice,mdt_dict)
             _LOGGER.warning(f"m={m.to_dict()}")
             await client.set_main_display_text(mydevice, MainDisplayText(mydevice,mdt_dict))
+
+    async def handle_set_mini_display_service(call):
+        deviceregistry=dr.async_get(hass)
+        deviceentry=deviceregistry.async_get(call.data['doppler_device_id'])
+        mydevice=""
+        for device in mydevices.values():
+            if ('sandman_doppler',device.id) in deviceentry.identifiers:
+                _LOGGER.warning(f"got device id in handle_set_main_display")
+                mydevice=device
+                break
+        if mydevice != "":
+            _LOGGER.warning(f"Called handle_display_num_mini_service")
+            mdn_dict=MiniDisplayNumberDict({"number": call.data['display_number'],
+                                            "duration": call.data['display_duration'],
+                                            "color": [call.data['display_color'][0],
+                                                      call.data['display_color'][1],
+                                                      call.data['display_color'][2],
+                                                      ]})
+            
+            await client.set_main_display_text(mydevice,
+                                               MiniDisplayNumber(mydevice,mdn_dict))
+
             
     hass.services.async_register(DOMAIN,"setalarmservice",handle_set_alarm_service)
     hass.services.async_register(DOMAIN,"deletealarmservice",handle_delete_alarm_service)
     hass.services.async_register(DOMAIN,"displaytextmainservice",handle_set_main_display_service)
+    hass.services.async_register(DOMAIN,"displaynumminiservice",handle_set_mini_display_service)
 
 
     

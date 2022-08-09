@@ -180,3 +180,44 @@ displaytextmainservice:
       advanced: false
       selector:
         color_rgb:
+
+displaynumminiservice:
+  name: Mini Display Number
+  description: Display Number on Mini Display
+  fields:
+    doppler_device_id:
+      name: Doppler ID
+      description: ID of doppler whose display to write to
+      required: true
+      advanced: false
+      selector:
+        device:
+          integration: sandman_doppler
+    display_number:
+      name: Number to Display
+      description: Number to Display on Mini Display
+      required: true
+      advanced: false
+      selector:
+        number:
+          min: -199
+          max: 199
+          mode: box
+    display_duration:
+      name: Display Duration
+      description: Length of time number is displayed on mini dispaly
+      required: true
+      advanced: false
+      selector:
+        number:
+          min: 0
+          max: 8675309
+          unit_of_measurement: seconds
+          mode: box          
+    display_color:
+      name: Display Color
+      description: Color of Displayed Number
+      required: true
+      advanced: false
+      selector:
+        color_rgb:
