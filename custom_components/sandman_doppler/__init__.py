@@ -186,7 +186,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         mydevice=""
         for device in mydevices.values():
             if ('sandman_doppler',device.id) in deviceentry.identifiers:
-                _LOGGER.warning(f"got device id in handle_set_main_display")
+                _LOGGER.warning(f"got device id in handle_set_mini_display_service")
                 mydevice=device
                 break
         if mydevice != "":
@@ -198,9 +198,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
                                                       call.data['display_color'][2],
                                                       ]})
             
-            await client.set_main_display_text(mydevice,
-                                               MiniDisplayNumber(mydevice,mdn_dict))
-
+            await client.set_mini_display_number(mydevice,
+                                                 MiniDisplayNumber(mydevice,mdn_dict))
+            
             
     hass.services.async_register(DOMAIN,"setalarmservice",handle_set_alarm_service)
     hass.services.async_register(DOMAIN,"deletealarmservice",handle_delete_alarm_service)
