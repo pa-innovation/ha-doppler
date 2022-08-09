@@ -17,6 +17,9 @@ from doppyler.model.alarm import AlarmSource
 from doppyler.model.alarm import AlarmDict
 from doppyler.model.color import Color
 from doppyler.model.color import ColorDict
+from doppyler.model.maindisplaytext import MainDisplayText
+from doppyler.model.maindisplaytext import MainDisplayTextDict
+
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_EMAIL, CONF_PASSWORD, CONF_LATITUDE, CONF_LONGITUDE
@@ -163,6 +166,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
                 break
         if mydevice != "":
             _LOGGER.warning(f"Called handle_set_main_display_service")
+            mdt_dict=MainDisplayTextDict({"text": call.data['display_text'],
+                                         "duration": call.data['display_duration'],
+                                         "speed": call.data['display_speed'],
+                                          "color": call.data['display_color']})
+            
+            await client.set_main_display_text(mydevice, MainDisplayText(mydevice,mdt_dict))
             
     hass.services.async_register(DOMAIN,"setalarmservice",handle_set_alarm_service)
     hass.services.async_register(DOMAIN,"deletealarmservice",handle_delete_alarm_service)
