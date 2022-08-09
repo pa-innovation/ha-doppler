@@ -175,7 +175,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
                                                     }})
 
             m=MainDisplayText(mydevice,mdt_dict)
-            _LOGGER.warning(f"m={m.to_api()}")
+            _LOGGER.warning(f"m={m.to_dict()}")
             await client.set_main_display_text(mydevice, MainDisplayText(mydevice,mdt_dict))
             
     hass.services.async_register(DOMAIN,"setalarmservice",handle_set_alarm_service)
