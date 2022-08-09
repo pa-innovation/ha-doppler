@@ -191,7 +191,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
                 break
         if mydevice != "":
             _LOGGER.warning(f"Called handle_display_num_mini_service")
-            mdn_dict=MiniDisplayNumberDict({"number": call.data['display_number'],
+            mdn_dict=MiniDisplayNumberDict({"num": call.data['display_number'],
                                             "duration": call.data['display_duration'],
                                             "color": [call.data['display_color'][0],
                                                       call.data['display_color'][1],
