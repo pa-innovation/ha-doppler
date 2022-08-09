@@ -172,7 +172,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
                                           "color": [call.data['display_color'][0],
                                                     call.data['display_color'][1],
                                                     call.data['display_color'][2],
-                                                    ])
+                                                    ]})
 
             m=MainDisplayText(mydevice,mdt_dict)
             _LOGGER.warning(f"m={m.to_dict()}")
