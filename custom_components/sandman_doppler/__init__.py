@@ -21,7 +21,8 @@ from doppyler.model.maindisplaytext import MainDisplayText
 from doppyler.model.maindisplaytext import MainDisplayTextDict
 from doppyler.model.minidisplaynumber import MiniDisplayNumber
 from doppyler.model.minidisplaynumber import MiniDisplayNumberDict
-
+from doppyler.model.lightbar import LightbarDisplayDict
+from doppyler.model.lightbar import LightbarDisplayEffect
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_EMAIL, CONF_PASSWORD, CONF_LATITUDE, CONF_LONGITUDE
@@ -211,7 +212,34 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
                 mydevice=device
                 break
         if mydevice != "":
-            pass
+            _LOGGER.warning(f"Called handle_set_lightbar_color_service")
+            color_list=[]
+            for c in [
+                    call.data['lightbar_color1'],
+                    call.data['lightbar_color2'],
+                    call.data['lightbar_color3'],
+                     call.data['lightbar_color4'],
+                     call.data['lightbar_color5'],
+                     call.data['lightbar_color6'],
+                     call.data['lightbar_color7'],
+                     call.data['lightbar_color8'],
+                     call.data['lightbar_color9'],
+                     call.data['lightbar_color10'],
+                     call.data['lightbar_color11'],
+                     call.data['lightbar_color12']]:
+                
+                color_list+=[c[0],c[1],c[2]]
+            
+            lbde_dict=LightbarDisplayDict({"colors": color_list,
+                                           "duration": int(call.data['duration']),
+                                           "speed": int(call.data['speed']),
+                                           "attributes": {"display":"set",
+                                                          "sparkle":call.data['lightbar_sparkle'],
+                                                          "rainbow":call.data['lightbar_rainbow']}
+                                                        
+                                           })
+            _LOGGER.warning(f"lbde_dict={ldbe_dict})
+                                          
             
     hass.services.async_register(DOMAIN,"setalarmservice",handle_set_alarm_service)
     hass.services.async_register(DOMAIN,"deletealarmservice",handle_delete_alarm_service)
