@@ -168,12 +168,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
                 break
         if mydevice != "":
             _LOGGER.warning(f"Called handle_set_main_display_service")
-            mdt_dict=MainDisplayTextDict({"text": call.data['display_text'],
-                                         "duration": call.data['display_duration'],
-                                         "speed": call.data['display_speed'],
-                                          "color": [call.data['display_color'][0],
-                                                    call.data['display_color'][1],
-                                                    call.data['display_color'][2],
+            mdt_dict=MainDisplayTextDict({"text": str(call.data['display_text']),
+                                         "duration": int(call.data['display_duration']),
+                                         "speed": int(call.data['display_speed']),
+                                          "color": [int(call.data['display_color'][0]),
+                                                    int(call.data['display_color'][1]),
+                                                    int(call.data['display_color'][2]),
                                                     ]})
 
             m=MainDisplayText(mydevice,mdt_dict)
@@ -191,11 +191,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
                 break
         if mydevice != "":
             _LOGGER.warning(f"Called handle_display_num_mini_service")
-            mdn_dict=MiniDisplayNumberDict({"num": call.data['display_number'],
-                                            "duration": call.data['display_duration'],
-                                            "color": [call.data['display_color'][0],
-                                                      call.data['display_color'][1],
-                                                      call.data['display_color'][2],
+            mdn_dict=MiniDisplayNumberDict({"num": int(call.data['display_number']),
+                                            "duration": int(call.data['display_duration']),
+                                            "color": [int(call.data['display_color'][0]),
+                                                      int(call.data['display_color'][1]),
+                                                      int(call.data['display_color'][2]),
                                                       ]})
             
             await client.set_mini_display_number(mydevice,
