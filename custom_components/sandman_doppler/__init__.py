@@ -253,6 +253,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
                                            "attributes": attributes_dict                                                        
                                            })
             _LOGGER.warning(f"lbde_dict={lbde_dict}")
+            await client.set_lightbar_effect(mydevice,LightBarDisplayEffect(mydevice,lbde_dict))
                                           
             
     hass.services.async_register(DOMAIN,"setalarmservice",handle_set_alarm_service)
