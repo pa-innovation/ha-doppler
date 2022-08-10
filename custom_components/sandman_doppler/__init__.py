@@ -200,13 +200,23 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             
             await client.set_mini_display_number(mydevice,
                                                  MiniDisplayNumber(mydevice,mdn_dict))
-            
+
+    async def handle_set_lightbar_color_service(call):
+        deviceregistry=dr.async_get(hass)
+        deviceentry=deviceregistry.async_get(call.data['doppler_device_id'])
+        mydevice=""
+        for device in mydevices.values():
+            if ('sandman_doppler',device.id) in deviceentry.identifiers:
+                _LOGGER.warning(f"got device id in handle_set_lightbar")
+                mydevice=device
+                break
+        if mydevice != "":
             
     hass.services.async_register(DOMAIN,"setalarmservice",handle_set_alarm_service)
     hass.services.async_register(DOMAIN,"deletealarmservice",handle_delete_alarm_service)
     hass.services.async_register(DOMAIN,"displaytextmainservice",handle_set_main_display_service)
     hass.services.async_register(DOMAIN,"displaynumminiservice",handle_set_mini_display_service)
-
+    hass.services.async_register(DOMAIN,"setlightbarcolorservice",handle_set_lightbar_color_service)
 
     
 
