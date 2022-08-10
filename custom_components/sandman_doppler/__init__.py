@@ -78,7 +78,7 @@ _LOGGER: logging.Logger = logging.getLogger(__package__)
 
 
 def check_key(mydict:dict,key):
-    if mydict.has_key(key):
+    if key in mydict:
         return mydict[key]
     else:
         return None
