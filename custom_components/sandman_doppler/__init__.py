@@ -77,6 +77,13 @@ SCAN_INTERVAL = timedelta(seconds=300)
 _LOGGER: logging.Logger = logging.getLogger(__package__)
 
 
+def check_key(mydict:dict,key):
+    if mydict.has_key(key):
+        return mydict[key]
+    else:
+        return None
+    
+
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Set up this integration using UI."""
     if hass.data.get(DOMAIN) is None:
@@ -216,28 +223,34 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             _LOGGER.warning(f"Called handle_set_lightbar_color_service")
             color_list=[]
             for c in [
-                    call.data['lightbar_color1'],
-                    call.data['lightbar_color2'],
-                    call.data['lightbar_color3'],
-                     call.data['lightbar_color4'],
-                     call.data['lightbar_color5'],
-                     call.data['lightbar_color6'],
-                     call.data['lightbar_color7'],
-                     call.data['lightbar_color8'],
-                     call.data['lightbar_color9'],
-                     call.data['lightbar_color10'],
-                     call.data['lightbar_color11'],
-                     call.data['lightbar_color12']]:
-                
-                color_list+=[c[0],c[1],c[2]]
-            
+                    check_key(call.data,'lightbar_color1'),
+                    check_key(call.data,'lightbar_color2'),
+                    check_key(call.data,'lightbar_color3'),
+                    check_key(call.data,'lightbar_color4'),
+                    check_key(call.data,'lightbar_color5'),
+                    check_key(call.data,'lightbar_color6'),
+                    check_key(call.data,'lightbar_color7'),
+                    check_key(call.data,'lightbar_color8'),
+                    check_key(call.data,'lightbar_color9'),
+                    check_key(call.data,'lightbar_color10'),
+                    check_key(call.data,'lightbar_color11'),
+                    check_key(call.data,'lightbar_color12')]:
+                if c is not None:
+                    color_list+=[c[0],c[1],c[2]]
+            s=check_key(call.data, 'lightbar_sparkle')
+            r=check_key(call.data, 'lightbar_rainbow')
+
+
+            attributes_dict={}
+            attributes_dict["display"]="set"
+            if s is not None:
+                attributes_dict["sparkle"]=f"{s}"
+            if r is not None:
+                attributes_dict["rainbow"]=f"{r}"
             lbde_dict=LightbarDisplayDict({"colors": color_list,
                                            "duration": int(call.data['duration']),
                                            "speed": int(call.data['speed']),
-                                           "attributes": {"display":"set",
-                                                          "sparkle":call.data['lightbar_sparkle'],
-                                                          "rainbow":call.data['lightbar_rainbow']}
-                                                        
+                                           "attributes": attributes_dict                                                        
                                            })
             _LOGGER.warning(f"lbde_dict={ldbe_dict}")
                                           
