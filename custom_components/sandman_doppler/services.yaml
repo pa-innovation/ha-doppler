@@ -255,7 +255,7 @@ setlightbarcolorservice:
       selector:
         color_rgb:
     lightbar_color4:
-      name: Color 1
+      name: Color 4
       description: Fourth color of lightbar
       required: false
       advanced: false
@@ -343,7 +343,10 @@ setlightbarcolorservice:
       required: false
       advanced: false
       selector:
-        boolean:
+        select:
+          - Low
+          - Medium
+          - High
     lightbar_rainbow:
       name: Rainbow
       description: Replaces specified palette with rainbow effect

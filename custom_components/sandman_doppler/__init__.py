@@ -211,6 +211,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
                 mydevice=device
                 break
         if mydevice != "":
+            pass
             
     hass.services.async_register(DOMAIN,"setalarmservice",handle_set_alarm_service)
     hass.services.async_register(DOMAIN,"deletealarmservice",handle_delete_alarm_service)
