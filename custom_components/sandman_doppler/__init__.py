@@ -212,6 +212,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
                 mydevice=device
                 break
         if mydevice != "":
+            _LOGGER.warning(f"data was {call.data}")
             _LOGGER.warning(f"Called handle_set_lightbar_color_service")
             color_list=[]
             for c in [
@@ -238,7 +239,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
                                                           "rainbow":call.data['lightbar_rainbow']}
                                                         
                                            })
-            _LOGGER.warning(f"lbde_dict={ldbe_dict})
+            _LOGGER.warning(f"lbde_dict={ldbe_dict}")
                                           
             
     hass.services.async_register(DOMAIN,"setalarmservice",handle_set_alarm_service)
