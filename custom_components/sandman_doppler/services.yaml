@@ -344,9 +344,10 @@ setlightbarcolorservice:
       advanced: false
       selector:
         select:
-          - Low
-          - Medium
-          - High
+          options:
+            - Low
+            - Medium
+            - High
     lightbar_rainbow:
       name: Rainbow
       description: Replaces specified palette with rainbow effect
