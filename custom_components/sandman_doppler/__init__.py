@@ -248,8 +248,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             if r is not None:
                 attributes_dict["rainbow"]=f"{r}"
             lbde_dict=LightbarDisplayDict({"colors": color_list,
-                                           "duration": int(call.data['duration']),
-                                           "speed": int(call.data['speed']),
+                                           "duration": int(call.data['lightbar_duration']),
+                                           "speed": int(call.data['lightbar_speed']),
                                            "attributes": attributes_dict                                                        
                                            })
             _LOGGER.warning(f"lbde_dict={ldbe_dict}")
