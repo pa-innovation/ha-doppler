@@ -236,7 +236,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
                     check_key(call.data,'lightbar_color11'),
                     check_key(call.data,'lightbar_color12')]:
                 if c is not None:
-                    color_list+=[c[0],c[1],c[2]]
+                    color_list.append([c[0],c[1],c[2]])
             s=check_key(call.data, 'lightbar_sparkle')
             r=check_key(call.data, 'lightbar_rainbow')
 
