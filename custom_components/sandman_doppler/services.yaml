@@ -1031,3 +1031,168 @@ setlightbarcometservice:
       advanced: false
       selector:
         boolean:
+setlightbarsweepservice:
+  name: Lightbar Sweep
+  description: Sets lightbar to display a sweep
+  fields:
+    doppler_device_id:
+      name: Doppler ID
+      description: ID of doppler whose display to write to
+      required: true
+      advanced: false
+      selector:
+        device:
+          integration: sandman_doppler
+    lightbar_color1:
+      name: Color 1
+      description: First color of lightbar
+      required: true
+      advanced: false
+      selector:
+        color_rgb:
+    lightbar_color2:
+      name: Color 2
+      description: Second color of lightbar
+      required: false
+      advanced: false
+      selector:
+        color_rgb:
+    lightbar_color3:
+      name: Color 3
+      description: Third color of lightbar
+      required: false
+      advanced: false
+      selector:
+        color_rgb:
+    lightbar_color4:
+      name: Color 4
+      description: Fourth color of lightbar
+      required: false
+      advanced: false
+      selector:
+        color_rgb:
+    lightbar_color5:
+      name: Color 5
+      description: Fifth color of lightbar
+      required: false
+      advanced: false
+      selector:
+        color_rgb:
+    lightbar_color6:
+      name: Color 6
+      description: Sixth color of lightbar
+      required: false
+      advanced: false
+      selector:
+        color_rgb:
+    lightbar_color7:
+      name: Color 7
+      description: Seventh color of lightbar
+      required: false
+      advanced: false
+      selector:
+        color_rgb:
+    lightbar_color8:
+      name: Color 8
+      description: Eighth color of lightbar
+      required: false
+      advanced: false
+      selector:
+        color_rgb:
+    lightbar_color9:
+      name: Color 9
+      description: Ninth color of lightbar
+      required: false
+      advanced: false
+      selector:
+        color_rgb:
+    lightbar_color10:
+      name: Color 10
+      description: Tenth color of lightbar
+      required: false
+      advanced: false
+      selector:
+        color_rgb:
+    lightbar_color11:
+      name: Color 11
+      description: Eleventh color of lightbar
+      required: false
+      advanced: false
+      selector:
+        color_rgb:
+    lightbar_color12:
+      name: Color 12
+      description: Twelveth color of lightbar
+      required: false
+      advanced: false
+      selector:
+        color_rgb:
+    lightbar_duration:
+      name: Duration
+      description: Duration of lightbar effect
+      required: true
+      advanced: false
+      selector:
+        number:
+          min: 0
+          max: 8675309
+          mode: box
+    lightbar_speed:
+      name: Speed
+      description: Speed of lightbar effect
+      required: true
+      advanced: false
+      selector:
+        number:
+          min: 0
+          max: 255
+          mode: box
+    lightbar_gap:
+      name: Gap
+      description: Number of color slices between colors
+      required: false
+      advanced: false
+      selector:
+        number:
+          min: 0
+          max: 255
+          mode: box
+    lightbar_size:
+      name: Size
+      description: Size of Comet
+      required: false
+      advanced: false
+      selector:
+        number:
+          min: 0
+          max: 255
+          mode: box
+    lightbar_direction:
+      name: Direction
+      description: Direction of comet
+      required: false
+      advanced: false
+      selector:
+        select:
+          options:
+            - right
+            - left
+            - bounce
+    lightbar_sparkle:
+      name: Sparkle
+      description: Makes sparkles in the effect
+      required: false
+      advanced: false
+      selector:
+        select:
+          options:
+            - low
+            - medium
+            - high
+    lightbar_rainbow:
+      name: Rainbow
+      description: Replaces specified palette with rainbow effect
+      required: false
+      advanced: false
+      selector:
+        boolean:

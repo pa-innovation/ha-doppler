@@ -500,6 +500,60 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             retval=await client.set_lightbar_effect(mydevice,LightbarDisplayEffect(mydevice,lbde_dict))
             _LOGGER.warning(f"retval={retval.to_dict()}")
 
+    async def handle_set_lightbar_sweep_service(call):
+        deviceregistry=dr.async_get(hass)
+        deviceentry=deviceregistry.async_get(call.data['doppler_device_id'])
+        mydevice=""
+        for device in mydevices.values():
+            if ('sandman_doppler',device.id) in deviceentry.identifiers:
+                _LOGGER.warning(f"got device id in handle_set_lightbar")
+                mydevice=device
+                break
+        if mydevice != "":
+            _LOGGER.warning(f"data was {call.data}")
+            _LOGGER.warning(f"Called handle_set_lightbar_pulse_service")
+            color_list=[]
+            for c in [
+                    check_key(call.data,'lightbar_color1'),
+                    check_key(call.data,'lightbar_color2'),
+                    check_key(call.data,'lightbar_color3'),
+                    check_key(call.data,'lightbar_color4'),
+                    check_key(call.data,'lightbar_color5'),
+                    check_key(call.data,'lightbar_color6'),
+                    check_key(call.data,'lightbar_color7'),
+                    check_key(call.data,'lightbar_color8'),
+                    check_key(call.data,'lightbar_color9'),
+                    check_key(call.data,'lightbar_color10'),
+                    check_key(call.data,'lightbar_color11'),
+                    check_key(call.data,'lightbar_color12')]:
+                if c is not None:
+                    color_list.append([c[0],c[1],c[2]])
+            s=check_key(call.data, 'lightbar_sparkle')
+            r=check_key(call.data, 'lightbar_rainbow')
+            sp=check_key(call.data, 'lightbar_speed')
+            gp=check_key(call.data, 'lightbar_gap')
+
+            attributes_dict={}
+            attributes_dict["display"]="sweep"
+            if gp is not None:
+                attributes_dict["gap"]=f"{gp}"
+            if s is not None:
+                attributes_dict["sparkle"]=f"{s}"
+            if r is not None:
+                if r==True:
+                    attributes_dict["rainbow"]=str("true")
+                else:
+                    attributes_dict["rainbow"]=str("false")
+                                
+            lbde_dict=LightbarDisplayDict({"colors": color_list,
+                                           "duration": int(call.data['lightbar_duration']),
+                                           "speed": int(call.data['lightbar_speed']),
+                                           "attributes": attributes_dict                                                        
+                                           })
+                            
+            _LOGGER.warning(f"lbde_dict={lbde_dict}")
+            retval=await client.set_lightbar_effect(mydevice,LightbarDisplayEffect(mydevice,lbde_dict))
+            _LOGGER.warning(f"retval={retval.to_dict()}")
 
             
 
@@ -512,6 +566,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     hass.services.async_register(DOMAIN,"setlightbarblinkservice",handle_set_lightbar_blink_service)
     hass.services.async_register(DOMAIN,"setlightbarpulseservice",handle_set_lightbar_pulse_service)
     hass.services.async_register(DOMAIN,"setlightbarcometservice",handle_set_lightbar_comet_service)
+    hass.services.async_register(DOMAIN,"setlightbarsweepservice",handle_set_lightbar_sweep_service)
 
     
 
