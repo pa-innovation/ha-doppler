@@ -1177,7 +1177,6 @@ setlightbarsweepservice:
           options:
             - right
             - left
-            - bounce
     lightbar_sparkle:
       name: Sparkle
       description: Makes sparkles in the effect
