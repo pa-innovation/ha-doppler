@@ -246,7 +246,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             if s is not None:
                 attributes_dict["sparkle"]=f"{s}"
             if r is not None:
-                attributes_dict["rainbow"]=f"{r}"
+                attributes_dict["rainbow"]=f"{r}".lower()
             lbde_dict=LightbarDisplayDict({"colors": color_list,
                                            "duration": int(call.data['lightbar_duration']),
                                            "speed": int(call.data['lightbar_speed']),
@@ -254,7 +254,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
                                            })
             _LOGGER.warning(f"lbde_dict={lbde_dict}")
             retval=await client.set_lightbar_effect(mydevice,LightbarDisplayEffect(mydevice,lbde_dict))
-            _LOGGER.warning(f"retval={retval.to_dict()}"
+            _LOGGER.warning(f"retval={retval.to_dict()}")
                                           
             
     hass.services.async_register(DOMAIN,"setalarmservice",handle_set_alarm_service)
