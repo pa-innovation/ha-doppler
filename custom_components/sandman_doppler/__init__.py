@@ -470,14 +470,14 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             s=check_key(call.data, 'lightbar_sparkle')
             r=check_key(call.data, 'lightbar_rainbow')
             sz=check_key(call.data, 'lightbar_size')
-            dr=check_key(call.data, 'lightbar_direction')
+            direct=check_key(call.data, 'lightbar_direction')
 
             attributes_dict={}
             attributes_dict["display"]="comet"
             if sz is not None:
                 attributes_dict["size"]=f"{sz}"
-            if dr is not None:
-                attributes_dict["size"]=f"{dr}"                
+            if direct is not None:
+                attributes_dict["direction"]=f"{direct}"                
             if s is not None:
                 attributes_dict["sparkle"]=f"{s}"
             if r is not None:
