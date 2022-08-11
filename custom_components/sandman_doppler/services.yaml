@@ -599,8 +599,8 @@ seteachlightbarcolorservice:
       selector:
         boolean:
 setlightbarblinkservice:
-  name: Lightbar color
-  description: Sets lightbar to a single color and cycles colors if multiple colors are selected
+  name: Lightbar Blink
+  description: Sets lightbar to blink between one or more colors and black
   fields:
     doppler_device_id:
       name: Doppler ID
