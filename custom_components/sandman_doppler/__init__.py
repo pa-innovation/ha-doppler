@@ -246,7 +246,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             if s is not None:
                 attributes_dict["sparkle"]=f"{s}"
             if r is not None:
-                attributes_dict["rainbow"]=f"{r}".lower()
+                if r==True:
+                    attributes_dict["rainbow"]="true"
+                else:
+                    attributes_dict["rainbow"]="false"
+                    
             lbde_dict=LightbarDisplayDict({"colors": color_list,
                                            "duration": int(call.data['lightbar_duration']),
                                            "speed": int(call.data['lightbar_speed']),
