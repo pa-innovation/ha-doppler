@@ -259,14 +259,86 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             _LOGGER.warning(f"lbde_dict={lbde_dict}")
             retval=await client.set_lightbar_effect(mydevice,LightbarDisplayEffect(mydevice,lbde_dict))
             _LOGGER.warning(f"retval={retval.to_dict()}")
-                                          
+
+    async def handle_set_each_lightbar_color_service(call):
+        deviceregistry=dr.async_get(hass)
+        deviceentry=deviceregistry.async_get(call.data['doppler_device_id'])
+        mydevice=""
+        for device in mydevices.values():
+            if ('sandman_doppler',device.id) in deviceentry.identifiers:
+                _LOGGER.warning(f"got device id in handle_set_lightbar")
+                mydevice=device
+                break
+        if mydevice != "":
+            _LOGGER.warning(f"data was {call.data}")
+            _LOGGER.warning(f"Called handle_set_lightbar_color_service")
+            color_list=[]
+            for c in [
+                    check_key(call.data,'lightbar_color1'),
+                    check_key(call.data,'lightbar_color2'),
+                    check_key(call.data,'lightbar_color3'),
+                    check_key(call.data,'lightbar_color4'),
+                    check_key(call.data,'lightbar_color5'),
+                    check_key(call.data,'lightbar_color6'),
+                    check_key(call.data,'lightbar_color7'),
+                    check_key(call.data,'lightbar_color8'),
+                    check_key(call.data,'lightbar_color9'),
+                    check_key(call.data,'lightbar_color10'),
+                    check_key(call.data,'lightbar_color11'),
+                    check_key(call.data,'lightbar_color12'),
+                    check_key(call.data,'lightbar_color13'),
+                    check_key(call.data,'lightbar_color14'),
+                    check_key(call.data,'lightbar_color15'),
+                    check_key(call.data,'lightbar_color16'),
+                    check_key(call.data,'lightbar_color17'),
+                    check_key(call.data,'lightbar_color18'),
+                    check_key(call.data,'lightbar_color19'),
+                    check_key(call.data,'lightbar_color20'),
+                    check_key(call.data,'lightbar_color21'),
+                    check_key(call.data,'lightbar_color22'),
+                    check_key(call.data,'lightbar_color23'),
+                    check_key(call.data,'lightbar_color24'),
+                    check_key(call.data,'lightbar_color25'),
+                    check_key(call.data,'lightbar_color26'),
+                    check_key(call.data,'lightbar_color27'),
+                    check_key(call.data,'lightbar_color28'),
+                    check_key(call.data,'lightbar_color29'),
+            ]:
+                if c is not None:
+                    color_list.append([c[0],c[1],c[2]])
+            s=check_key(call.data, 'lightbar_sparkle')
+            r=check_key(call.data, 'lightbar_rainbow')
+
+
+            attributes_dict={}
+            attributes_dict["display"]="set-each"
+            if s is not None:
+                attributes_dict["sparkle"]=f"{s}"
+            if r is not None:
+                if r==True:
+                    attributes_dict["rainbow"]=str("true")
+                else:
+                    attributes_dict["rainbow"]=str("false")
+                    
+            lbde_dict=LightbarDisplayDict({"colors": color_list,
+                                           "duration": int(call.data['lightbar_duration']),
+                                           "speed": int(call.data['lightbar_speed']),
+                                           "attributes": attributes_dict                                                        
+                                           })
+            _LOGGER.warning(f"lbde_dict={lbde_dict}")
+            retval=await client.set_lightbar_effect(mydevice,LightbarDisplayEffect(mydevice,lbde_dict))
+            _LOGGER.warning(f"retval={retval.to_dict()}")
+
+
             
+
     hass.services.async_register(DOMAIN,"setalarmservice",handle_set_alarm_service)
     hass.services.async_register(DOMAIN,"deletealarmservice",handle_delete_alarm_service)
     hass.services.async_register(DOMAIN,"displaytextmainservice",handle_set_main_display_service)
     hass.services.async_register(DOMAIN,"displaynumminiservice",handle_set_mini_display_service)
     hass.services.async_register(DOMAIN,"setlightbarcolorservice",handle_set_lightbar_color_service)
-
+    hass.services.async_register(DOMAIN,"seteachlightbarcolorservice",handle_set_each_lightbar_color_service)
+            
     
 
         

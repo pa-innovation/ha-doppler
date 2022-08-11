@@ -355,3 +355,246 @@ setlightbarcolorservice:
       advanced: false
       selector:
         boolean:
+seteachlightbarcolorservice:
+  name: Lightbar color
+  description: Sets lightbar to a single color and cycles colors if multiple colors are selected
+  fields:
+    doppler_device_id:
+      name: Doppler ID
+      description: ID of doppler whose display to write to
+      required: true
+      advanced: false
+      selector:
+        device:
+          integration: sandman_doppler
+    lightbar_color1:
+      name: Color 1
+      description: First color of lightbar
+      required: true
+      advanced: false
+      selector:
+        color_rgb:
+    lightbar_color2:
+      name: Color 2
+      description: Second color of lightbar
+      required: false
+      advanced: false
+      selector:
+        color_rgb:
+    lightbar_color3:
+      name: Color 3
+      description: Third color of lightbar
+      required: false
+      advanced: false
+      selector:
+        color_rgb:
+    lightbar_color4:
+      name: Color 4
+      description: Fourth color of lightbar
+      required: false
+      advanced: false
+      selector:
+        color_rgb:
+    lightbar_color5:
+      name: Color 5
+      description: Fifth color of lightbar
+      required: false
+      advanced: false
+      selector:
+        color_rgb:
+    lightbar_color6:
+      name: Color 6
+      description: Sixth color of lightbar
+      required: false
+      advanced: false
+      selector:
+        color_rgb:
+    lightbar_color7:
+      name: Color 7
+      description: Seventh color of lightbar
+      required: false
+      advanced: false
+      selector:
+        color_rgb:
+    lightbar_color8:
+      name: Color 8
+      description: Eighth color of lightbar
+      required: false
+      advanced: false
+      selector:
+        color_rgb:
+    lightbar_color9:
+      name: Color 9
+      description: Ninth color of lightbar
+      required: false
+      advanced: false
+      selector:
+        color_rgb:
+    lightbar_color10:
+      name: Color 10
+      description: Tenth color of lightbar
+      required: false
+      advanced: false
+      selector:
+        color_rgb:
+    lightbar_color11:
+      name: Color 11
+      description: Eleventh color of lightbar
+      required: false
+      advanced: false
+      selector:
+        color_rgb:
+    lightbar_color12:
+      name: Color 12
+      description: Twelveth color of lightbar
+      required: false
+      advanced: false
+      selector:
+        color_rgb:
+    lightbar_color13:
+      name: Color 13
+      description: Thirteenth color of lightbar
+      required: false
+      advanced: false
+      selector:
+        color_rgb:
+    lightbar_color14:
+      name: Color 14
+      description: Fourteenth color of lightbar
+      required: false
+      advanced: false
+      selector:
+        color_rgb:
+    lightbar_color15:
+      name: Color 15
+      description: Fifteenth color of lightbar
+      required: false
+      advanced: false
+      selector:
+        color_rgb:
+    lightbar_color16:
+      name: Color 16
+      description: Sixteenth color of lightbar
+      required: false
+      advanced: false
+      selector:
+        color_rgb:
+    lightbar_color17:
+      name: Color 17
+      description: Seventeenth color of lightbar
+      required: false
+      advanced: false
+      selector:
+        color_rgb:
+    lightbar_color18:
+      name: Color 18
+      description: Eighteenth color of lightbar
+      required: false
+      advanced: false
+      selector:
+        color_rgb:
+    lightbar_color19:
+      name: Color 19
+      description: Nineteenth color of lightbar
+      required: false
+      advanced: false
+      selector:
+        color_rgb:
+    lightbar_color20:
+      name: Color 20
+      description: Twentieth color of lightbar
+      required: false
+      advanced: false
+      selector:
+        color_rgb:
+    lightbar_color21:
+      name: Color 21
+      description: Twentyfirst color of lightbar
+      required: false
+      advanced: false
+      selector:
+        color_rgb:
+    lightbar_color22:
+      name: Color 22
+      description: Twentysecond color of lightbar
+      required: false
+      advanced: false
+      selector:
+        color_rgb:
+    lightbar_color23:
+      name: Color 23
+      description: Twentythird color of lightbar
+      required: false
+      advanced: false
+      selector:
+        color_rgb:
+    lightbar_color24:
+      name: Color 24
+      description: Twentyfourth color of lightbar
+      required: false
+      advanced: false
+      selector:
+        color_rgb:
+    lightbar_color25:
+      name: Color 25
+      description: Twentyfifth color of lightbar
+      required: false
+      advanced: false
+      selector:
+        color_rgb:
+    lightbar_color26:
+      name: Color 26
+      description: Twentysixth color of lightbar
+      required: false
+      advanced: false
+      selector:
+        color_rgb:
+    lightbar_color27:
+      name: Color 27
+      description: Twentyseventh color of lightbar
+      required: false
+      advanced: false
+      selector:
+        color_rgb:
+    lightbar_color28:
+      name: Color 28
+      description: Twentyeighth color of lightbar
+      required: false
+      advanced: false
+      selector:
+        color_rgb:
+    lightbar_color29:
+      name: Color 29
+      description: Twentyninth color of lightbar
+      required: false
+      advanced: false
+      selector:
+        color_rgb:          
+    lightbar_duration:
+      name: Duration
+      description: Duration of lightbar effect
+      required: true
+      advanced: false
+      selector:
+        number:
+          min: 0
+          max: 8675309
+          mode: box
+    lightbar_sparkle:
+      name: Sparkle
+      description: Makes sparkles in the effect
+      required: false
+      advanced: false
+      selector:
+        select:
+          options:
+            - low
+            - medium
+            - high
+    lightbar_rainbow:
+      name: Rainbow
+      description: Replaces specified palette with rainbow effect
+      required: false
+      advanced: false
+      selector:
+        boolean:
