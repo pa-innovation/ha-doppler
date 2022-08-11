@@ -598,9 +598,9 @@ seteachlightbarcolorservice:
       advanced: false
       selector:
         boolean:
-setlightbarpulseservice:
-  name: Lightbar Pulse
-  description: Sets lightbar to pulse between one or more colors and black
+setlightbarblinkservice:
+  name: Lightbar Blink
+  description: Sets lightbar to blink between one or more colors and black
   fields:
     doppler_device_id:
       name: Doppler ID
@@ -732,9 +732,9 @@ setlightbarpulseservice:
       advanced: false
       selector:
         boolean:
-setlightbarblinkservice:
-  name: Lightbar Blink
-  description: Sets lightbar to blink between one or more colors and black
+setlightbarpulseservice:
+  name: Lightbar Pulse
+  description: Sets lightbar to pulse between one or more colors and black
   fields:
     doppler_device_id:
       name: Doppler ID
