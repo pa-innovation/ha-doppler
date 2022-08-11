@@ -356,8 +356,8 @@ setlightbarcolorservice:
       selector:
         boolean:
 seteachlightbarcolorservice:
-  name: Lightbar color
-  description: Sets lightbar to a single color and cycles colors if multiple colors are selected
+  name: Lightbar color Set Each
+  description: Sets each dot on the lightbar individually for duration
   fields:
     doppler_device_id:
       name: Doppler ID
