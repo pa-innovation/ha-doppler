@@ -322,7 +322,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
                     
             lbde_dict=LightbarDisplayDict({"colors": color_list,
                                            "duration": int(call.data['lightbar_duration']),
-                                           "speed": int(call.data['lightbar_speed']),
+                                           "speed": 0,
                                            "attributes": attributes_dict                                                        
                                            })
             _LOGGER.warning(f"lbde_dict={lbde_dict}")
