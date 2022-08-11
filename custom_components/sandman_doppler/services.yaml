@@ -1159,7 +1159,7 @@ setlightbarsweepservice:
           mode: box
     lightbar_size:
       name: Size
-      description: Size of Comet
+      description: Size of Sweep
       required: false
       advanced: false
       selector:
@@ -1169,7 +1169,7 @@ setlightbarsweepservice:
           mode: box
     lightbar_direction:
       name: Direction
-      description: Direction of comet
+      description: Direction of Sweep
       required: false
       advanced: false
       selector:
