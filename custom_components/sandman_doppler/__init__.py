@@ -476,8 +476,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             attributes_dict["display"]="comet"
             if sz is not None:
                 attributes_dict["size"]=f"{sz}"
+            else:
+                attributes_dict["size"]=f"10"
             if direct is not None:
-                attributes_dict["direction"]=f"{direct}"                
+                attributes_dict["direction"]=f"{direct}"
+            else:
+                attributes_dict["direction"]="right"                
             if s is not None:
                 attributes_dict["sparkle"]=f"{s}"
             if r is not None:

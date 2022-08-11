@@ -995,7 +995,7 @@ setlightbarcometservice:
     lightbar_size:
       name: Size
       description: Size of Comet
-      required: true
+      required: false
       advanced: false
       selector:
         number:
@@ -1005,7 +1005,7 @@ setlightbarcometservice:
     lightbar_direction:
       name: Direction
       description: Direction of comet
-      required: true
+      required: false
       advanced: false
       selector:
         select:
