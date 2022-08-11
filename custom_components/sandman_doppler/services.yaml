@@ -709,6 +709,7 @@ setlightbarblinkservice:
       description: Speed of lightbar effect
       required: false
       advanced: false
+      default: 1
       selector:
         number:
           min: 0

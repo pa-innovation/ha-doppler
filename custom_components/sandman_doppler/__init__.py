@@ -371,19 +371,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
                     attributes_dict["rainbow"]=str("true")
                 else:
                     attributes_dict["rainbow"]=str("false")
-            if sp is not None:
-                speed=sp
-            else:
-                speed=None
-                    
+                                
             lbde_dict=LightbarDisplayDict({"colors": color_list,
                                            "duration": int(call.data['lightbar_duration']),
-                                           "speed": int(speed),
+                                           "speed": int('lightbar_speed'),
                                            "attributes": attributes_dict                                                        
                                            })
-            if speed is None:
-                del lbde_dict['speed']
-                
+                            
             _LOGGER.warning(f"lbde_dict={lbde_dict}")
             retval=await client.set_lightbar_effect(mydevice,LightbarDisplayEffect(mydevice,lbde_dict))
             _LOGGER.warning(f"retval={retval.to_dict()}")
