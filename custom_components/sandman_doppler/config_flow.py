@@ -52,10 +52,12 @@ class BlueprintFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                 {
                     vol.Required(CONF_EMAIL): str,
                     vol.Required(CONF_PASSWORD): str,
-                    vol.Required(CONF_LATITUDE,
-                                 default=self.hass.config.latitude): cv.latitude,
-                    vol.Required(CONF_LONGITUDE,
-                                 default=self.hass.config.longitude) : cv.longitude
+                    vol.Required(
+                        CONF_LATITUDE, default=self.hass.config.latitude
+                    ): cv.latitude,
+                    vol.Required(
+                        CONF_LONGITUDE, default=self.hass.config.longitude
+                    ): cv.longitude,
                 }
             ),
             errors=self._errors,

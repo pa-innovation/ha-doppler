@@ -82,7 +82,9 @@ class DopplerDisplayLightDay(BaseDopplerLight):
     @property
     def brightness(self) -> int:
         """Return the brightness of this light between 0..255."""
-        brightness = self.coordinator.data[self.device.name][ATTR_DAY_DISPLAY_BRIGHTNESS]
+        brightness = self.coordinator.data[self.device.name][
+            ATTR_DAY_DISPLAY_BRIGHTNESS
+        ]
         if brightness is not None:
             return round((brightness / 100) * 255)
         return 0
@@ -121,7 +123,9 @@ class DopplerDisplayLightNight(BaseDopplerLight):
     @property
     def brightness(self) -> int:
         """Return the brightness of this light between 0..255."""
-        brightness = self.coordinator.data[self.device.name][ATTR_NIGHT_DISPLAY_BRIGHTNESS]
+        brightness = self.coordinator.data[self.device.name][
+            ATTR_NIGHT_DISPLAY_BRIGHTNESS
+        ]
         if brightness is not None:
             return round((brightness / 100) * 255)
         return 0
@@ -150,7 +154,9 @@ class DopplerButtonLightDay(BaseDopplerLight):
     @property
     def rgb_color(self) -> tuple[int, int, int] | None:
         """Return the rgb color value [int, int, int]."""
-        color: Color | None = self.coordinator.data[self.device.name][ATTR_DAY_BUTTON_COLOR]
+        color: Color | None = self.coordinator.data[self.device.name][
+            ATTR_DAY_BUTTON_COLOR
+        ]
         if not color:
             return None
         return (color.red, color.green, color.blue)
@@ -172,14 +178,14 @@ class DopplerButtonLightDay(BaseDopplerLight):
                 self.device,
                 int(100 * brightness / 255),
             )
-        
+
         if rgb_color is not None:
 
-            await self.coordinator.api.set_sync_button_display_color(
-                self.device,False)
+            await self.coordinator.api.set_sync_button_display_color(self.device, False)
             await self.coordinator.api.set_day_button_color(
                 self.device, Color(rgb_color[0], rgb_color[1], rgb_color[2])
             )
+
 
 class DopplerButtonLightNight(BaseDopplerLight):
     """Doppler Button Light class."""
@@ -190,7 +196,9 @@ class DopplerButtonLightNight(BaseDopplerLight):
     @property
     def rgb_color(self) -> tuple[int, int, int] | None:
         """Return the rgb color value [int, int, int]."""
-        color: Color | None = self.coordinator.data[self.device.name][ATTR_NIGHT_BUTTON_COLOR]
+        color: Color | None = self.coordinator.data[self.device.name][
+            ATTR_NIGHT_BUTTON_COLOR
+        ]
         if not color:
             return None
         return (color.red, color.green, color.blue)
@@ -198,11 +206,12 @@ class DopplerButtonLightNight(BaseDopplerLight):
     @property
     def brightness(self) -> int:
         """Return the brightness of this light between 0..255."""
-        brightness = self.coordinator.data[self.device.name][ATTR_NIGHT_BUTTON_BRIGHTNESS]
+        brightness = self.coordinator.data[self.device.name][
+            ATTR_NIGHT_BUTTON_BRIGHTNESS
+        ]
         if brightness is not None:
             return round((brightness / 100) * 255)
         return 0
-
 
     async def async_turn_on(self, **kwargs: Any) -> None:
         """Turn the device on."""
@@ -215,8 +224,7 @@ class DopplerButtonLightNight(BaseDopplerLight):
             )
         if rgb_color is not None:
 
-            await self.coordinator.api.set_sync_button_display_color(
-                self.device, False)
+            await self.coordinator.api.set_sync_button_display_color(self.device, False)
             await self.coordinator.api.set_night_button_color(
                 self.device, Color(rgb_color[0], rgb_color[1], rgb_color[2])
             )

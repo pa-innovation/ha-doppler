@@ -12,7 +12,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import DopplerDataUpdateCoordinator
-from .const import ATTR_VOLUME_LEVEL, ATTR_TIMEOFFSET,DOMAIN
+from .const import ATTR_VOLUME_LEVEL, ATTR_TIMEOFFSET, DOMAIN
 from .entity import DopplerEntity
 
 _LOGGER = logging.getLogger(__name__)
@@ -34,8 +34,6 @@ async def async_setup_entry(
     async_add_devices(entities)
 
 
-
-    
 #    async_add_devices(
 #        [
 #            DopplerVolumeLevelNumber(coordinator, entry, device, "Volume Level"),
@@ -57,16 +55,15 @@ class DopplerVolumeLevelNumber(DopplerEntity, NumberEntity):
     #     """Return the current value."""
     #     return self.coordinator.data[self.device.name][ATTR_VOLUME_LEVEL]
 
-  
     @property
-    def native_value(self) -> float |None:
+    def native_value(self) -> float | None:
         """Return the current value"""
         return self.coordinator.data[self.device.name][ATTR_VOLUME_LEVEL]
-    
-    async def async_set_native_value(self, value:float) -> None:
+
+    async def async_set_native_value(self, value: float) -> None:
         """Update the current volume value"""
         self._attr_native_value = value
-        await self.coordinator.api.set_volume_level(self.device,int(value))
+        await self.coordinator.api.set_volume_level(self.device, int(value))
 
 
 class DopplerTimeOffsetNumber(DopplerEntity, NumberEntity):
@@ -76,15 +73,13 @@ class DopplerTimeOffsetNumber(DopplerEntity, NumberEntity):
     _attr_native_min_value = -128
     _attr_native_max_value = +127
     _attr_mode = "box"
-    
+
     @property
     def native_value(self) -> int:
         """Return the current value"""
         return self.coordinator.data[self.device.name][ATTR_TIMEOFFSET]
-    
-    async def async_set_native_value(self, value:int) -> None:
+
+    async def async_set_native_value(self, value: int) -> None:
         """Update the current volume value"""
         self._attr_native_value = value
-        await self.coordinator.api.set_offset(self.device,int(value))
-
-
+        await self.coordinator.api.set_offset(self.device, int(value))

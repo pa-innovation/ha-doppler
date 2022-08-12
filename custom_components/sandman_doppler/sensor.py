@@ -49,61 +49,65 @@ async def async_setup_entry(
                 DopplerDayNightSensor(coordinator, entry, device, "Day/Night Mode"),
                 DopplerWifiUptimeSensor(coordinator, entry, device, "Wifi Uptime"),
                 DopplerWifiSSIDSensor(coordinator, entry, device, "Wifi SSID"),
-                DopplerWifiSignalStrengthSensor(coordinator, entry, device, "Wifi Signal Strength"),
-#                DopplerAlarmsSensor(coordinator, entry, device, "Alarms"),
+                DopplerWifiSignalStrengthSensor(
+                    coordinator, entry, device, "Wifi Signal Strength"
+                ),
+                #                DopplerAlarmsSensor(coordinator, entry, device, "Alarms"),
             ]
         )
     async_add_devices(entities)
 
-class DopplerLightSensor(DopplerEntity,SensorEntity):
-    
+
+class DopplerLightSensor(DopplerEntity, SensorEntity):
+
     _attr_state_class = SensorStateClass.MEASUREMENT
 
     @property
     def native_value(self):
-         return self.coordinator.data[self.device.name][ATTR_LIGHTSENSOR_VALUE]
+        return self.coordinator.data[self.device.name][ATTR_LIGHTSENSOR_VALUE]
 
 
-class DopplerDayNightSensor(DopplerEntity,SensorEntity):
-    
+class DopplerDayNightSensor(DopplerEntity, SensorEntity):
+
     _attr_state_class = SensorStateClass.MEASUREMENT
 
     @property
     def native_value(self):
-         return self.coordinator.data[self.device.name][ATTR_DAYNIGHTMODE_VALUE]
+        return self.coordinator.data[self.device.name][ATTR_DAYNIGHTMODE_VALUE]
 
 
-class DopplerWifiUptimeSensor(DopplerEntity,SensorEntity):
-    
+class DopplerWifiUptimeSensor(DopplerEntity, SensorEntity):
+
     _attr_state_class = SensorStateClass.MEASUREMENT
 
     @property
     def native_value(self):
-         return self.coordinator.data[self.device.name][ATTR_WIFI].uptime
+        return self.coordinator.data[self.device.name][ATTR_WIFI].uptime
 
-     
-class DopplerWifiSSIDSensor(DopplerEntity,SensorEntity):
-    
+
+class DopplerWifiSSIDSensor(DopplerEntity, SensorEntity):
+
     _attr_state_class = SensorStateClass.MEASUREMENT
 
     @property
     def native_value(self):
-         return self.coordinator.data[self.device.name][ATTR_WIFI].ssid
+        return self.coordinator.data[self.device.name][ATTR_WIFI].ssid
 
-class DopplerWifiSignalStrengthSensor(DopplerEntity,SensorEntity):
-    
+
+class DopplerWifiSignalStrengthSensor(DopplerEntity, SensorEntity):
+
     _attr_state_class = SensorStateClass.MEASUREMENT
 
     @property
     def native_value(self):
         return self.coordinator.data[self.device.name][ATTR_WIFI].signalstrength
 
+
 # class DopplerAlarmsSensor(DopplerEntity,SensorEntity):
-    
+
 #     _attr_state_class = SensorStateClass.MEASUREMENT
 
 #     @property
 #     def native_value(self):
 #         mylist =[Alarm.to_dict(alarm) for alarm in self.coordinator.data[self.device.name][ATTR_ALARMS]]
 #         return mylist
-

@@ -35,7 +35,7 @@ ATTR_ALEXA_TAPTALK_TONE = "alexa_taptalk_tone"
 ATTR_ALEXA_WAKEWORD_TONE = "alexa_wakeword_tone"
 ATTR_SOUND_PRESET = "sound_preset"
 ATTR_SOUND_PRESET_MODE = "sound_preset_mode"
-ATTR_WEATHER_ON= "weather_on"
+ATTR_WEATHER_ON = "weather_on"
 ATTR_WEATHER_MODE = "weather_mode"
 ATTR_LIGHTSENSOR_VALUE = "lightsensor"
 ATTR_DAYNIGHTMODE_VALUE = "daynight"
@@ -60,18 +60,19 @@ If you have any issues with this you need to open an issue here:
 """
 
 
-#Weather modes
-WEATHER_OPTIONS = ["Off" ,               #0
-                   "Daily Max F",        #1
-                   "Daily Max C",        #2
-                   "Daily Avg Humidity", #3
-                   "Daily AQI",          #4
-                   "Daily Min F",        #5
-                   "Daily Min C",        #6
-                   "Daily Humidity Min", #7
-                   "Daily Humididy Max", #8
-                   "Hourly F",           #9
-                   "Hourly C",           #10
-                   "Hourly Humidity",    #11
-                   "Hourly AQI",         #12
-                   ]
+# Weather modes
+WEATHER_OPTIONS = [
+    "Off",  # 0
+    "Daily Max F",  # 1
+    "Daily Max C",  # 2
+    "Daily Avg Humidity",  # 3
+    "Daily AQI",  # 4
+    "Daily Min F",  # 5
+    "Daily Min C",  # 6
+    "Daily Humidity Min",  # 7
+    "Daily Humididy Max",  # 8
+    "Hourly F",  # 9
+    "Hourly C",  # 10
+    "Hourly Humidity",  # 11
+    "Hourly AQI",  # 12
+]

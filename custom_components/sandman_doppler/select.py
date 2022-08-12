@@ -12,7 +12,15 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import DopplerDataUpdateCoordinator
-from .const import ATTR_TIME_MODE, ATTR_VOLUME_LEVEL, ATTR_SOUND_PRESET, ATTR_WEATHER_MODE,ATTR_TIMEZONE, WEATHER_OPTIONS, DOMAIN
+from .const import (
+    ATTR_TIME_MODE,
+    ATTR_VOLUME_LEVEL,
+    ATTR_SOUND_PRESET,
+    ATTR_WEATHER_MODE,
+    ATTR_TIMEZONE,
+    WEATHER_OPTIONS,
+    DOMAIN,
+)
 from .entity import DopplerEntity
 
 _LOGGER = logging.getLogger(__name__)
@@ -24,7 +32,7 @@ async def async_setup_entry(
     """Setup sensor platform."""
     coordinator: DopplerDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]
 
-    entities= []
+    entities = []
     for device in coordinator.api.devices.values():
         entities.extend(
             [
@@ -35,8 +43,6 @@ async def async_setup_entry(
             ]
         )
     async_add_devices(entities)
-
-    
 
 
 class DopplerTimeModeNumber(DopplerEntity, SelectEntity):
@@ -53,6 +59,7 @@ class DopplerTimeModeNumber(DopplerEntity, SelectEntity):
         """Change the selected option."""
         await self.coordinator.api.set_time_mode(self.device, int(option))
 
+
 class DopplerSoundPresetSelect(DopplerEntity, SelectEntity):
     """Doppler Time Mode Select class."""
 
@@ -61,7 +68,7 @@ class DopplerSoundPresetSelect(DopplerEntity, SelectEntity):
         "Preset 2 Bass Boost",
         "Preset 3 Treble Boost",
         "Preset 4 Mids Boost",
-        "Preset 5 Untuned"
+        "Preset 5 Untuned",
     ]
 
     @property
@@ -71,16 +78,17 @@ class DopplerSoundPresetSelect(DopplerEntity, SelectEntity):
 
     async def async_select_option(self, option: str) -> None:
         """Change the selected option."""
-        if option=="Preset 1 Balanced":
+        if option == "Preset 1 Balanced":
             await self.coordinator.api.set_sound_preset(self.device, "PRESET1")
-        elif option=="Preset 2 Bass Boost":
+        elif option == "Preset 2 Bass Boost":
             await self.coordinator.api.set_sound_preset(self.device, "PRESET2")
-        elif option=="Preset 3 Treble Boost":
+        elif option == "Preset 3 Treble Boost":
             await self.coordinator.api.set_sound_preset(self.device, "PRESET3")
-        elif option=="Preset 4 Mids Boost":
-            await self.coordinator.api.set_sound_preset(self.device, "PRESET4")        
-        elif option=="Preset 5 Untuned":
+        elif option == "Preset 4 Mids Boost":
+            await self.coordinator.api.set_sound_preset(self.device, "PRESET4")
+        elif option == "Preset 5 Untuned":
             await self.coordinator.api.set_sound_preset(self.device, "PRESET5")
+
 
 class DopplerWeatherModeSelect(DopplerEntity, SelectEntity):
     """Doppler Time Mode Select class."""
@@ -94,9 +102,11 @@ class DopplerWeatherModeSelect(DopplerEntity, SelectEntity):
 
     async def async_select_option(self, option: str) -> str:
         """Change the selected option."""
-        mode = await self.coordinator.api.set_weather_mode(self.device, self._attr_options.index(option))
+        mode = await self.coordinator.api.set_weather_mode(
+            self.device, self._attr_options.index(option)
+        )
         return self._attr_options[mode]
-    
+
 
 class DopplerTimezoneSelect(DopplerEntity, SelectEntity):
     """Doppler Timezone Select class."""
@@ -120,7 +130,7 @@ class DopplerTimezoneSelect(DopplerEntity, SelectEntity):
         "America/Caracas",
         "Canada/Newfoundland",
         "Canada/Atlantic",
-        "Brazil", 
+        "Brazil",
         "Brazil/DeNoronha",
         "Atlantic/Cape_Verde",
         "Europe/London",
@@ -157,7 +167,5 @@ class DopplerTimezoneSelect(DopplerEntity, SelectEntity):
 
     async def async_select_option(self, option: str) -> str:
         """Change the selected option."""
-        mode = await self.coordinator.api.set_timezone(self.device,option)
+        mode = await self.coordinator.api.set_timezone(self.device, option)
         return str(mode)
-
-            
