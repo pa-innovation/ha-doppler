@@ -1,6 +1,8 @@
 """Provides device triggers for sandman_doppler."""
 from __future__ import annotations
 
+from .const import DOMAIN
+
 from typing import Any
 
 import voluptuous as vol
@@ -31,7 +33,7 @@ TRIGGER_TYPES = {"Doppler-4fcd8f3c_butt_1", "Doppler-4fcd8f3c_butt2"}
 
 TRIGGER_SCHEMA = DEVICE_TRIGGER_BASE_SCHEMA.extend(
     {
-        vol.Required(CONF_ENTITY_ID): cv.entity_id,
+#        vol.Required(CONF_ENTITY_ID): cv.entity_id,
         vol.Required(CONF_TYPE): vol.In(TRIGGER_TYPES),
     }
 )
@@ -52,9 +54,9 @@ async def async_get_triggers(
     # return zha_device.device_triggers
 
     # Get all the integrations entities for this device
-    for entry in entity_registry.async_entries_for_device(registry, device_id):
-        if entry.domain != DOMAIN:
-            continue
+    #for entry in entity_registry.async_entries_for_device(registry, device_id):
+    #    if entry.domain != DOMAIN:
+    #        continue
 
         # Add triggers for each entity that belongs to this integration
         # TODO add your own triggers.
@@ -62,7 +64,6 @@ async def async_get_triggers(
             CONF_PLATFORM: "device",
             CONF_DEVICE_ID: device_id,
             CONF_DOMAIN: DOMAIN,
-            CONF_ENTITY_ID: entry.entity_id,
         }
         triggers.append({**base_trigger, CONF_TYPE: "Doppler-4fcd8f3c_butt_1"})
         triggers.append({**base_trigger, CONF_TYPE: "Doppler-4fcd8f3c_butt_2"})
