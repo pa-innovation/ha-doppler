@@ -1,8 +1,6 @@
 """Provides device triggers for sandman_doppler."""
 from __future__ import annotations
 
-from .const import DOMAIN
-
 from typing import Any
 
 import voluptuous as vol
@@ -61,9 +59,6 @@ async def async_get_triggers(
         # Add triggers for each entity that belongs to this integration
         # TODO add your own triggers.
         base_trigger = {
-            CONF_PLATFORM: "device",
-            CONF_DEVICE_ID: device_id,
-            CONF_DOMAIN: DOMAIN,
         }
         triggers.append({**base_trigger, CONF_TYPE: "Doppler-4fcd8f3c_butt_1"})
         triggers.append({**base_trigger, CONF_TYPE: "Doppler-4fcd8f3c_butt_2"})
@@ -80,5 +75,5 @@ async def async_attach_trigger(
     """Attach a trigger."""
 
     return await state_trigger.async_attach_trigger(
-        hass, state_config, action, automation_info, platform_type="event"
+        hass, state_config, action, automation_info, platform_type="device"
     )
