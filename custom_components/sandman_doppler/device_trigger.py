@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 from typing import Any
+import logging
+_LOGGER: logging.Logger = logging.getLogger(__package__)
 
 import voluptuous as vol
 
@@ -68,6 +70,8 @@ async def async_get_triggers(
         CONF_TYPE: "Doppler-4fcd8f3c_butt_1",
     })
 
+    _LOGGER.warning(f"triggers= {triggers}")
+
     return triggers
 
 
@@ -78,12 +82,14 @@ async def async_attach_trigger(
     automation_info: AutomationTriggerInfo,
 ) -> CALLBACK_TYPE:
     """Attach a trigger."""
+
     event_config = event_trigger.TRIGGER_SCHEMA({
         event_trigger.CONF_PLATFORM: "event",
-        event_trigger.CONF_EVENT_TYPE: "Doppler-4fcd8f3c_butt_1",
-    }
-
-    
+        event_trigger.CONF_EVENT_TYPE: "Doppler-4fcd8f3c_butt_1"
+    })
+                                                
+    _LOGGER.warning(f"event_config={event_config}")
+            
     return await event_trigger.async_attach_trigger(
         hass, event_config, action, automation_info, platform_type="device"
     )
