@@ -73,7 +73,7 @@ from .const import (
     STARTUP_MESSAGE,
 )
 
-SCAN_INTERVAL = timedelta(seconds=300)
+SCAN_INTERVAL = timedelta(seconds=900)
 
 _LOGGER: logging.Logger = logging.getLogger(__package__)
 

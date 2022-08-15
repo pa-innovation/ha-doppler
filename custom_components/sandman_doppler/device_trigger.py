@@ -24,6 +24,7 @@ from homeassistant.const import (
 )
 from homeassistant.core import CALLBACK_TYPE, HomeAssistant
 from homeassistant.helpers import config_validation as cv, entity_registry
+from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.typing import ConfigType
 
 from .const import DOMAIN
@@ -44,6 +45,7 @@ async def async_get_triggers(
 ) -> list[dict[str, Any]]:
     """List device triggers for sandman_doppler devices."""
     registry = entity_registry.async_get(hass)
+    device_registry=dr.async_get(hass)
     triggers = []
 
     # TODO Read this comment and remove it.
@@ -60,7 +62,8 @@ async def async_get_triggers(
 
         # Add triggers for each entity that belongs to this integration
         # TODO add your own triggers.
-
+        _LOGGER.warning(f"device_id={device_id}")
+        
     triggers.append({
         # Required fields of TRIGGER_BASE_SCHEMA
         CONF_PLATFORM: "device",
