@@ -63,7 +63,13 @@ async def async_get_triggers(
         # Add triggers for each entity that belongs to this integration
         # TODO add your own triggers.
     _LOGGER.warning(f"device_id={device_id}")
-        
+
+    for device in device_registry:
+        if device['id'] == device_id:
+            _LOGGER.warning(f"device_registry_id={device['id']}")
+
+    
+    
     triggers.append({
         # Required fields of TRIGGER_BASE_SCHEMA
         CONF_PLATFORM: "device",
