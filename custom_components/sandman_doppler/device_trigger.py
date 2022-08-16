@@ -108,11 +108,6 @@ async def async_attach_trigger(
         event_trigger.CONF_PLATFORM: "event",
         event_trigger.CONF_EVENT_TYPE: "Doppler-4fcd8f3c_butt_1"
     },
-    {
-        event_trigger.CONF_PLATFORM: "event",
-        event_trigger.CONF_EVENT_TYPE: "Doppler-4fcd8f3c_butt_2"
-    }
-                                                )
     
     _LOGGER.warning(f"event_config={event_config}")
             
