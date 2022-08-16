@@ -30,12 +30,12 @@ from homeassistant.helpers.typing import ConfigType
 from .const import DOMAIN
 
 # TODO specify your supported trigger types.
-TRIGGER_TYPES = {"Doppler-4fcd8f3c_butt_1", "Doppler-4fcd8f3c_butt2"}
+#TRIGGER_TYPES = {"Doppler-4fcd8f3c_butt_1", "Doppler-4fcd8f3c_butt2"}
 
 TRIGGER_SCHEMA = DEVICE_TRIGGER_BASE_SCHEMA.extend(
     {
 #        vol.Required(CONF_ENTITY_ID): cv.entity_id,
-        vol.Required(CONF_TYPE): vol.In(TRIGGER_TYPES),
+#        vol.Required(CONF_TYPE): vol.In(TRIGGER_TYPES),
     }
 )
 
@@ -107,8 +107,13 @@ async def async_attach_trigger(
     event_config = event_trigger.TRIGGER_SCHEMA({
         event_trigger.CONF_PLATFORM: "event",
         event_trigger.CONF_EVENT_TYPE: "Doppler-4fcd8f3c_butt_1"
-    })
-                                                
+    },
+    {
+        event_trigger.CONF_PLATFORM: "event",
+        event_trigger.CONF_EVENT_TYPE: "Doppler-4fcd8f3c_butt_2"
+    }
+                                                )
+    
     _LOGGER.warning(f"event_config={event_config}")
             
     return await event_trigger.async_attach_trigger(
