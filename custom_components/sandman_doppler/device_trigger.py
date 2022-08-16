@@ -64,9 +64,9 @@ async def async_get_triggers(
         # TODO add your own triggers.
     _LOGGER.warning(f"device_id={device_id}")
 
-    for device in device_registry:
-        if device['id'] == device_id:
-            _LOGGER.warning(f"device_registry_id={device['id']}")
+
+    device_entry=dr.async_get(device_id)
+    _LOGGER.warning(f"device_entry={device_entry}")
 
     
     
