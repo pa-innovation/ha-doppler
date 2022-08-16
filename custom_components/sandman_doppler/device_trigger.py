@@ -65,7 +65,7 @@ async def async_get_triggers(
     _LOGGER.warning(f"device_id={device_id}")
 
 
-    device_entry=dr.async_get(device_id)
+    device_entry=dr.async_get(str(device_id))
     _LOGGER.warning(f"device_entry.identifiers={device_entry.identifiers}")
 
     
