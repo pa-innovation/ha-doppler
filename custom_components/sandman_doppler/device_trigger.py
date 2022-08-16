@@ -41,7 +41,7 @@ TRIGGER_TYPES = {SANDMAN_DOPPLER_BUTTON_EVENT}
 
 TRIGGER_SCHEMA = DEVICE_TRIGGER_BASE_SCHEMA.extend(
     {
-#        vol.Required(CONF_ENTITY_ID): cv.entity_id,
+        vol.Required(CONF_ENTITY_ID): cv.entity_id,
         vol.Required(CONF_TYPE): TRIGGER_TYPES,
     }
 )
