@@ -76,3 +76,7 @@ WEATHER_OPTIONS = [
     "Hourly Humidity",  # 11
     "Hourly AQI",  # 12
 ]
+
+SANDMAN_DOPPLER_BUTTON_EVENT = "sandman_doppler_button_event"
+ATTR_DSN = "dsn"
+ATTR_BUTTON = "button"
