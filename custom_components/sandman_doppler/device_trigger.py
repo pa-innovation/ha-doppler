@@ -45,7 +45,7 @@ async def async_get_triggers(
 ) -> list[dict[str, Any]]:
     """List device triggers for sandman_doppler devices."""
     registry = entity_registry.async_get(hass)
-    device_registry=dr.async_get(hass)
+    my_device_registry=dr.async_get(hass)
     triggers = []
 
     # TODO Read this comment and remove it.
@@ -65,7 +65,7 @@ async def async_get_triggers(
     _LOGGER.warning(f"device_id={device_id}")
 
 
-    device_entry=dr.async_get(str(device_id))
+    device_entry=my_device_registry.async_get(device_id)
     _LOGGER.warning(f"device_entry.identifiers={device_entry.identifiers}")
 
     
