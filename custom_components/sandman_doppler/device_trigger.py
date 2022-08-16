@@ -68,6 +68,9 @@ async def async_get_triggers(
     device_entry=my_device_registry.async_get(device_id)
     _LOGGER.warning(f"device_entry.identifiers={device_entry.identifiers}")
 
+    for id in device_entry.identifiers:
+        if id[1].startswith("Doppler"):
+            trigger_base=id[1]
     
     
     triggers.append({
@@ -76,7 +79,16 @@ async def async_get_triggers(
         CONF_DOMAIN: "sandman_doppler",
         CONF_DEVICE_ID: device_id,
         # Required fields of TRIGGER_SCHEMA
-        CONF_TYPE: "Doppler-4fcd8f3c_butt_1",
+        CONF_TYPE: trigger_base+"_butt_1",
+    })
+
+    triggers.append({
+        # Required fields of TRIGGER_BASE_SCHEMA
+        CONF_PLATFORM: "device",
+        CONF_DOMAIN: "sandman_doppler",
+        CONF_DEVICE_ID: device_id,
+        # Required fields of TRIGGER_SCHEMA
+        CONF_TYPE: trigger_base+"_butt_2",
     })
 
     _LOGGER.warning(f"triggers= {triggers}")
