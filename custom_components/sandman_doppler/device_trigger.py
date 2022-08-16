@@ -30,12 +30,12 @@ from homeassistant.helpers.typing import ConfigType
 from .const import DOMAIN
 
 # TODO specify your supported trigger types.
-#TRIGGER_TYPES = {"Doppler-4fcd8f3c_butt_1", "Doppler-4fcd8f3c_butt2"}
+TRIGGER_TYPES = {"Doppler-4fcd8f3c_butt_1", "Doppler-4fcd8f3c_butt2"}
 
 TRIGGER_SCHEMA = DEVICE_TRIGGER_BASE_SCHEMA.extend(
     {
 #        vol.Required(CONF_ENTITY_ID): cv.entity_id,
-#        vol.Required(CONF_TYPE): vol.In(TRIGGER_TYPES),
+        vol.Required(CONF_TYPE): vol.In(TRIGGER_TYPES),
     }
 )
 
