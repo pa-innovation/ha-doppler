@@ -114,7 +114,7 @@ async def async_attach_trigger(
         event_trigger.CONF_EVENT_TYPE: SANDMAN_DOPPLER_BUTTON_EVENT,
         event_trigger.CONF_EVENT_DATA: {
             ATTR_DSN: dsn,
-            ATTR_BUTTON: {"button1":1,"button2":2}
+            ATTR_BUTTON: {"button1","button2"}
         },
     },)
     
