@@ -87,8 +87,22 @@ async def async_get_triggers(
         CONF_DEVICE_ID: device_id,
         # Required fields of TRIGGER_SCHEMA
         CONF_TYPE: SANDMAN_DOPPLER_BUTTON_EVENT,
+        CONF_SUBTYPE: "button1"
+        
     })
 
+    triggers.append({
+        # Required fields of TRIGGER_BASE_SCHEMA
+        CONF_PLATFORM: "device",
+        CONF_DOMAIN: "sandman_doppler",
+        CONF_DEVICE_ID: device_id,
+        # Required fields of TRIGGER_SCHEMA
+        CONF_TYPE: SANDMAN_DOPPLER_BUTTON_EVENT,
+        CONF_SUBTYPE: "button2"
+        
+    })
+
+    
     _LOGGER.warning(f"triggers= {triggers}")
 
     return triggers
