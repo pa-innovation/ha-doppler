@@ -20,6 +20,7 @@ from homeassistant.const import (
     CONF_ENTITY_ID,
     CONF_PLATFORM,
     CONF_TYPE,
+    CONF_SUBTYPE,
     STATE_OFF,
     STATE_ON,
 )
