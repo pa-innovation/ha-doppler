@@ -60,9 +60,10 @@ async def async_get_triggers(
     assert device_entry
     _LOGGER.warning(f"device_entry.identifiers={device_entry.identifiers}")
 
-    for id in device_entry.identifiers:
-        if id[1].startswith("Doppler"):
-            dsn = id[1]
+    # for id in device_entry.identifiers:
+    #     if id[1].startswith("Doppler"):
+    #         dsn = id[1]
+    dsn = "test"
 
     for i in range(1, 3):
         triggers.append({
