@@ -37,13 +37,10 @@ from .const import (
     ATTR_BUTTON,
 )
 
-# TODO specify your supported trigger types.
-#TRIGGER_TYPES = {"Doppler-4fcd8f3c_butt_1", "Doppler-4fcd8f3c_butt_2"}
 TRIGGER_TYPES = {"sandman_doppler_button_event"}
 
 TRIGGER_SCHEMA = DEVICE_TRIGGER_BASE_SCHEMA.extend(
     {
-#        vol.Required(CONF_ENTITY_ID): cv.entity_id,
         vol.Required(CONF_TYPE): vol.In(TRIGGER_TYPES),
     }
 )
@@ -69,15 +66,13 @@ async def async_get_triggers(
 
     for i in range(1, 3):
         triggers.append({
-            # Required fields of TRIGGER_BASE_SCHEMA
             CONF_PLATFORM: "device",
             CONF_DOMAIN: "sandman_doppler",
             CONF_DEVICE_ID: device_id,
-            "dsn": dsn,
-            "button_num": i,
-            # Required fields of TRIGGER_SCHEMA
+            ATTR_DSN: dsn,
+            ATTR_BUTTON: i,
             CONF_TYPE: "sandman_doppler_button_event",
-            "subtype": i,
+            CONF_SUBTYPE: i,
         })
 
     _LOGGER.warning(f"triggers= {triggers}")
