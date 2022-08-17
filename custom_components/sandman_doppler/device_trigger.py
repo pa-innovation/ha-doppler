@@ -39,7 +39,7 @@ from .const import (
 
 # TODO specify your supported trigger types.
 #TRIGGER_TYPES = {"Doppler-4fcd8f3c_butt_1", "Doppler-4fcd8f3c_butt2"}
-TRIGGER_TYPES = {SANDMAN_DOPPLER_BUTTON1_EVENT,SANDMAN_DOPPLER_BUTTON2_EVENT}
+TRIGGER_TYPES = {SANDMAN_DOPPLER_BUTTON_EVENT}
 
 TRIGGER_SCHEMA = DEVICE_TRIGGER_BASE_SCHEMA.extend(
     {
