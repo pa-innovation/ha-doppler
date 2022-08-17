@@ -57,20 +57,6 @@ async def async_get_triggers(
     my_device_registry=dr.async_get(hass)
     triggers = []
 
-    # TODO Read this comment and remove it.
-    # This example shows how to iterate over the entities of this device
-    # that match this integration. If your triggers instead rely on
-    # events fired by devices without entities, do something like:
-    # zha_device = await _async_get_zha_device(hass, device_id)
-    # return zha_device.device_triggers
-
-    # Get all the integrations entities for this device
-    #for entry in entity_registry.async_entries_for_device(registry, device_id):
-    #    if entry.domain != DOMAIN:
-    #        continue
-
-        # Add triggers for each entity that belongs to this integration
-        # TODO add your own triggers.
     _LOGGER.warning(f"device_id={device_id}")
 
 
@@ -108,19 +94,19 @@ async def async_attach_trigger(
     my_device_registry=dr.async_get(hass)
     device=my_device_registry.async_get(config[CONF_DEVICE_ID])
 
-    for id in device.identifiers:
-        if id.startswith("Doppler"):
-            dsn=id
+#    for id in device.identifiers:
+#        if id.startswith("Doppler"):
+#            dsn=id
     
     event_config = event_trigger.TRIGGER_SCHEMA({
         event_trigger.CONF_PLATFORM: CONF_EVENT,
         event_trigger.CONF_EVENT_TYPE: "sandman_doppler_button_event",
-#        event_trigger.CONF_EVENT_DATA: {
+        event_trigger.CONF_EVENT_DATA: {
 #            ATTR_DSN: dsn,
 #            ATTR_BUTTON: {"button1","button2"},
-#            CONF_DEVICE_ID: config[CONF_DEVICE_ID],
-#            CONF_TYPE: config[CONF_TYPE]
-#        },
+            CONF_DEVICE_ID: config[CONF_DEVICE_ID],
+            CONF_TYPE: config[CONF_TYPE]
+        },
     },)
     
     _LOGGER.warning(f"event_config={event_config}")
