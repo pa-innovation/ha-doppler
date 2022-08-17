@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from typing import Any
 import logging
+
 _LOGGER: logging.Logger = logging.getLogger(__package__)
 
 import voluptuous as vol
@@ -29,13 +30,13 @@ from homeassistant.helpers import config_validation as cv, entity_registry
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.typing import ConfigType
 
-from .const import (
-    DOMAIN,
-    SANDMAN_DOPPLER_BUTTON1_EVENT,
-    SANDMAN_DOPPLER_BUTTON2_EVENT,
-    ATTR_DSN,
-    ATTR_BUTTON,
-)
+#from .const import (
+#    DOMAIN,
+#    SANDMAN_DOPPLER_BUTTON1_EVENT,
+#    SANDMAN_DOPPLER_BUTTON2_EVENT,
+#    ATTR_DSN,
+#    ATTR_BUTTON,
+#)
 
 TRIGGER_TYPES = {"sandman_doppler_button_event"}
 
@@ -66,19 +67,31 @@ async def async_get_triggers(
     dsn = "test"
 
     for i in range(1, 3):
-        triggers.append({
+        triggers.append(
+            {
+                CONF_PLATFORM: "device",
+                CONF_DOMAIN: "sandman_doppler",
+                CONF_DEVICE_ID: device_id,
+                ATTR_DSN: dsn,
+                ATTR_BUTTON: i,
+                CONF_TYPE: "sandman_doppler_button_event",
+                CONF_SUBTYPE: i,
+            }
+        )
+
+    _LOGGER.warning(f"triggers= {triggers}")
+
+    return [
+        {
             CONF_PLATFORM: "device",
             CONF_DOMAIN: "sandman_doppler",
             CONF_DEVICE_ID: device_id,
             ATTR_DSN: dsn,
-            ATTR_BUTTON: i,
+            ATTR_BUTTON: 1,
             CONF_TYPE: "sandman_doppler_button_event",
-            CONF_SUBTYPE: i,
-        })
-
-    _LOGGER.warning(f"triggers= {triggers}")
-
-    return triggers
+            CONF_SUBTYPE: 1,
+        }
+    ]
 
 
 async def async_attach_trigger(
@@ -89,26 +102,28 @@ async def async_attach_trigger(
 ) -> CALLBACK_TYPE:
     """Attach a trigger."""
 
-#    my_device_registry=dr.async_get(hass)
-#    device=my_device_registry.async_get(config[CONF_DEVICE_ID])
+    #    my_device_registry=dr.async_get(hass)
+    #    device=my_device_registry.async_get(config[CONF_DEVICE_ID])
 
-#    for id in device.identifiers:
-#        if id.startswith("Doppler"):
-#            dsn=id
-    
-    event_config = event_trigger.TRIGGER_SCHEMA({
-        event_trigger.CONF_PLATFORM: "event",
-        event_trigger.CONF_EVENT_TYPE: "sandman_doppler_button_event",
-#        event_trigger.CONF_EVENT_DATA: {
-#            ATTR_DSN: dsn,
-#            ATTR_BUTTON: {"button1","button2"},
-#            CONF_DEVICE_ID: config[CONF_DEVICE_ID],
-#            CONF_TYPE: config[CONF_TYPE],
-#        },
-    })
-    
+    #    for id in device.identifiers:
+    #        if id.startswith("Doppler"):
+    #            dsn=id
+
+    event_config = event_trigger.TRIGGER_SCHEMA(
+        {
+            event_trigger.CONF_PLATFORM: "event",
+            event_trigger.CONF_EVENT_TYPE: "sandman_doppler_button_event",
+            #        event_trigger.CONF_EVENT_DATA: {
+            #            ATTR_DSN: dsn,
+            #            ATTR_BUTTON: {"button1","button2"},
+            #            CONF_DEVICE_ID: config[CONF_DEVICE_ID],
+            #            CONF_TYPE: config[CONF_TYPE],
+            #        },
+        }
+    )
+
     _LOGGER.warning(f"event_config={event_config}")
-            
+
     return await event_trigger.async_attach_trigger(
         hass, event_config, action, automation_info, platform_type="device"
     )
