@@ -28,7 +28,13 @@ from homeassistant.helpers import config_validation as cv, entity_registry
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.typing import ConfigType
 
-from .const import DOMAIN
+from .const import (
+    DOMAIN,
+    ATTR_DSN,
+    ATTR_BUTTON,
+    CONF_SUBTYPE,
+)
+
 
 TRIGGER_TYPES = {"sandman_doppler_button_event"}
 
@@ -53,10 +59,11 @@ async def async_get_triggers(
     assert device_entry
     _LOGGER.warning(f"device_entry.identifiers={device_entry.identifiers}")
 
+    #Apparently, identifiers is not giving us a DSN like it used to
     # for id in device_entry.identifiers:
     #     if id[1].startswith("Doppler"):
     #         dsn = id[1]
-#    dsn = "test"
+    dsn = "test"
 
 #    for i in range(1, 3):
 #        triggers.append(
@@ -78,10 +85,10 @@ async def async_get_triggers(
             CONF_PLATFORM: "device",
             CONF_DOMAIN: DOMAIN,
             CONF_DEVICE_ID: device_id,
-#            ATTR_DSN: dsn,
-#            ATTR_BUTTON: 1,
+            ATTR_DSN: dsn,
+            ATTR_BUTTON: 1,
             CONF_TYPE: "sandman_doppler_button_event",
-#            CONF_SUBTYPE: "1",
+#            CONF_SUBTYPE: str(1),
         }
     ]
 
