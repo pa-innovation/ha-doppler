@@ -39,11 +39,11 @@ from .const import (
 
 # TODO specify your supported trigger types.
 #TRIGGER_TYPES = {"Doppler-4fcd8f3c_butt_1", "Doppler-4fcd8f3c_butt2"}
-TRIGGER_TYPES = {SANDMAN_DOPPLER_BUTTON_EVENT}
+TRIGGER_TYPES = {"sandman_doppler_button_event"}
 
 TRIGGER_SCHEMA = DEVICE_TRIGGER_BASE_SCHEMA.extend(
     {
-#        vol.Required(CONF_ENTITY_ID): cv.entity_id,
+        vol.Required(CONF_ENTITY_ID): cv.entity_id,
         vol.Required(CONF_TYPE): TRIGGER_TYPES,
     }
 )
@@ -88,7 +88,7 @@ async def async_get_triggers(
         CONF_DOMAIN: "sandman_doppler",
         CONF_DEVICE_ID: device_id,
         # Required fields of TRIGGER_SCHEMA
-        CONF_TYPE: SANDMAN_DOPPLER_BUTTON_EVENT,
+        CONF_TYPE: "sandman_doppler_button_event",
         
     })
     
@@ -114,7 +114,7 @@ async def async_attach_trigger(
     
     event_config = event_trigger.TRIGGER_SCHEMA({
         event_trigger.CONF_PLATFORM: CONF_EVENT,
-        event_trigger.CONF_EVENT_TYPE: SANDMAN_DOPPLER_BUTTON_EVENT,
+        event_trigger.CONF_EVENT_TYPE: "sandman_doppler_button_event",
 #        event_trigger.CONF_EVENT_DATA: {
 #            ATTR_DSN: dsn,
 #            ATTR_BUTTON: {"button1","button2"},
