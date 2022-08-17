@@ -30,19 +30,22 @@ from homeassistant.helpers import config_validation as cv, entity_registry
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.typing import ConfigType
 
-#from .const import (
-#    DOMAIN,
-#    SANDMAN_DOPPLER_BUTTON1_EVENT,
-#    SANDMAN_DOPPLER_BUTTON2_EVENT,
-#    ATTR_DSN,
-#    ATTR_BUTTON,
-#)
+from .const import (
+    DOMAIN,
+    SANDMAN_DOPPLER_BUTTON1_EVENT,
+    SANDMAN_DOPPLER_BUTTON2_EVENT,
+    ATTR_DSN,
+    ATTR_BUTTON,
+)
 
 TRIGGER_TYPES = {"sandman_doppler_button_event"}
 
 TRIGGER_SCHEMA = DEVICE_TRIGGER_BASE_SCHEMA.extend(
     {
         vol.Required(CONF_TYPE): vol.In(TRIGGER_TYPES),
+        vol.Required(ATTR_DSN): cv.string,
+        vol.Required(ATTR_BUTTON): vol.Coerce(int),
+        vol.Required(CONF_SUBTYPE): vol.Coerce(int),
     }
 )
 
@@ -84,7 +87,7 @@ async def async_get_triggers(
     return [
         {
             CONF_PLATFORM: "device",
-            CONF_DOMAIN: "sandman_doppler",
+            CONF_DOMAIN: DOMAIN,
             CONF_DEVICE_ID: device_id,
             ATTR_DSN: dsn,
             ATTR_BUTTON: 1,
