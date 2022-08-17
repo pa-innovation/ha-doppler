@@ -53,15 +53,15 @@ async def async_get_triggers(
     hass: HomeAssistant, device_id: str
 ) -> list[dict[str, Any]]:
     """List device triggers for sandman_doppler devices."""
-#    registry = entity_registry.async_get(hass)
-#    my_device_registry=dr.async_get(hass)
+    registry = entity_registry.async_get(hass)
+    device_registry=dr.async_get(hass)
 
     triggers = []
 
-#    _LOGGER.warning(f"device_id={device_id}")
+    _LOGGER.warning(f"device_id={device_id}")
 
 
-#    device_entry=my_device_registry.async_get(device_id)
+#    device_entry=device_registry.async_get(device_id)
 #    _LOGGER.warning(f"device_entry.identifiers={device_entry.identifiers}")
 
 #    for id in device_entry.identifiers:
@@ -79,7 +79,7 @@ async def async_get_triggers(
         
     })
     
-#    _LOGGER.warning(f"triggers= {triggers}")
+    _LOGGER.warning(f"triggers= {triggers}")
 
     return triggers
 
