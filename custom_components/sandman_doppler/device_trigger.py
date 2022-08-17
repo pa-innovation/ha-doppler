@@ -53,31 +53,33 @@ async def async_get_triggers(
     hass: HomeAssistant, device_id: str
 ) -> list[dict[str, Any]]:
     """List device triggers for sandman_doppler devices."""
-    registry = entity_registry.async_get(hass)
-    device_registry=dr.async_get(hass)
+    device_registry = dr.async_get(hass)
 
     triggers = []
 
     _LOGGER.warning(f"device_id={device_id}")
 
+    device_entry = device_registry.async_get(device_id)
+    assert device_entry
+    _LOGGER.warning(f"device_entry.identifiers={device_entry.identifiers}")
 
-#    device_entry=device_registry.async_get(device_id)
-#    _LOGGER.warning(f"device_entry.identifiers={device_entry.identifiers}")
+    for id in device_entry.identifiers:
+        if id[1].startswith("Doppler"):
+            dsn = id[1]
 
-#    for id in device_entry.identifiers:
-#        if id[1].startswith("Doppler"):
-#            trigger_base=id[1]
-    
-    
-    triggers.append({
-        # Required fields of TRIGGER_BASE_SCHEMA
-        CONF_PLATFORM: "device",
-        CONF_DOMAIN: "sandman_doppler",
-        CONF_DEVICE_ID: device_id,
-        # Required fields of TRIGGER_SCHEMA
-        CONF_TYPE: "sandman_doppler_button_event",       
-    })
-    
+    for i in range(1, 3):
+        triggers.append({
+            # Required fields of TRIGGER_BASE_SCHEMA
+            CONF_PLATFORM: "device",
+            CONF_DOMAIN: "sandman_doppler",
+            CONF_DEVICE_ID: device_id,
+            "dsn": dsn,
+            "button_num": i,
+            # Required fields of TRIGGER_SCHEMA
+            CONF_TYPE: "sandman_doppler_button_event",
+            "subtype": i,
+        })
+
     _LOGGER.warning(f"triggers= {triggers}")
 
     return triggers
