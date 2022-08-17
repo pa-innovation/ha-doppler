@@ -45,7 +45,7 @@ TRIGGER_SCHEMA = DEVICE_TRIGGER_BASE_SCHEMA.extend(
         vol.Required(CONF_TYPE): vol.In(TRIGGER_TYPES),
         vol.Required(ATTR_DSN): cv.string,
         vol.Required(ATTR_BUTTON): vol.Coerce(int),
-        vol.Required(CONF_SUBTYPE): vol.Coerce(int),
+        vol.Required(CONF_SUBTYPE): vol.Coerce(str),
     }
 )
 
@@ -92,7 +92,7 @@ async def async_get_triggers(
             ATTR_DSN: dsn,
             ATTR_BUTTON: 1,
             CONF_TYPE: "sandman_doppler_button_event",
-            CONF_SUBTYPE: 1,
+            CONF_SUBTYPE: "1",
         }
     ]
 
