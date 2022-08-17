@@ -115,12 +115,12 @@ async def async_attach_trigger(
     event_config = event_trigger.TRIGGER_SCHEMA({
         event_trigger.CONF_PLATFORM: CONF_EVENT,
         event_trigger.CONF_EVENT_TYPE: SANDMAN_DOPPLER_BUTTON_EVENT,
-        event_trigger.CONF_EVENT_DATA: {
-            ATTR_DSN: dsn,
-            ATTR_BUTTON: {"button1","button2"},
-            CONF_DEVICE_ID: config[CONF_DEVICE_ID],
-            CONF_TYPE: config[CONF_TYPE]
-        },
+#        event_trigger.CONF_EVENT_DATA: {
+#            ATTR_DSN: dsn,
+#            ATTR_BUTTON: {"button1","button2"},
+#            CONF_DEVICE_ID: config[CONF_DEVICE_ID],
+#            CONF_TYPE: config[CONF_TYPE]
+#        },
     },)
     
     _LOGGER.warning(f"event_config={event_config}")
