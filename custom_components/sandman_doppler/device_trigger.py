@@ -75,8 +75,7 @@ async def async_get_triggers(
         CONF_DOMAIN: "sandman_doppler",
         CONF_DEVICE_ID: device_id,
         # Required fields of TRIGGER_SCHEMA
-        CONF_TYPE: "sandman_doppler_button_event",
-        
+        CONF_TYPE: "sandman_doppler_button_event",       
     })
     
     _LOGGER.warning(f"triggers= {triggers}")
@@ -108,7 +107,7 @@ async def async_attach_trigger(
 #            CONF_DEVICE_ID: config[CONF_DEVICE_ID],
 #            CONF_TYPE: config[CONF_TYPE],
 #        },
-    },)
+    })
     
     _LOGGER.warning(f"event_config={event_config}")
             
