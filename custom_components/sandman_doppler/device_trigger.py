@@ -38,7 +38,7 @@ from .const import (
 )
 
 # TODO specify your supported trigger types.
-#TRIGGER_TYPES = {"Doppler-4fcd8f3c_butt_1", "Doppler-4fcd8f3c_butt2"}
+#TRIGGER_TYPES = {"Doppler-4fcd8f3c_butt_1", "Doppler-4fcd8f3c_butt_2"}
 TRIGGER_TYPES = {"sandman_doppler_button_event"}
 
 TRIGGER_SCHEMA = DEVICE_TRIGGER_BASE_SCHEMA.extend(
@@ -53,14 +53,15 @@ async def async_get_triggers(
     hass: HomeAssistant, device_id: str
 ) -> list[dict[str, Any]]:
     """List device triggers for sandman_doppler devices."""
-    registry = entity_registry.async_get(hass)
-    my_device_registry=dr.async_get(hass)
+#    registry = entity_registry.async_get(hass)
+#    my_device_registry=dr.async_get(hass)
+
     triggers = []
 
     _LOGGER.warning(f"device_id={device_id}")
 
 
-    device_entry=my_device_registry.async_get(device_id)
+#    device_entry=my_device_registry.async_get(device_id)
     _LOGGER.warning(f"device_entry.identifiers={device_entry.identifiers}")
 
 #    for id in device_entry.identifiers:
@@ -72,7 +73,7 @@ async def async_get_triggers(
         # Required fields of TRIGGER_BASE_SCHEMA
         CONF_PLATFORM: "device",
         CONF_DOMAIN: "sandman_doppler",
-#        CONF_DEVICE_ID: device_id,
+        CONF_DEVICE_ID: device_id,
         # Required fields of TRIGGER_SCHEMA
         CONF_TYPE: "sandman_doppler_button_event",
         
@@ -91,8 +92,8 @@ async def async_attach_trigger(
 ) -> CALLBACK_TYPE:
     """Attach a trigger."""
 
-    my_device_registry=dr.async_get(hass)
-    device=my_device_registry.async_get(config[CONF_DEVICE_ID])
+#    my_device_registry=dr.async_get(hass)
+#    device=my_device_registry.async_get(config[CONF_DEVICE_ID])
 
 #    for id in device.identifiers:
 #        if id.startswith("Doppler"):
@@ -101,12 +102,12 @@ async def async_attach_trigger(
     event_config = event_trigger.TRIGGER_SCHEMA({
         event_trigger.CONF_PLATFORM: "event",
         event_trigger.CONF_EVENT_TYPE: "sandman_doppler_button_event",
-#        event_trigger.CONF_EVENT_DATA: {
+        event_trigger.CONF_EVENT_DATA: {
 #            ATTR_DSN: dsn,
 #            ATTR_BUTTON: {"button1","button2"},
-#            CONF_DEVICE_ID: config[CONF_DEVICE_ID],
-#            CONF_TYPE: config[CONF_TYPE]
-#        },
+            CONF_DEVICE_ID: config[CONF_DEVICE_ID],
+            CONF_TYPE: config[CONF_TYPE],
+        },
     },)
     
     _LOGGER.warning(f"event_config={event_config}")
