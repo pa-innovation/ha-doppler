@@ -72,7 +72,7 @@ async def async_get_triggers(
         # Required fields of TRIGGER_BASE_SCHEMA
         CONF_PLATFORM: "device",
         CONF_DOMAIN: "sandman_doppler",
-        CONF_DEVICE_ID: device_id,
+#        CONF_DEVICE_ID: device_id,
         # Required fields of TRIGGER_SCHEMA
         CONF_TYPE: "sandman_doppler_button",
         
