@@ -78,5 +78,7 @@ WEATHER_OPTIONS = [
 ]
 
 SANDMAN_DOPPLER_BUTTON_EVENT = "sandman_doppler_button_event"
+SANDMAN_DOPPLER_BUTTON1_EVENT = "sandman_doppler_button1_event"
+SANDMAN_DOPPLER_BUTTON2_EVENT = "sandman_doppler_button2_event"
 ATTR_DSN = "dsn"
 ATTR_BUTTON = "button"
