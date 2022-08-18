@@ -77,9 +77,7 @@ WEATHER_OPTIONS = [
     "Hourly AQI",  # 12
 ]
 
-SANDMAN_DOPPLER_BUTTON_EVENT = "sandman_doppler_button_event"
-SANDMAN_DOPPLER_BUTTON1_EVENT = "sandman_doppler_button1_event"
-SANDMAN_DOPPLER_BUTTON2_EVENT = "sandman_doppler_button2_event"
+SANDMAN_DOPPLER_BUTTON = "sandman_doppler_button"
 ATTR_DSN = "dsn"
 ATTR_BUTTON = "button"
-CONF_SUBTYPE="subtype"
+CONF_SUBTYPE= "subtype"

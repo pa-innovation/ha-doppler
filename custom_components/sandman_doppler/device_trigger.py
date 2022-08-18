@@ -41,6 +41,9 @@ TRIGGER_TYPES = {"sandman_doppler_button_event"}
 TRIGGER_SCHEMA = DEVICE_TRIGGER_BASE_SCHEMA.extend(
     {
         vol.Required(CONF_TYPE): vol.In(TRIGGER_TYPES),
+        vol.Required(ATTR_DSN): vol.Match(r'Doppler-[a-f0-9]{8}'),
+        vol.Required(ATTR_BUTTON): vol.In({1,2}),
+        vol.Required(CONF_SUBTYPE): vol.In({1,2}),
     }
 )
 
@@ -59,12 +62,12 @@ async def async_get_triggers(
     assert device_entry
     _LOGGER.warning(f"device_entry.identifiers={device_entry.identifiers}")
 
-    #Apparently, identifiers is not giving us a DSN like it used to
-    # for id in device_entry.identifiers:
-    #     if id[1].startswith("Doppler"):
-    #         dsn = id[1]
-    dsn = "test"
-
+    
+    for id in device_entry.identifiers:
+        if id[1].startswith("Doppler"):
+            dsn = id[1]
+    assert dsn
+    _LOGGER.warning(f"dsn={dsn}")
     for i in range(1, 3):
         triggers.append(
             {
@@ -81,19 +84,6 @@ async def async_get_triggers(
     _LOGGER.warning(f"triggers= {triggers}")
     return triggers
 
-    # return [
-    #     {
-    #         CONF_PLATFORM: "device",
-    #         CONF_DOMAIN: DOMAIN,
-    #         CONF_DEVICE_ID: device_id,
-    #         ATTR_DSN: dsn,
-    #         ATTR_BUTTON: 1,
-    #         CONF_TYPE: "sandman_doppler_button_event",
-    #         CONF_SUBTYPE: str(1),
-    #     }
-    # ]
-
-
 async def async_attach_trigger(
     hass: HomeAssistant,
     config: ConfigType,
@@ -108,17 +98,19 @@ async def async_attach_trigger(
     #    for id in device.identifiers:
     #        if id.startswith("Doppler"):
     #            dsn=id
-
+    _LOGGER.warning(f"config= {config}")
     event_config = event_trigger.TRIGGER_SCHEMA({
             event_trigger.CONF_PLATFORM: "event",
             event_trigger.CONF_EVENT_TYPE: "sandman_doppler_button_event",
-            #        event_trigger.CONF_EVENT_DATA: {
-            #            ATTR_DSN: dsn,
-            #            ATTR_BUTTON: {"button1","button2"},
-            #            CONF_DEVICE_ID: config[CONF_DEVICE_ID],
-            #            CONF_TYPE: config[CONF_TYPE],
-            #        },
-        })
+            event_trigger.CONF_EVENT_DATA: {
+                ATTR_DSN: config[ATTR_DSN],
+                ATTR_BUTTON: config[ATTR_BUTTON],
+
+#                CONF_DEVICE_ID: config[CONF_DEVICE_ID],
+#                CONF_TYPE: config[CONF_TYPE],
+
+            },
+    })
 
     _LOGGER.warning(f"event_config={event_config}")
 
