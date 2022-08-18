@@ -36,7 +36,7 @@ from .const import (
 )
 
 
-TRIGGER_TYPES = {"sandman_doppler_button_event"}
+TRIGGER_TYPES = {"sandman_doppler_button"}
 
 TRIGGER_SCHEMA = DEVICE_TRIGGER_BASE_SCHEMA.extend(
     {
@@ -76,7 +76,7 @@ async def async_get_triggers(
                 CONF_DEVICE_ID: device_id,
                 ATTR_DSN: dsn,
                 ATTR_BUTTON: i,
-                CONF_TYPE: "sandman_doppler_button_event",
+                CONF_TYPE: "sandman_doppler_button",
                 CONF_SUBTYPE: i,
             }
         )
@@ -101,7 +101,7 @@ async def async_attach_trigger(
     _LOGGER.warning(f"config= {config}")
     event_config = event_trigger.TRIGGER_SCHEMA({
             event_trigger.CONF_PLATFORM: "event",
-            event_trigger.CONF_EVENT_TYPE: "sandman_doppler_button_event",
+            event_trigger.CONF_EVENT_TYPE: "sandman_doppler_button",
             event_trigger.CONF_EVENT_DATA: {
                 ATTR_DSN: config[ATTR_DSN],
                 ATTR_BUTTON: config[ATTR_BUTTON],

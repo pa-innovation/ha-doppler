@@ -28,7 +28,7 @@
   },
   "device_automation": {
     "trigger_type": {
-      "sandman_doppler_button_event": "Button #{subtype} pushed"
+      "sandman_doppler_button": "Button #{subtype} pushed"
     }
   }
 }
