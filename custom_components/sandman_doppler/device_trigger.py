@@ -65,32 +65,33 @@ async def async_get_triggers(
     #         dsn = id[1]
     dsn = "test"
 
-#    for i in range(1, 3):
-#        triggers.append(
-#            {
-#                CONF_PLATFORM: "device",
-#                CONF_DOMAIN: "sandman_doppler",
-#                CONF_DEVICE_ID: device_id,
-#                ATTR_DSN: dsn,
-#                ATTR_BUTTON: i,
-#                CONF_TYPE: "Doppler-4fcd8f3c_butt_1",
-#                CONF_SUBTYPE: i,
-#            }
-#        )
+    for i in range(1, 3):
+        triggers.append(
+            {
+                CONF_PLATFORM: "device",
+                CONF_DOMAIN: "sandman_doppler",
+                CONF_DEVICE_ID: device_id,
+                ATTR_DSN: dsn,
+                ATTR_BUTTON: i,
+                CONF_TYPE: "sandman_doppler_button_event",
+                CONF_SUBTYPE: i,
+            }
+        )
 
-#    _LOGGER.warning(f"triggers= {triggers}")
+    _LOGGER.warning(f"triggers= {triggers}")
+    return triggers
 
-    return [
-        {
-            CONF_PLATFORM: "device",
-            CONF_DOMAIN: DOMAIN,
-            CONF_DEVICE_ID: device_id,
-            ATTR_DSN: dsn,
-            ATTR_BUTTON: 1,
-            CONF_TYPE: "sandman_doppler_button_event",
-#            CONF_SUBTYPE: str(1),
-        }
-    ]
+    # return [
+    #     {
+    #         CONF_PLATFORM: "device",
+    #         CONF_DOMAIN: DOMAIN,
+    #         CONF_DEVICE_ID: device_id,
+    #         ATTR_DSN: dsn,
+    #         ATTR_BUTTON: 1,
+    #         CONF_TYPE: "sandman_doppler_button_event",
+    #         CONF_SUBTYPE: str(1),
+    #     }
+    # ]
 
 
 async def async_attach_trigger(

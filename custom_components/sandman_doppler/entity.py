@@ -33,4 +33,4 @@ class DopplerEntity(CoordinatorEntity):
 
     @property
     def device_info(self):
-        return {"identifiers": {(DOMAIN, self.device.id)}}
+        return {"identifiers": {(DOMAIN, self.device.id),(DOMAIN, self.device.device_info.dsn)}}
