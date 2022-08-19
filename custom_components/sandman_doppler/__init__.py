@@ -617,6 +617,28 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             )
             _LOGGER.warning(f"retval={retval.to_dict()}")
 
+    async def handle_set_display_color_service(call):
+        deviceregistry = dr.async_get(hass)
+        deviceentry = deviceregistry.async_get(call.data["doppler_device_id"])
+        mydevice = ""
+        for device in mydevices.values():
+            if ("sandman_doppler", device.id) in deviceentry.identifiers:
+                mydevice = device
+                break
+        if mydevice != "":
+            dayornight=check_key(call.data,"display_day_or_night")
+            colorval=check_key(call.data, "display_color")
+
+            if(dayornight=="Day"):            
+                retval = await client.set_day_display_color(
+                    mydevice, Color.from_list(colorval))
+            elif (dayornight=="Night"):
+                retval = await client.set_night_display_color(
+                    mydevice, Color.from_list(colorval))
+            else:
+                raise Exception("Got None for Dayornight")
+
+            
     hass.services.async_register(DOMAIN, "setalarmservice", handle_set_alarm_service)
     hass.services.async_register(
         DOMAIN, "deletealarmservice", handle_delete_alarm_service
@@ -644,6 +666,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     )
     hass.services.async_register(
         DOMAIN, "setlightbarsweepservice", handle_set_lightbar_sweep_service
+    )
+
+    hass.services.async_register(
+        DOMAIN, "setdisplaycolorservice", handle_set_display_color_service
     )
 
     return True

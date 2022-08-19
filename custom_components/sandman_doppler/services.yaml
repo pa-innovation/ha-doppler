@@ -1195,3 +1195,32 @@ setlightbarsweepservice:
       advanced: false
       selector:
         boolean:
+setdisplaycolorservice:
+  name: Set Display Color
+  description: Sets display color for day or night mode
+  fields:
+    doppler_device_id:
+      name: Doppler ID
+      description: ID of doppler to set color
+      required: true
+      advanced: false
+      selector:
+        device:
+          integration: sandman_doppler
+    display_day_or_night:
+      name: Day or Night
+      description: Whether to set color for day or night mode
+      required: true
+      advanced: false
+      selector:
+        select:
+          options:
+            - Day
+            - Night
+    display_color:
+      name: Display Color
+      description: Color to which to set the display 
+      required: true
+      advanced: false
+      selector:
+        color_rgb:
