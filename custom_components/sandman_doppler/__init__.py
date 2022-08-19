@@ -638,6 +638,48 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             else:
                 raise Exception("Got None for Dayornight")
 
+    async def handle_set_button_color_service(call):
+        deviceregistry = dr.async_get(hass)
+        deviceentry = deviceregistry.async_get(call.data["doppler_device_id"])
+        mydevice = ""
+        for device in mydevices.values():
+            if ("sandman_doppler", device.id) in deviceentry.identifiers:
+                mydevice = device
+                break
+        if mydevice != "":
+            dayornight=check_key(call.data,"button_day_or_night")
+            colorval=check_key(call.data, "button_color")
+
+            if(dayornight=="Day"):            
+                retval = await client.set_day_button_color(
+                    mydevice, Color.from_list(colorval))
+            elif (dayornight=="Night"):
+                retval = await client.set_night_button_color(
+                    mydevice, Color.from_list(colorval))
+            else:
+                raise Exception("Got None for Dayornight")
+
+    async def handle_set_display_brightness_service(call):
+        deviceregistry = dr.async_get(hass)
+        deviceentry = deviceregistry.async_get(call.data["doppler_device_id"])
+        mydevice = ""
+        for device in mydevices.values():
+            if ("sandman_doppler", device.id) in deviceentry.identifiers:
+                mydevice = device
+                break
+        if mydevice != "":
+            dayornight=check_key(call.data,"display_day_or_night")
+            brightness=check_key(call.data, "display_brightness")
+
+            if(dayornight=="Day"):            
+                retval = await client.set_day_display_brightness(
+                    mydevice, brightness)
+            elif (dayornight=="Night"):
+                retval = await client.set_night_display_brightness(
+                    mydevice, brightness)
+            else:
+                raise Exception("Got None for Dayornight")
+        
             
     hass.services.async_register(DOMAIN, "setalarmservice", handle_set_alarm_service)
     hass.services.async_register(
@@ -667,11 +709,18 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     hass.services.async_register(
         DOMAIN, "setlightbarsweepservice", handle_set_lightbar_sweep_service
     )
-
     hass.services.async_register(
         DOMAIN, "setdisplaycolorservice", handle_set_display_color_service
     )
+    hass.services.async_register(
+        DOMAIN, "setbuttoncolorservice", handle_set_button_color_service
+    )
+    hass.services.async_register(
+        DOMAIN, "setdisplaybrightnessservice", handle_set_display_brightness_service
+    )
 
+
+    
     return True
 
 
