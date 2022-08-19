@@ -679,6 +679,26 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
                     mydevice, brightness)
             else:
                 raise Exception("Got None for Dayornight")
+    async def handle_set_button_brightness_service(call):
+        deviceregistry = dr.async_get(hass)
+        deviceentry = deviceregistry.async_get(call.data["doppler_device_id"])
+        mydevice = ""
+        for device in mydevices.values():
+            if ("sandman_doppler", device.id) in deviceentry.identifiers:
+                mydevice = device
+                break
+        if mydevice != "":
+            dayornight=check_key(call.data,"display_day_or_night")
+            brightness=check_key(call.data, "button_brightness")
+
+            if(dayornight=="Day"):            
+                retval = await client.set_day_button_brightness(
+                    mydevice, brightness)
+            elif (dayornight=="Night"):
+                retval = await client.set_night_button_brightness(
+                    mydevice, brightness)
+            else:
+                raise Exception("Got None for Dayornight")
         
             
     hass.services.async_register(DOMAIN, "setalarmservice", handle_set_alarm_service)
@@ -717,6 +737,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     )
     hass.services.async_register(
         DOMAIN, "setdisplaybrightnessservice", handle_set_display_brightness_service
+    )
+    hass.services.async_register(
+        DOMAIN, "setbuttonbrightnessservice", handle_set_button_brightness_service
     )
 
 

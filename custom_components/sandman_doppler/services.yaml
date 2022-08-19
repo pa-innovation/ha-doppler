@@ -1256,11 +1256,11 @@ setbuttoncolorservice:
 
 setdisplaybrightnessservice:
   name: Set Display Brightness
-  description: Sets display color for day or night mode
+  description: Sets display brightness for day or night mode
   fields:
     doppler_device_id:
       name: Doppler ID
-      description: ID of doppler to set color
+      description: ID of doppler to set brightness
       required: true
       advanced: false
       selector:
@@ -1277,6 +1277,38 @@ setdisplaybrightnessservice:
             - Day
             - Night
     display_brightness:
+      name: Display Brightness
+      description: Brightness to which to set the display 
+      required: true
+      advanced: false
+      selector:
+        number:
+          min: 0
+          max: 100
+          mode: box
+setbuttonbrightnessservice:
+  name: Set Button Brightness
+  description: Sets button brightness for day or night mode
+  fields:
+    doppler_device_id:
+      name: Doppler ID
+      description: ID of doppler to set brightness
+      required: true
+      advanced: false
+      selector:
+        device:
+          integration: sandman_doppler
+    display_day_or_night:
+      name: Day or Night
+      description: Whether to set brightness for day or night mode
+      required: true
+      advanced: false
+      selector:
+        select:
+          options:
+            - Day
+            - Night
+    button_brightness:
       name: Display Brightness
       description: Brightness to which to set the display 
       required: true
