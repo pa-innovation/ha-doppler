@@ -1,11 +1,11 @@
 """The Sandman Doppler integration."""
 from __future__ import annotations
 
+from typing import Any
 import asyncio
 from datetime import timedelta
 import logging
 import voluptuous as vol
-from typing import Any
 from aiohttp.client import ClientTimeout, DEFAULT_TIMEOUT
 
 from doppyler.client import DopplerClient
@@ -268,7 +268,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             if s is not None:
                 attributes_dict["sparkle"] = f"{s}"
             if r is not None:
-                if r == True:
+                if r is True:
                     attributes_dict["rainbow"] = str("true")
                 else:
                     attributes_dict["rainbow"] = str("false")
@@ -341,7 +341,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             if s is not None:
                 attributes_dict["sparkle"] = f"{s}"
             if r is not None:
-                if r == True:
+                if r is True:
                     attributes_dict["rainbow"] = str("true")
                 else:
                     attributes_dict["rainbow"] = str("false")
@@ -591,13 +591,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             if sz is not None:
                 attributes_dict["size"] = f"{sz}"
             else:
-                attributes_dict["size"] = f"10"
+                attributes_dict["size"] = "10"
             if direct is not None:
                 attributes_dict["direction"] = f"{direct}"
             else:
                 attributes_dict["direction"] = "right"
             if r is not None:
-                if r == True:
+                if r is True:
                     attributes_dict["rainbow"] = str("true")
                 else:
                     attributes_dict["rainbow"] = str("false")
@@ -626,15 +626,17 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
                 mydevice = device
                 break
         if mydevice != "":
-            dayornight=check_key(call.data,"display_day_or_night")
-            colorval=check_key(call.data, "display_color")
+            dayornight = check_key(call.data, "display_day_or_night")
+            colorval = check_key(call.data, "display_color")
 
-            if(dayornight=="Day"):            
+            if dayornight == "Day":
                 retval = await client.set_day_display_color(
-                    mydevice, Color.from_list(colorval))
-            elif (dayornight=="Night"):
+                    mydevice, Color.from_list(colorval)
+                )
+            elif dayornight == "Night":
                 retval = await client.set_night_display_color(
-                    mydevice, Color.from_list(colorval))
+                    mydevice, Color.from_list(colorval)
+                )
             else:
                 raise Exception("Got None for Dayornight")
 
@@ -647,15 +649,17 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
                 mydevice = device
                 break
         if mydevice != "":
-            dayornight=check_key(call.data,"button_day_or_night")
-            colorval=check_key(call.data, "button_color")
+            dayornight = check_key(call.data, "button_day_or_night")
+            colorval = check_key(call.data, "button_color")
 
-            if(dayornight=="Day"):            
+            if dayornight == "Day":
                 retval = await client.set_day_button_color(
-                    mydevice, Color.from_list(colorval))
-            elif (dayornight=="Night"):
+                    mydevice, Color.from_list(colorval)
+                )
+            elif dayornight == "Night":
                 retval = await client.set_night_button_color(
-                    mydevice, Color.from_list(colorval))
+                    mydevice, Color.from_list(colorval)
+                )
             else:
                 raise Exception("Got None for Dayornight")
 
@@ -668,17 +672,16 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
                 mydevice = device
                 break
         if mydevice != "":
-            dayornight=check_key(call.data,"display_day_or_night")
-            brightness=check_key(call.data, "display_brightness")
+            dayornight = check_key(call.data, "display_day_or_night")
+            brightness = check_key(call.data, "display_brightness")
 
-            if(dayornight=="Day"):            
-                retval = await client.set_day_display_brightness(
-                    mydevice, brightness)
-            elif (dayornight=="Night"):
-                retval = await client.set_night_display_brightness(
-                    mydevice, brightness)
+            if dayornight == "Day":
+                retval = await client.set_day_display_brightness(mydevice, brightness)
+            elif dayornight == "Night":
+                retval = await client.set_night_display_brightness(mydevice, brightness)
             else:
                 raise Exception("Got None for Dayornight")
+
     async def handle_set_button_brightness_service(call):
         deviceregistry = dr.async_get(hass)
         deviceentry = deviceregistry.async_get(call.data["doppler_device_id"])
@@ -688,19 +691,16 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
                 mydevice = device
                 break
         if mydevice != "":
-            dayornight=check_key(call.data,"display_day_or_night")
-            brightness=check_key(call.data, "button_brightness")
+            dayornight = check_key(call.data, "display_day_or_night")
+            brightness = check_key(call.data, "button_brightness")
 
-            if(dayornight=="Day"):            
-                retval = await client.set_day_button_brightness(
-                    mydevice, brightness)
-            elif (dayornight=="Night"):
-                retval = await client.set_night_button_brightness(
-                    mydevice, brightness)
+            if dayornight == "Day":
+                retval = await client.set_day_button_brightness(mydevice, brightness)
+            elif dayornight == "Night":
+                retval = await client.set_night_button_brightness(mydevice, brightness)
             else:
                 raise Exception("Got None for Dayornight")
-        
-            
+
     hass.services.async_register(DOMAIN, "setalarmservice", handle_set_alarm_service)
     hass.services.async_register(
         DOMAIN, "deletealarmservice", handle_delete_alarm_service
@@ -742,8 +742,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         DOMAIN, "setbuttonbrightnessservice", handle_set_button_brightness_service
     )
 
-
-    
     return True
 
 
@@ -768,6 +766,7 @@ class DopplerDataUpdateCoordinator(DataUpdateCoordinator):
 
     async def _async_update_data(self) -> dict[str, Any]:
         """Update data via library."""
+        _LOGGER.warning("sandman_doppler Ran _async_update_data")
         if not self._dev_reg:
             self._dev_reg = dr.async_get(self.hass)
 
@@ -796,6 +795,8 @@ class DopplerDataUpdateCoordinator(DataUpdateCoordinator):
                     ATTR_DAY_BUTTON_COLOR
                 ] = await self.api.get_day_button_color(device)
                 await asyncio.sleep(0.5)
+                #_LOGGER.warning("_async_update_data after get_day_button_color")
+                #_LOGGER.warning(device_data[ATTR_DAY_BUTTON_COLOR])
                 device_data[
                     ATTR_NIGHT_BUTTON_COLOR
                 ] = await self.api.get_night_button_color(device)
@@ -896,20 +897,24 @@ class DopplerDataUpdateCoordinator(DataUpdateCoordinator):
                     device_data[ATTR_SOUND_PRESET] = "Preset 5 Untuned"
 
                 await asyncio.sleep(0.5)
-
+                #_LOGGER.warning("Before api.get_sound_preset_mode")
                 device_data[
                     ATTR_SOUND_PRESET_MODE
                 ] = await self.api.get_sound_preset_mode(device)
                 await asyncio.sleep(0.5)
 
+                #_LOGGER.warning("Before api.get_weather_status")
                 device_data[ATTR_WEATHER_ON] = await self.api.get_weather_status(device)
+                #device_data[ATTR_WEATHER_ON] = True
                 await asyncio.sleep(0.5)
 
+                #_LOGGER.warning("Before api.get_weather_options")
                 device_data[ATTR_WEATHER_MODE] = WEATHER_OPTIONS[
                     await self.api.get_weather_mode(device)
                 ]
+                #device_data[ATTR_WEATHER_MODE] = 15
                 await asyncio.sleep(0.5)
-
+                #_LOGGER.warning("Before api.get_lightsensor_value")
                 device_data[
                     ATTR_LIGHTSENSOR_VALUE
                 ] = await self.api.get_lightsensor_value(device)
@@ -922,13 +927,13 @@ class DopplerDataUpdateCoordinator(DataUpdateCoordinator):
 
                 device_data[ATTR_TIMEOFFSET] = await self.api.get_offset(device)
                 await asyncio.sleep(0.5)
-
+                #_LOGGER.warning("Before api.get_timezone")
                 device_data[ATTR_TIMEZONE] = await self.api.get_timezone(device)
                 await asyncio.sleep(0.5)
 
         except Exception as exception:
             raise UpdateFailed() from exception
-
+        #_LOGGER.warning("sandman_doppler Completed _async_update_data")
         return data
 
 
