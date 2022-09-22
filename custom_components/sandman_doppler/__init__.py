@@ -91,10 +91,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         await device.set_sync_button_display_color(False)
         await device.set_sync_day_night_color(False)
         await device.set_sync_button_display_brightness(False)
-        await device.set_weather_configuration(
-            device,
-            location=f"{entry.data[CONF_LATITUDE]},{entry.data[CONF_LONGITUDE]}",
-        )
 
     # async def handle_set_alarm_service(call: ServiceCall) -> None:
     #     deviceregistry = dr.async_get(hass)
