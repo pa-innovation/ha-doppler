@@ -1,75 +1,64 @@
-"""Adds config flow for Blueprint."""
+"""Adds config flow for Doppler."""
+from __future__ import annotations
+
 from doppyler.client import DopplerClient
-from homeassistant import config_entries
-from homeassistant.const import CONF_EMAIL, CONF_PASSWORD, CONF_LATITUDE, CONF_LONGITUDE
-from homeassistant.helpers import config_validation as cv
-from homeassistant.core import callback
-from homeassistant.data_entry_flow import FlowResult
-from homeassistant.helpers.aiohttp_client import async_create_clientsession
+from doppyler.exceptions import DopplerException
 import voluptuous as vol
+
+from homeassistant import config_entries
+from homeassistant.const import CONF_EMAIL, CONF_PASSWORD
+from homeassistant.helpers import config_validation as cv
+from homeassistant.data_entry_flow import FlowResult
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .const import DOMAIN
 
 
-class BlueprintFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
-    """Config flow for Blueprint."""
+class DopplerFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
+    """Config flow for Doppler clocks."""
 
     VERSION = 1
-    CONNECTION_CLASS = config_entries.CONN_CLASS_CLOUD_POLL
-
-    def __init__(self) -> None:
-        """Initialize."""
-        self._errors = {}
 
     async def async_step_user(self, user_input: dict[str, str] = None) -> FlowResult:
         """Handle a flow initialized by the user."""
-        self._errors = {}
+        errors = {}
 
         if user_input is not None:
             await self.async_set_unique_id(user_input[CONF_EMAIL])
             self._abort_if_unique_id_configured()
 
-            valid = await self._test_credentials(
+            if await self._credentials_valid(
                 user_input[CONF_EMAIL], user_input[CONF_PASSWORD]
-            )
-            if valid:
+            ):
                 return self.async_create_entry(
                     title=user_input[CONF_EMAIL], data=user_input
                 )
             else:
-                self._errors["base"] = "auth"
+                errors["base"] = "auth"
 
-            return self._show_config_form()
+        user_input = user_input or {}
 
-        return self._show_config_form()
-
-    @callback
-    def _show_config_form(self) -> FlowResult:
-        """Show the configuration form to edit location data."""
         return self.async_show_form(
             step_id="user",
             data_schema=vol.Schema(
                 {
-                    vol.Required(CONF_EMAIL): str,
-                    vol.Required(CONF_PASSWORD): str,
                     vol.Required(
-                        CONF_LATITUDE, default=self.hass.config.latitude
-                    ): cv.latitude,
+                        CONF_EMAIL, default=user_input.get(CONF_EMAIL)
+                    ): cv.string,
                     vol.Required(
-                        CONF_LONGITUDE, default=self.hass.config.longitude
-                    ): cv.longitude,
+                        CONF_PASSWORD, default=user_input.get(CONF_PASSWORD)
+                    ): cv.string,
                 }
             ),
-            errors=self._errors,
+            errors=errors,
         )
 
-    async def _test_credentials(self, email: str, password: str) -> bool:
-        """Return true if credentials is valid."""
+    async def _credentials_valid(self, email: str, password: str) -> bool:
+        """Return true if credentials are valid."""
+        session = async_get_clientsession(self.hass)
+        client = DopplerClient(email, password, client_session=session)
         try:
-            session = async_create_clientsession(self.hass)
-            client = DopplerClient(email, password, client_session=session)
             await client.get_devices()
-            return True
-        except Exception:  # pylint: disable=broad-except
-            pass
-        return False
+        except DopplerException:
+            return False
+        return True
