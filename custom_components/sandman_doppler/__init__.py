@@ -794,11 +794,6 @@ class DopplerDataUpdateCoordinator(DataUpdateCoordinator):
                     ATTR_NIGHT_BUTTON_BRIGHTNESS
                 ] = await device.get_night_button_brightness()
                 await asyncio.sleep(0.5)
-
-                device_data[
-                    ATTR_AUTO_BRIGHTNESS_ENABLED
-                ] = await self.api.is_automatic_brightness_enabled()
-                await asyncio.sleep(0.5)
                 # device_data[
                 #     ATTR_DOTW_STATUS
                 # ] = await device.get_day_of_the_week_status()
@@ -871,25 +866,21 @@ class DopplerDataUpdateCoordinator(DataUpdateCoordinator):
                 await asyncio.sleep(0.5)
 
                 # _LOGGER.warning("Before api.get_weather_status")
-                device_data[ATTR_WEATHER_ON] = await device.get_weather_status()
+                device_data[ATTR_WEATHER] = await device.get_weather_configuration()
                 # device_data[ATTR_WEATHER_ON] = True
                 await asyncio.sleep(0.5)
 
-                # _LOGGER.warning("Before api.get_weather_options")
-                device_data[ATTR_WEATHER_MODE] = WEATHER_OPTIONS[
-                    await device.get_weather_mode()
-                ]
                 # device_data[ATTR_WEATHER_MODE] = 15
                 await asyncio.sleep(0.5)
                 # _LOGGER.warning("Before api.get_lightsensor_value")
                 device_data[
                     ATTR_LIGHTSENSOR_VALUE
-                ] = await device.get_lightsensor_value()
+                ] = await device.get_light_sensor_value()
                 await asyncio.sleep(0.5)
 
                 device_data[
                     ATTR_DAYNIGHTMODE_VALUE
-                ] = await device.get_daynightmode_value()
+                ] = await device.get_day_night_mode_status()
                 await asyncio.sleep(0.5)
 
                 device_data[ATTR_TIMEOFFSET] = await device.get_offset()
