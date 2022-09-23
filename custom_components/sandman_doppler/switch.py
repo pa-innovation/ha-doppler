@@ -23,6 +23,7 @@ from homeassistant.components.switch import (
 )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import DopplerDataUpdateCoordinator
@@ -120,6 +121,7 @@ class BaseDopplerSwitch(DopplerEntity, SwitchEntity):
     """Base class for Doppler switches."""
 
     _attr_device_class: SwitchDeviceClass.SWITCH
+    _attr_entity_category = EntityCategory.CONFIG
 
     def __init__(
         self,
