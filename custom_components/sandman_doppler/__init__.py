@@ -726,6 +726,7 @@ class DopplerDataUpdateCoordinator(DataUpdateCoordinator):
         self, hass: HomeAssistant, entry: ConfigEntry, client: DopplerClient
     ) -> None:
         """Initialize."""
+        self.data: dict[str, dict[str, Any]] = {}
         self.api = client
         self.platforms = []
         self._dev_reg = None

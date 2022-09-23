@@ -11,7 +11,7 @@ from . import DopplerDataUpdateCoordinator
 from .const import DOMAIN
 
 
-class DopplerEntity(CoordinatorEntity):
+class DopplerEntity(CoordinatorEntity[DopplerDataUpdateCoordinator]):
     """Base class for a Doppler entity."""
 
     _attr_has_entity_name = True

@@ -232,12 +232,12 @@ class DopplerWeatherSwitch(DopplerEntity, SwitchEntity):
 
     async def async_turn_on(self, **kwargs):
         """Turn Weather On"""
-        await self.device.set_weather_status(self.device, True)
+        await self.device.set_weather_configuration(self.device, enabled=True)
         _LOGGER.warning(self.config_entry.data[CONF_LATITUDE])
 
     async def async_turn_off(self, **kwargs):
         """Turn Weather Off"""
-        await self.device.set_weather_status(self.device, False)
+        await self.device.set_weather_configuration(self.device, enabled=False)
 
     @property
     def is_on(self):
