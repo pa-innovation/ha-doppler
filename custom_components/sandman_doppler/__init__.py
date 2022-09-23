@@ -60,624 +60,526 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         await device.set_sync_day_night_color(False)
         await device.set_sync_button_display_brightness(False)
 
-    # async def handle_set_alarm_service(call: ServiceCall) -> None:
-    #     deviceregistry = dr.async_get(hass)
-    #     deviceentry = deviceregistry.async_get(call.data["doppler_device_id"])
-    #     _LOGGER.warning(
-    #         f"Calling setalarm {call.data['alarm_time']} {deviceentry.identifiers}"
-    #     )
-    #     _LOGGER.warning(f"printing config entries{deviceentry.config_entries}")
-    #     mydevice = ""
-    #     for device in mydevices.values():
-    #         if ("sandman_doppler", device.id) in deviceentry.identifiers:
-    #             _LOGGER.warning(f"managed to locate the device id")
-    #             mydevice = device
-    #             break
-    #     if mydevice != "":
-    #         if "repeat" in call.data:
-    #             r = call.data["repeat"]
-    #         else:
-    #             r = ""
-    #         alarmdict = AlarmDict(
-    #             id=int(call.data["alarm_id"]),
-    #             name=call.data["alarm_name"],
-    #             time_hr=int(call.data["alarm_time"].split(":")[0]),
-    #             time_min=int(call.data["alarm_time"].split(":")[1]),
-    #             repeat=r,
-    #             color=ColorDict(
-    #                 red=int(call.data["color"][0]),
-    #                 green=int(call.data["color"][1]),
-    #                 blue=int(call.data["color"][2]),
-    #             ),
-    #             volume=int(call.data["volume"]),
-    #             status=AlarmStatus.SET,
-    #             src=AlarmSource.APP,
-    #             sound=call.data["sound"],
-    #         )
+    def get_device_from_call_data(call: ServiceCall ):
+        device_registry = dr.async_get(hass)
+        device_entry = device_registry.async_get(call.data["doppler_device_id"])
+        dsn=next(id for id in device_entry.identifiers)[1]
+        #_LOGGER.warning(f"device_entry.identifiers is {device_entry.identifiers}")
+        #_LOGGER.warning(f"dsn is {dsn}")
+        return client.devices[dsn]
 
-    #         alarm = Alarm(mydevice, alarmdict)
-    #         result = await client.append_new_alarm(mydevice, alarm)
-    #         _LOGGER.warning(f"alarm result was {result}")
+    async def handle_set_alarm_service(call: ServiceCall) -> None:
+        device=get_device_from_call_data(call)
+        if "repeat" in call.data:
+            r = call.data["repeat"]
+        else:
+            r = ""
+        alarmdict = AlarmDict(
+            id=int(call.data["alarm_id"]),
+            name=call.data["alarm_name"],
+            time_hr=int(call.data["alarm_time"].split(":")[0]),
+            time_min=int(call.data["alarm_time"].split(":")[1]),
+            repeat=r,
+            color=ColorDict(
+                red=int(call.data["color"][0]),
+                green=int(call.data["color"][1]),
+                blue=int(call.data["color"][2]),
+            ),
+            volume=int(call.data["volume"]),
+            status=AlarmStatus.SET,
+            src=AlarmSource.APP,
+            sound=call.data["sound"],
+        )
 
-    # async def handle_delete_alarm_service(call: ServiceCall) -> None:
-    #     deviceregistry = dr.async_get(hass)
-    #     deviceentry = deviceregistry.async_get(call.data["doppler_device_id"])
-    #     mydevice = ""
-    #     for device in mydevices.values():
-    #         if ("sandman_doppler", device.id) in deviceentry.identifiers:
-    #             _LOGGER.warning(f"managed to locate the device id")
-    #             mydevice = device
-    #             break
-    #     if mydevice != "":
-    #         await client.delete_alarm(mydevice, int(call.data["alarm_id"]))
+        result = await device.add_alarm(Alarm.from_dict(alarmdict))
+        _LOGGER.warning(f"alarm result was {result}")
 
-    # async def handle_set_main_display_service(call: ServiceCall) -> None:
-    #     deviceregistry = dr.async_get(hass)
-    #     deviceentry = deviceregistry.async_get(call.data["doppler_device_id"])
-    #     mydevice = ""
-    #     for device in mydevices.values():
-    #         if ("sandman_doppler", device.id) in deviceentry.identifiers:
-    #             _LOGGER.warning(f"got device id in handle_set_main_display")
-    #             mydevice = device
-    #             break
-    #     if mydevice != "":
-    #         _LOGGER.warning(f"Called handle_set_main_display_service")
-    #         mdt_dict = MainDisplayTextDict(
-    #             {
-    #                 "text": str(call.data["display_text"]),
-    #                 "duration": int(call.data["display_duration"]),
-    #                 "speed": int(call.data["display_speed"]),
-    #                 "color": [
-    #                     int(call.data["display_color"][0]),
-    #                     int(call.data["display_color"][1]),
-    #                     int(call.data["display_color"][2]),
-    #                 ],
-    #             }
-    #         )
+    async def handle_delete_alarm_service(call: ServiceCall) -> None:
+        device=get_device_from_call_data(call)
+        await device.delete_alarm(int(call.data["alarm_id"]))
 
-    #         m = MainDisplayText(mydevice, mdt_dict)
-    #         _LOGGER.warning(f"m={m.to_dict()}")
-    #         await client.set_main_display_text(
-    #             mydevice, MainDisplayText(mydevice, mdt_dict)
-    #         )
+    async def handle_set_main_display_service(call: ServiceCall) -> None:
+        device= get_device_from_call_data(call)
+        _LOGGER.warning(f"Called handle_set_main_display_service")
+        mdt_dict = MainDisplayTextDict(
+            {
+                "text": str(call.data["display_text"]),
+                "duration": int(call.data["display_duration"]),
+                "speed": int(call.data["display_speed"]),
+                "color": [
+                    int(call.data["display_color"][0]),
+                    int(call.data["display_color"][1]),
+                    int(call.data["display_color"][2]),
+                ],
+            }
+        )
 
-    # async def handle_set_mini_display_service(call: ServiceCall) -> None:
-    #     deviceregistry = dr.async_get(hass)
-    #     deviceentry = deviceregistry.async_get(call.data["doppler_device_id"])
-    #     mydevice = ""
-    #     for device in mydevices.values():
-    #         if ("sandman_doppler", device.id) in deviceentry.identifiers:
-    #             _LOGGER.warning(f"got device id in handle_set_mini_display_service")
-    #             mydevice = device
-    #             break
-    #     if mydevice != "":
-    #         _LOGGER.warning(f"Called handle_display_num_mini_service")
-    #         mdn_dict = MiniDisplayNumberDict(
-    #             {
-    #                 "num": int(call.data["display_number"]),
-    #                 "duration": int(call.data["display_duration"]),
-    #                 "color": [
-    #                     int(call.data["display_color"][0]),
-    #                     int(call.data["display_color"][1]),
-    #                     int(call.data["display_color"][2]),
-    #                 ],
-    #             }
-    #         )
+        await device.set_main_display_text(
+            MainDisplayText.from_dict(mdt_dict)
+        )
 
-    #         await client.set_mini_display_number(
-    #             mydevice, MiniDisplayNumber(mydevice, mdn_dict)
-    #         )
+    async def handle_set_mini_display_service(call: ServiceCall) -> None:
+        device= get_device_from_call_data(call)
+        _LOGGER.warning(f"Called handle_display_num_mini_service")
+        mdn_dict = MiniDisplayNumberDict(
+            {
+                "num": int(call.data["display_number"]),
+                "duration": int(call.data["display_duration"]),
+                "color": [
+                    int(call.data["display_color"][0]),
+                    int(call.data["display_color"][1]),
+                    int(call.data["display_color"][2]),
+                ],
+            }
+        )
 
-    # async def handle_set_lightbar_color_service(call: ServiceCall) -> None:
-    #     deviceregistry = dr.async_get(hass)
-    #     deviceentry = deviceregistry.async_get(call.data["doppler_device_id"])
-    #     mydevice = ""
-    #     for device in mydevices.values():
-    #         if ("sandman_doppler", device.id) in deviceentry.identifiers:
-    #             _LOGGER.warning(f"got device id in handle_set_lightbar")
-    #             mydevice = device
-    #             break
-    #     if mydevice != "":
-    #         _LOGGER.warning(f"data was {call.data}")
-    #         _LOGGER.warning(f"Called handle_set_lightbar_color_service")
-    #         color_list = []
-    #         for c in [
-    #             call.data.get("lightbar_color1"),
-    #             call.data.get("lightbar_color2"),
-    #             call.data.get("lightbar_color3"),
-    #             call.data.get("lightbar_color4"),
-    #             call.data.get("lightbar_color5"),
-    #             call.data.get("lightbar_color6"),
-    #             call.data.get("lightbar_color7"),
-    #             call.data.get("lightbar_color8"),
-    #             call.data.get("lightbar_color9"),
-    #             call.data.get("lightbar_color10"),
-    #             call.data.get("lightbar_color11"),
-    #             call.data.get("lightbar_color12"),
-    #         ]:
-    #             if c is not None:
-    #                 color_list.append([c[0], c[1], c[2]])
-    #         s = call.data.get("lightbar_sparkle")
-    #         r = call.data.get("lightbar_rainbow")
+        await device.set_mini_display_number(
+            MiniDisplayNumber.from_dict(mdn_dict)
+        )
 
-    #         attributes_dict = {}
-    #         attributes_dict["display"] = "set"
-    #         if s is not None:
-    #             attributes_dict["sparkle"] = f"{s}"
-    #         if r is not None:
-    #             if r is True:
-    #                 attributes_dict["rainbow"] = str("true")
-    #             else:
-    #                 attributes_dict["rainbow"] = str("false")
+    async def handle_set_lightbar_color_service(call: ServiceCall) -> None:
 
-    #         lbde_dict = LightbarDisplayDict(
-    #             {
-    #                 "colors": color_list,
-    #                 "duration": int(call.data["lightbar_duration"]),
-    #                 "speed": int(call.data["lightbar_speed"]),
-    #                 "attributes": attributes_dict,
-    #             }
-    #         )
-    #         _LOGGER.warning(f"lbde_dict={lbde_dict}")
-    #         retval = await client.set_lightbar_effect(
-    #             mydevice, LightbarDisplayEffect(mydevice, lbde_dict)
-    #         )
-    #         _LOGGER.warning(f"retval={retval.to_dict()}")
+        device=get_device_from_call_data(call)
+        _LOGGER.warning(f"data was {call.data}")
+        _LOGGER.warning(f"Called handle_set_lightbar_color_service")
+        color_list = []
+        for c in [
+            call.data.get("lightbar_color1"),
+            call.data.get("lightbar_color2"),
+            call.data.get("lightbar_color3"),
+            call.data.get("lightbar_color4"),
+            call.data.get("lightbar_color5"),
+            call.data.get("lightbar_color6"),
+            call.data.get("lightbar_color7"),
+            call.data.get("lightbar_color8"),
+            call.data.get("lightbar_color9"),
+            call.data.get("lightbar_color10"),
+            call.data.get("lightbar_color11"),
+            call.data.get("lightbar_color12"),
+        ]:
+            if c is not None:
+                color_list.append([c[0], c[1], c[2]])
+        s = call.data.get("lightbar_sparkle")
+        r = call.data.get("lightbar_rainbow")
 
-    # async def handle_set_each_lightbar_color_service(call: ServiceCall) -> None:
-    #     deviceregistry = dr.async_get(hass)
-    #     deviceentry = deviceregistry.async_get(call.data["doppler_device_id"])
-    #     mydevice = ""
-    #     for device in mydevices.values():
-    #         if ("sandman_doppler", device.id) in deviceentry.identifiers:
-    #             _LOGGER.warning(f"got device id in handle_set_lightbar")
-    #             mydevice = device
-    #             break
-    #     if mydevice != "":
-    #         _LOGGER.warning(f"data was {call.data}")
-    #         _LOGGER.warning(f"Called handle_set_lightbar_color_service")
-    #         color_list = []
-    #         for c in [
-    #             call.data.get("lightbar_color1"),
-    #             call.data.get("lightbar_color2"),
-    #             call.data.get("lightbar_color3"),
-    #             call.data.get("lightbar_color4"),
-    #             call.data.get("lightbar_color5"),
-    #             call.data.get("lightbar_color6"),
-    #             call.data.get("lightbar_color7"),
-    #             call.data.get("lightbar_color8"),
-    #             call.data.get("lightbar_color9"),
-    #             call.data.get("lightbar_color10"),
-    #             call.data.get("lightbar_color11"),
-    #             call.data.get("lightbar_color12"),
-    #             call.data.get("lightbar_color13"),
-    #             call.data.get("lightbar_color14"),
-    #             call.data.get("lightbar_color15"),
-    #             call.data.get("lightbar_color16"),
-    #             call.data.get("lightbar_color17"),
-    #             call.data.get("lightbar_color18"),
-    #             call.data.get("lightbar_color19"),
-    #             call.data.get("lightbar_color20"),
-    #             call.data.get("lightbar_color21"),
-    #             call.data.get("lightbar_color22"),
-    #             call.data.get("lightbar_color23"),
-    #             call.data.get("lightbar_color24"),
-    #             call.data.get("lightbar_color25"),
-    #             call.data.get("lightbar_color26"),
-    #             call.data.get("lightbar_color27"),
-    #             call.data.get("lightbar_color28"),
-    #             call.data.get("lightbar_color29"),
-    #         ]:
-    #             if c is not None:
-    #                 color_list.append([c[0], c[1], c[2]])
-    #         s = call.data.get("lightbar_sparkle")
-    #         r = call.data.get("lightbar_rainbow")
+        attributes_dict = {}
+        attributes_dict["display"] = "set"
+        if s is not None:
+            attributes_dict["sparkle"] = f"{s}"
+        if r is not None:
+            if r is True:
+                attributes_dict["rainbow"] = str("true")
+            else:
+                attributes_dict["rainbow"] = str("false")
 
-    #         attributes_dict = {}
-    #         attributes_dict["display"] = "set-each"
-    #         if s is not None:
-    #             attributes_dict["sparkle"] = f"{s}"
-    #         if r is not None:
-    #             if r is True:
-    #                 attributes_dict["rainbow"] = str("true")
-    #             else:
-    #                 attributes_dict["rainbow"] = str("false")
+        lbde_dict = LightbarDisplayDict(
+            {
+                "colors": color_list,
+                "duration": int(call.data["lightbar_duration"]),
+                "speed": int(call.data["lightbar_speed"]),
+                "attributes": attributes_dict,
+            }
+        )
+        _LOGGER.warning(f"lbde_dict={lbde_dict}")
+        retval = await device.set_light_bar_effect(
+            LightbarDisplayEffect.from_dict(lbde_dict)
+        )
+        _LOGGER.warning(f"retval={retval.to_dict()}")
 
-    #         lbde_dict = LightbarDisplayDict(
-    #             {
-    #                 "colors": color_list,
-    #                 "duration": int(call.data["lightbar_duration"]),
-    #                 "speed": 0,
-    #                 "attributes": attributes_dict,
-    #             }
-    #         )
-    #         _LOGGER.warning(f"lbde_dict={lbde_dict}")
-    #         retval = await client.set_lightbar_effect(
-    #             mydevice, LightbarDisplayEffect(mydevice, lbde_dict)
-    #         )
-    #         _LOGGER.warning(f"retval={retval.to_dict()}")
+    async def handle_set_each_lightbar_color_service(call: ServiceCall) -> None:
 
-    # async def handle_set_lightbar_blink_service(call: ServiceCall) -> None:
-    #     deviceregistry = dr.async_get(hass)
-    #     deviceentry = deviceregistry.async_get(call.data["doppler_device_id"])
-    #     mydevice = ""
-    #     for device in mydevices.values():
-    #         if ("sandman_doppler", device.id) in deviceentry.identifiers:
-    #             _LOGGER.warning(f"got device id in handle_set_lightbar")
-    #             mydevice = device
-    #             break
-    #     if mydevice != "":
-    #         _LOGGER.warning(f"data was {call.data}")
-    #         _LOGGER.warning(f"Called handle_set_lightbar_color_service")
-    #         color_list = []
-    #         for c in [
-    #             call.data.get("lightbar_color1"),
-    #             call.data.get("lightbar_color2"),
-    #             call.data.get("lightbar_color3"),
-    #             call.data.get("lightbar_color4"),
-    #             call.data.get("lightbar_color5"),
-    #             call.data.get("lightbar_color6"),
-    #             call.data.get("lightbar_color7"),
-    #             call.data.get("lightbar_color8"),
-    #             call.data.get("lightbar_color9"),
-    #             call.data.get("lightbar_color10"),
-    #             call.data.get("lightbar_color11"),
-    #             call.data.get("lightbar_color12"),
-    #         ]:
-    #             if c is not None:
-    #                 color_list.append([c[0], c[1], c[2]])
-    #         s = call.data.get("lightbar_sparkle")
-    #         r = call.data.get("lightbar_rainbow")
-    #         sp = call.data.get("lightbar_speed")
+        _LOGGER.warning(f"data was {call.data}")
+        _LOGGER.warning(f"Called handle_set_lightbar_color_service")
+        color_list = []
+        for c in [
+            call.data.get("lightbar_color1"),
+            call.data.get("lightbar_color2"),
+            call.data.get("lightbar_color3"),
+            call.data.get("lightbar_color4"),
+            call.data.get("lightbar_color5"),
+            call.data.get("lightbar_color6"),
+            call.data.get("lightbar_color7"),
+            call.data.get("lightbar_color8"),
+            call.data.get("lightbar_color9"),
+            call.data.get("lightbar_color10"),
+            call.data.get("lightbar_color11"),
+            call.data.get("lightbar_color12"),
+            call.data.get("lightbar_color13"),
+            call.data.get("lightbar_color14"),
+            call.data.get("lightbar_color15"),
+            call.data.get("lightbar_color16"),
+            call.data.get("lightbar_color17"),
+            call.data.get("lightbar_color18"),
+            call.data.get("lightbar_color19"),
+            call.data.get("lightbar_color20"),
+            call.data.get("lightbar_color21"),
+            call.data.get("lightbar_color22"),
+            call.data.get("lightbar_color23"),
+            call.data.get("lightbar_color24"),
+            call.data.get("lightbar_color25"),
+            call.data.get("lightbar_color26"),
+            call.data.get("lightbar_color27"),
+            call.data.get("lightbar_color28"),
+            call.data.get("lightbar_color29"),
+        ]:
+            if c is not None:
+                color_list.append([c[0], c[1], c[2]])
+        s = call.data.get("lightbar_sparkle")
+        r = call.data.get("lightbar_rainbow")
 
-    #         attributes_dict = {}
-    #         attributes_dict["display"] = "blink"
-    #         if s is not None:
-    #             attributes_dict["sparkle"] = f"{s}"
-    #         if r is not None:
-    #             if r == True:
-    #                 attributes_dict["rainbow"] = str("true")
-    #             else:
-    #                 attributes_dict["rainbow"] = str("false")
+        attributes_dict = {}
+        attributes_dict["display"] = "set-each"
+        if s is not None:
+            attributes_dict["sparkle"] = f"{s}"
+        if r is not None:
+            if r is True:
+                attributes_dict["rainbow"] = str("true")
+            else:
+                attributes_dict["rainbow"] = str("false")
 
-    #         lbde_dict = LightbarDisplayDict(
-    #             {
-    #                 "colors": color_list,
-    #                 "duration": int(call.data["lightbar_duration"]),
-    #                 "speed": int(call.data["lightbar_speed"]),
-    #                 "attributes": attributes_dict,
-    #             }
-    #         )
+        lbde_dict = LightbarDisplayDict(
+            {
+                "colors": color_list,
+                "duration": int(call.data["lightbar_duration"]),
+                "speed": 0,
+                "attributes": attributes_dict,
+            }
+        )
+        _LOGGER.warning(f"lbde_dict={lbde_dict}")
+        retval = await device.set_light_bar_effect(
+            LightbarDisplayEffect.from_dict(lbde_dict)
+        )
+        _LOGGER.warning(f"retval={retval.to_dict()}")
 
-    #         _LOGGER.warning(f"lbde_dict={lbde_dict}")
-    #         retval = await client.set_lightbar_effect(
-    #             mydevice, LightbarDisplayEffect(mydevice, lbde_dict)
-    #         )
-    #         _LOGGER.warning(f"retval={retval.to_dict()}")
+    async def handle_set_lightbar_blink_service(call: ServiceCall) -> None:
 
-    # async def handle_set_lightbar_pulse_service(call: ServiceCall) -> None:
-    #     deviceregistry = dr.async_get(hass)
-    #     deviceentry = deviceregistry.async_get(call.data["doppler_device_id"])
-    #     mydevice = ""
-    #     for device in mydevices.values():
-    #         if ("sandman_doppler", device.id) in deviceentry.identifiers:
-    #             _LOGGER.warning(f"got device id in handle_set_lightbar")
-    #             mydevice = device
-    #             break
-    #     if mydevice != "":
-    #         _LOGGER.warning(f"data was {call.data}")
-    #         _LOGGER.warning(f"Called handle_set_lightbar_pulse_service")
-    #         color_list = []
-    #         for c in [
-    #             call.data.get("lightbar_color1"),
-    #             call.data.get("lightbar_color2"),
-    #             call.data.get("lightbar_color3"),
-    #             call.data.get("lightbar_color4"),
-    #             call.data.get("lightbar_color5"),
-    #             call.data.get("lightbar_color6"),
-    #             call.data.get("lightbar_color7"),
-    #             call.data.get("lightbar_color8"),
-    #             call.data.get("lightbar_color9"),
-    #             call.data.get("lightbar_color10"),
-    #             call.data.get("lightbar_color11"),
-    #             call.data.get("lightbar_color12"),
-    #         ]:
-    #             if c is not None:
-    #                 color_list.append([c[0], c[1], c[2]])
-    #         s = call.data.get("lightbar_sparkle")
-    #         r = call.data.get("lightbar_rainbow")
-    #         sp = call.data.get("lightbar_speed")
-    #         gp = call.data.get("lightbar_gap")
+        device=get_device_from_call_data(call)
+        _LOGGER.warning(f"data was {call.data}")
+        _LOGGER.warning(f"Called handle_set_lightbar_color_service")
+        color_list = []
+        for c in [
+            call.data.get("lightbar_color1"),
+            call.data.get("lightbar_color2"),
+            call.data.get("lightbar_color3"),
+            call.data.get("lightbar_color4"),
+            call.data.get("lightbar_color5"),
+            call.data.get("lightbar_color6"),
+            call.data.get("lightbar_color7"),
+            call.data.get("lightbar_color8"),
+            call.data.get("lightbar_color9"),
+            call.data.get("lightbar_color10"),
+            call.data.get("lightbar_color11"),
+            call.data.get("lightbar_color12"),
+        ]:
+            if c is not None:
+                color_list.append([c[0], c[1], c[2]])
+        s = call.data.get("lightbar_sparkle")
+        r = call.data.get("lightbar_rainbow")
+        sp = call.data.get("lightbar_speed")
 
-    #         attributes_dict = {}
-    #         attributes_dict["display"] = "pulse"
-    #         if gp is not None:
-    #             attributes_dict["gap"] = f"{gp}"
-    #         if s is not None:
-    #             attributes_dict["sparkle"] = f"{s}"
-    #         if r is not None:
-    #             if r == True:
-    #                 attributes_dict["rainbow"] = str("true")
-    #             else:
-    #                 attributes_dict["rainbow"] = str("false")
+        attributes_dict = {}
+        attributes_dict["display"] = "blink"
+        if s is not None:
+            attributes_dict["sparkle"] = f"{s}"
+        if r is not None:
+            if r == True:
+                attributes_dict["rainbow"] = str("true")
+            else:
+                attributes_dict["rainbow"] = str("false")
 
-    #         lbde_dict = LightbarDisplayDict(
-    #             {
-    #                 "colors": color_list,
-    #                 "duration": int(call.data["lightbar_duration"]),
-    #                 "speed": int(call.data["lightbar_speed"]),
-    #                 "attributes": attributes_dict,
-    #             }
-    #         )
+        lbde_dict = LightbarDisplayDict(
+            {
+                "colors": color_list,
+                "duration": int(call.data["lightbar_duration"]),
+                "speed": int(call.data["lightbar_speed"]),
+                "attributes": attributes_dict,
+            }
+        )
 
-    #         _LOGGER.warning(f"lbde_dict={lbde_dict}")
-    #         retval = await client.set_lightbar_effect(
-    #             mydevice, LightbarDisplayEffect(mydevice, lbde_dict)
-    #         )
-    #         _LOGGER.warning(f"retval={retval.to_dict()}")
+        _LOGGER.warning(f"lbde_dict={lbde_dict}")
+        retval = await device.set_light_bar_effect(
+            LightbarDisplayEffect.from_dict(lbde_dict)
+        )
+        _LOGGER.warning(f"retval={retval.to_dict()}")
 
-    # async def handle_set_lightbar_comet_service(call: ServiceCall) -> None:
-    #     deviceregistry = dr.async_get(hass)
-    #     deviceentry = deviceregistry.async_get(call.data["doppler_device_id"])
-    #     mydevice = ""
-    #     for device in mydevices.values():
-    #         if ("sandman_doppler", device.id) in deviceentry.identifiers:
-    #             _LOGGER.warning(f"got device id in handle_set_lightbar")
-    #             mydevice = device
-    #             break
-    #     if mydevice != "":
-    #         _LOGGER.warning(f"data was {call.data}")
-    #         _LOGGER.warning(f"Called handle_set_lightbar_pulse_service")
-    #         color_list = []
-    #         for c in [
-    #             call.data.get("lightbar_color1"),
-    #             call.data.get("lightbar_color2"),
-    #             call.data.get("lightbar_color3"),
-    #             call.data.get("lightbar_color4"),
-    #             call.data.get("lightbar_color5"),
-    #             call.data.get("lightbar_color6"),
-    #             call.data.get("lightbar_color7"),
-    #             call.data.get("lightbar_color8"),
-    #             call.data.get("lightbar_color9"),
-    #             call.data.get("lightbar_color10"),
-    #             call.data.get("lightbar_color11"),
-    #             call.data.get("lightbar_color12"),
-    #         ]:
-    #             if c is not None:
-    #                 color_list.append([c[0], c[1], c[2]])
-    #         s = call.data.get("lightbar_sparkle")
-    #         r = call.data.get("lightbar_rainbow")
-    #         sz = call.data.get("lightbar_size")
-    #         direct = call.data.get("lightbar_direction")
+    async def handle_set_lightbar_pulse_service(call: ServiceCall) -> None:
+        device=get_device_from_call_data(call)
 
-    #         attributes_dict = {}
-    #         attributes_dict["display"] = "comet"
-    #         if sz is not None:
-    #             attributes_dict["size"] = f"{sz}"
-    #         else:
-    #             attributes_dict["size"] = f"10"
-    #         if direct is not None:
-    #             attributes_dict["direction"] = f"{direct}"
-    #         else:
-    #             attributes_dict["direction"] = "right"
-    #         if s is not None:
-    #             attributes_dict["sparkle"] = f"{s}"
-    #         if r is not None:
-    #             if r == True:
-    #                 attributes_dict["rainbow"] = str("true")
-    #             else:
-    #                 attributes_dict["rainbow"] = str("false")
+        _LOGGER.warning(f"data was {call.data}")
+        _LOGGER.warning(f"Called handle_set_lightbar_pulse_service")
+        color_list = []
+        for c in [
+            call.data.get("lightbar_color1"),
+            call.data.get("lightbar_color2"),
+            call.data.get("lightbar_color3"),
+            call.data.get("lightbar_color4"),
+            call.data.get("lightbar_color5"),
+            call.data.get("lightbar_color6"),
+            call.data.get("lightbar_color7"),
+            call.data.get("lightbar_color8"),
+            call.data.get("lightbar_color9"),
+            call.data.get("lightbar_color10"),
+            call.data.get("lightbar_color11"),
+            call.data.get("lightbar_color12"),
+        ]:
+            if c is not None:
+                color_list.append([c[0], c[1], c[2]])
+        s = call.data.get("lightbar_sparkle")
+        r = call.data.get("lightbar_rainbow")
+        sp = call.data.get("lightbar_speed")
+        gp = call.data.get("lightbar_gap")
 
-    #         lbde_dict = LightbarDisplayDict(
-    #             {
-    #                 "colors": color_list,
-    #                 "duration": int(call.data["lightbar_duration"]),
-    #                 "speed": int(call.data["lightbar_speed"]),
-    #                 "attributes": attributes_dict,
-    #             }
-    #         )
+        attributes_dict = {}
+        attributes_dict["display"] = "pulse"
+        if gp is not None:
+            attributes_dict["gap"] = f"{gp}"
+        if s is not None:
+            attributes_dict["sparkle"] = f"{s}"
+        if r is not None:
+            if r == True:
+                attributes_dict["rainbow"] = str("true")
+            else:
+                attributes_dict["rainbow"] = str("false")
 
-    #         _LOGGER.warning(f"lbde_dict={lbde_dict}")
-    #         retval = await client.set_lightbar_effect(
-    #             mydevice, LightbarDisplayEffect(mydevice, lbde_dict)
-    #         )
-    #         _LOGGER.warning(f"retval={retval.to_dict()}")
+        lbde_dict = LightbarDisplayDict(
+            {
+                "colors": color_list,
+                "duration": int(call.data["lightbar_duration"]),
+                "speed": int(call.data["lightbar_speed"]),
+                "attributes": attributes_dict,
+            }
+        )
 
-    # async def handle_set_lightbar_sweep_service(call: ServiceCall) -> None:
-    #     deviceregistry = dr.async_get(hass)
-    #     deviceentry = deviceregistry.async_get(call.data["doppler_device_id"])
-    #     mydevice = ""
-    #     for device in mydevices.values():
-    #         if ("sandman_doppler", device.id) in deviceentry.identifiers:
-    #             _LOGGER.warning(f"got device id in handle_set_lightbar")
-    #             mydevice = device
-    #             break
-    #     if mydevice != "":
-    #         _LOGGER.warning(f"data was {call.data}")
-    #         _LOGGER.warning(f"Called handle_set_lightbar_pulse_service")
-    #         color_list = []
-    #         for c in [
-    #             call.data.get("lightbar_color1"),
-    #             call.data.get("lightbar_color2"),
-    #             call.data.get("lightbar_color3"),
-    #             call.data.get("lightbar_color4"),
-    #             call.data.get("lightbar_color5"),
-    #             call.data.get("lightbar_color6"),
-    #             call.data.get("lightbar_color7"),
-    #             call.data.get("lightbar_color8"),
-    #             call.data.get("lightbar_color9"),
-    #             call.data.get("lightbar_color10"),
-    #             call.data.get("lightbar_color11"),
-    #             call.data.get("lightbar_color12"),
-    #         ]:
-    #             if c is not None:
-    #                 color_list.append([c[0], c[1], c[2]])
-    #         s = call.data.get("lightbar_sparkle")
-    #         r = call.data.get("lightbar_rainbow")
-    #         sp = call.data.get("lightbar_speed")
-    #         gp = call.data.get("lightbar_gap")
-    #         sz = call.data.get("lightbar_size")
-    #         direct = call.data.get("lightbar_direction")
+        _LOGGER.warning(f"lbde_dict={lbde_dict}")
+        retval = await device.set_light_bar_effect(
+            LightbarDisplayEffect.from_dict(lbde_dict)
+        )
+        _LOGGER.warning(f"retval={retval.to_dict()}")
 
-    #         attributes_dict = {}
-    #         attributes_dict["display"] = "sweep"
-    #         if gp is not None:
-    #             attributes_dict["gap"] = f"{gp}"
-    #         if s is not None:
-    #             attributes_dict["sparkle"] = f"{s}"
-    #         if sz is not None:
-    #             attributes_dict["size"] = f"{sz}"
-    #         else:
-    #             attributes_dict["size"] = "10"
-    #         if direct is not None:
-    #             attributes_dict["direction"] = f"{direct}"
-    #         else:
-    #             attributes_dict["direction"] = "right"
-    #         if r is not None:
-    #             if r is True:
-    #                 attributes_dict["rainbow"] = str("true")
-    #             else:
-    #                 attributes_dict["rainbow"] = str("false")
+    async def handle_set_lightbar_comet_service(call: ServiceCall) -> None:
+        device=get_device_from_call_data(call)
+        _LOGGER.warning(f"data was {call.data}")
+        _LOGGER.warning(f"Called handle_set_lightbar_pulse_service")
+        color_list = []
+        for c in [
+            call.data.get("lightbar_color1"),
+            call.data.get("lightbar_color2"),
+            call.data.get("lightbar_color3"),
+            call.data.get("lightbar_color4"),
+            call.data.get("lightbar_color5"),
+            call.data.get("lightbar_color6"),
+            call.data.get("lightbar_color7"),
+            call.data.get("lightbar_color8"),
+            call.data.get("lightbar_color9"),
+            call.data.get("lightbar_color10"),
+            call.data.get("lightbar_color11"),
+            call.data.get("lightbar_color12"),
+        ]:
+            if c is not None:
+                color_list.append([c[0], c[1], c[2]])
+        s = call.data.get("lightbar_sparkle")
+        r = call.data.get("lightbar_rainbow")
+        sz = call.data.get("lightbar_size")
+        direct = call.data.get("lightbar_direction")
 
-    #         lbde_dict = LightbarDisplayDict(
-    #             {
-    #                 "colors": color_list,
-    #                 "duration": int(call.data["lightbar_duration"]),
-    #                 "speed": int(call.data["lightbar_speed"]),
-    #                 "attributes": attributes_dict,
-    #             }
-    #         )
+        attributes_dict = {}
+        attributes_dict["display"] = "comet"
+        if sz is not None:
+            attributes_dict["size"] = f"{sz}"
+        else:
+            attributes_dict["size"] = f"10"
+        if direct is not None:
+            attributes_dict["direction"] = f"{direct}"
+        else:
+            attributes_dict["direction"] = "right"
+        if s is not None:
+            attributes_dict["sparkle"] = f"{s}"
+        if r is not None:
+            if r == True:
+                attributes_dict["rainbow"] = str("true")
+            else:
+                attributes_dict["rainbow"] = str("false")
 
-    #         _LOGGER.warning(f"lbde_dict={lbde_dict}")
-    #         retval = await client.set_lightbar_effect(
-    #             mydevice, LightbarDisplayEffect(mydevice, lbde_dict)
-    #         )
-    #         _LOGGER.warning(f"retval={retval.to_dict()}")
+        lbde_dict = LightbarDisplayDict(
+            {
+                "colors": color_list,
+                "duration": int(call.data["lightbar_duration"]),
+                "speed": int(call.data["lightbar_speed"]),
+                "attributes": attributes_dict,
+            }
+        )
 
-    # async def handle_set_display_color_service(call: ServiceCall) -> None:
-    #     deviceregistry = dr.async_get(hass)
-    #     deviceentry = deviceregistry.async_get(call.data["doppler_device_id"])
-    #     mydevice = ""
-    #     for device in mydevices.values():
-    #         if ("sandman_doppler", device.id) in deviceentry.identifiers:
-    #             mydevice = device
-    #             break
-    #     if mydevice != "":
-    #         dayornight = call.data.get("display_day_or_night")
-    #         colorval = call.data.get("display_color")
+        _LOGGER.warning(f"lbde_dict={lbde_dict}")
+        retval = await device.set_light_bar_effect(
+            LightbarDisplayEffect.from_dict(lbde_dict)
+        )
+        _LOGGER.warning(f"retval={retval.to_dict()}")
 
-    #         if dayornight == "Day":
-    #             retval = await client.set_day_display_color(
-    #                 mydevice, Color.from_list(colorval)
-    #             )
-    #         elif dayornight == "Night":
-    #             retval = await client.set_night_display_color(
-    #                 mydevice, Color.from_list(colorval)
-    #             )
-    #         else:
-    #             raise Exception("Got None for Dayornight")
+    async def handle_set_lightbar_sweep_service(call: ServiceCall) -> None:
+        device = get_device_from_call_data(call)
 
-    # async def handle_set_button_color_service(call: ServiceCall) -> None:
-    #     deviceregistry = dr.async_get(hass)
-    #     deviceentry = deviceregistry.async_get(call.data["doppler_device_id"])
-    #     mydevice = ""
-    #     for device in mydevices.values():
-    #         if ("sandman_doppler", device.id) in deviceentry.identifiers:
-    #             mydevice = device
-    #             break
-    #     if mydevice != "":
-    #         dayornight = call.data.get("button_day_or_night")
-    #         colorval = call.data.get("button_color")
+        _LOGGER.warning(f"data was {call.data}")
+        _LOGGER.warning(f"Called handle_set_lightbar_sweep_service")
+        color_list = []
+        for c in [
+            call.data.get("lightbar_color1"),
+            call.data.get("lightbar_color2"),
+            call.data.get("lightbar_color3"),
+            call.data.get("lightbar_color4"),
+            call.data.get("lightbar_color5"),
+            call.data.get("lightbar_color6"),
+            call.data.get("lightbar_color7"),
+            call.data.get("lightbar_color8"),
+            call.data.get("lightbar_color9"),
+            call.data.get("lightbar_color10"),
+            call.data.get("lightbar_color11"),
+            call.data.get("lightbar_color12"),
+        ]:
+            if c is not None:
+                color_list.append([c[0], c[1], c[2]])
+        s = call.data.get("lightbar_sparkle")
+        r = call.data.get("lightbar_rainbow")
+        sp = call.data.get("lightbar_speed")
+        gp = call.data.get("lightbar_gap")
+        sz = call.data.get("lightbar_size")
+        direct = call.data.get("lightbar_direction")
 
-    #         if dayornight == "Day":
-    #             retval = await client.set_day_button_color(
-    #                 mydevice, Color.from_list(colorval)
-    #             )
-    #         elif dayornight == "Night":
-    #             retval = await client.set_night_button_color(
-    #                 mydevice, Color.from_list(colorval)
-    #             )
-    #         else:
-    #             raise Exception("Got None for Dayornight")
+        attributes_dict = {}
+        attributes_dict["display"] = "sweep"
+        if gp is not None:
+            attributes_dict["gap"] = f"{gp}"
+        if s is not None:
+            attributes_dict["sparkle"] = f"{s}"
+        if sz is not None:
+            attributes_dict["size"] = f"{sz}"
+        else:
+            attributes_dict["size"] = "10"
+        if direct is not None:
+            attributes_dict["direction"] = f"{direct}"
+        else:
+            attributes_dict["direction"] = "right"
+        if r is not None:
+            if r is True:
+                attributes_dict["rainbow"] = str("true")
+            else:
+                attributes_dict["rainbow"] = str("false")
 
-    # async def handle_set_display_brightness_service(call: ServiceCall) -> None:
-    #     deviceregistry = dr.async_get(hass)
-    #     deviceentry = deviceregistry.async_get(call.data["doppler_device_id"])
-    #     mydevice = ""
-    #     for device in mydevices.values():
-    #         if ("sandman_doppler", device.id) in deviceentry.identifiers:
-    #             mydevice = device
-    #             break
-    #     if mydevice != "":
-    #         dayornight = call.data.get("display_day_or_night")
-    #         brightness = call.data.get("display_brightness")
+        lbde_dict = LightbarDisplayDict(
+            {
+                "colors": color_list,
+                "duration": int(call.data["lightbar_duration"]),
+                "speed": int(call.data["lightbar_speed"]),
+                "attributes": attributes_dict,
+            }
+        )
 
-    #         if dayornight == "Day":
-    #             retval = await client.set_day_display_brightness(mydevice, brightness)
-    #         elif dayornight == "Night":
-    #             retval = await client.set_night_display_brightness(mydevice, brightness)
-    #         else:
-    #             raise Exception("Got None for Dayornight")
+        _LOGGER.warning(f"lbde_dict={lbde_dict}")
+        retval = await device.set_light_bar_effect(
+            LightbarDisplayEffect.from_dict(lbde_dict)
+        )
+        _LOGGER.warning(f"retval={retval.to_dict()}")
 
-    # async def handle_set_button_brightness_service(call: ServiceCall) -> None:
-    #     deviceregistry = dr.async_get(hass)
-    #     deviceentry = deviceregistry.async_get(call.data["doppler_device_id"])
-    #     mydevice = ""
-    #     for device in mydevices.values():
-    #         if ("sandman_doppler", device.id) in deviceentry.identifiers:
-    #             mydevice = device
-    #             break
-    #     if mydevice != "":
-    #         dayornight = call.data.get("display_day_or_night")
-    #         brightness = call.data.get("button_brightness")
+    async def handle_set_display_color_service(call: ServiceCall) -> None:
+        device = get_device_from_call_data(call)
+        
+        dayornight = call.data.get("display_day_or_night")
+        colorval = call.data.get("display_color")
 
-    #         if dayornight == "Day":
-    #             retval = await client.set_day_button_brightness(mydevice, brightness)
-    #         elif dayornight == "Night":
-    #             retval = await client.set_night_button_brightness(mydevice, brightness)
-    #         else:
-    #             raise Exception("Got None for Dayornight")
+        if dayornight == "Day":
+            retval = await device.set_day_display_color(
+                Color.from_list(colorval)
+            )
+        elif dayornight == "Night":
+            retval = await device.set_night_display_color(
+                device, Color.from_list(colorval)
+            )
+        else:
+            raise Exception("Got None for Dayornight")
 
-    # hass.services.async_register(DOMAIN, "setalarmservice", handle_set_alarm_service)
-    # hass.services.async_register(
-    #     DOMAIN, "deletealarmservice", handle_delete_alarm_service
-    # )
-    # hass.services.async_register(
-    #     DOMAIN, "displaytextmainservice", handle_set_main_display_service
-    # )
-    # hass.services.async_register(
-    #     DOMAIN, "displaynumminiservice", handle_set_mini_display_service
-    # )
-    # hass.services.async_register(
-    #     DOMAIN, "setlightbarcolorservice", handle_set_lightbar_color_service
-    # )
-    # hass.services.async_register(
-    #     DOMAIN, "seteachlightbarcolorservice", handle_set_each_lightbar_color_service
-    # )
-    # hass.services.async_register(
-    #     DOMAIN, "setlightbarblinkservice", handle_set_lightbar_blink_service
-    # )
-    # hass.services.async_register(
-    #     DOMAIN, "setlightbarpulseservice", handle_set_lightbar_pulse_service
-    # )
-    # hass.services.async_register(
-    #     DOMAIN, "setlightbarcometservice", handle_set_lightbar_comet_service
-    # )
-    # hass.services.async_register(
-    #     DOMAIN, "setlightbarsweepservice", handle_set_lightbar_sweep_service
-    # )
-    # hass.services.async_register(
-    #     DOMAIN, "setdisplaycolorservice", handle_set_display_color_service
-    # )
-    # hass.services.async_register(
-    #     DOMAIN, "setbuttoncolorservice", handle_set_button_color_service
-    # )
-    # hass.services.async_register(
-    #     DOMAIN, "setdisplaybrightnessservice", handle_set_display_brightness_service
-    # )
-    # hass.services.async_register(
-    #     DOMAIN, "setbuttonbrightnessservice", handle_set_button_brightness_service
-    # )
+    async def handle_set_button_color_service(call: ServiceCall) -> None:
+        device = get_device_from_call_data(call)
+        
+        dayornight = call.data.get("button_day_or_night")
+        colorval = call.data.get("button_color")
+
+        if dayornight == "Day":
+            retval = await device.set_day_button_color(
+                Color.from_list(colorval)
+            )
+        elif dayornight == "Night":
+            retval = await device.set_night_button_color(
+                Color.from_list(colorval)
+            )
+        else:
+            raise Exception("Got None for Dayornight")
+
+    async def handle_set_display_brightness_service(call: ServiceCall) -> None:
+        device=get_device_from_call_data(call)
+        
+        dayornight = call.data.get("display_day_or_night")
+        brightness = call.data.get("display_brightness")
+
+        if dayornight == "Day":
+            retval = await device.set_day_display_brightness(brightness)
+        elif dayornight == "Night":
+            retval = await device.set_night_display_brightness(brightness)
+        else:
+            raise Exception("Got None for Dayornight")
+
+    async def handle_set_button_brightness_service(call: ServiceCall) -> None:
+
+        device=get_device_from_call_data(call)
+        dayornight = call.data.get("display_day_or_night")
+        brightness = call.data.get("button_brightness")
+
+        if dayornight == "Day":
+            retval = await device.set_day_button_brightness(brightness)
+        elif dayornight == "Night":
+            retval = await device.set_night_button_brightness(brightness)
+        else:
+            raise Exception("Got None for Dayornight")
+
+    hass.services.async_register(
+        DOMAIN, "setalarmservice", handle_set_alarm_service)
+    hass.services.async_register(
+        DOMAIN, "deletealarmservice", handle_delete_alarm_service
+    )
+    hass.services.async_register(
+        DOMAIN, "displaytextmainservice", handle_set_main_display_service
+    )
+    hass.services.async_register(
+        DOMAIN, "displaynumminiservice", handle_set_mini_display_service
+    )
+    hass.services.async_register(
+        DOMAIN, "setlightbarcolorservice", handle_set_lightbar_color_service
+    )
+    hass.services.async_register(
+        DOMAIN, "seteachlightbarcolorservice", handle_set_each_lightbar_color_service
+    )
+    hass.services.async_register(
+        DOMAIN, "setlightbarblinkservice", handle_set_lightbar_blink_service
+    )
+    hass.services.async_register(
+        DOMAIN, "setlightbarpulseservice", handle_set_lightbar_pulse_service
+    )
+    hass.services.async_register(
+        DOMAIN, "setlightbarcometservice", handle_set_lightbar_comet_service
+    )
+    hass.services.async_register(
+        DOMAIN, "setlightbarsweepservice", handle_set_lightbar_sweep_service
+    )
+    hass.services.async_register(
+        DOMAIN, "setdisplaycolorservice", handle_set_display_color_service
+    )
+    hass.services.async_register(
+        DOMAIN, "setbuttoncolorservice", handle_set_button_color_service
+    )
+    hass.services.async_register(
+        DOMAIN, "setdisplaybrightnessservice", handle_set_display_brightness_service
+    )
+    hass.services.async_register(
+        DOMAIN, "setbuttonbrightnessservice", handle_set_button_brightness_service
+    )
 
     return True
 
