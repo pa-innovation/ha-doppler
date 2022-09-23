@@ -68,13 +68,13 @@ SCAN_INTERVAL = timedelta(seconds=900)
 _LOGGER = logging.getLogger(__name__)
 
 
-async def async_setup(hass: HomeAssistant, config: ConfigType) -> None:
+async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     """Setup integration."""
     _LOGGER.info(STARTUP_MESSAGE)
     return True
 
 
-async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
+async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up config entry."""
     hass.data.setdefault(DOMAIN, {})
 
@@ -889,7 +889,7 @@ class DopplerDataUpdateCoordinator(DataUpdateCoordinator):
                 _LOGGER.warning("DONE loop for device %s", device)
 
         except Exception as exception:
-            _LOGGER.debug(exception)
+            _LOGGER.debug("%s: %s", type(exception), exception)
             raise UpdateFailed() from exception
         # _LOGGER.warning("sandman_doppler Completed _async_update_data")
         return data
