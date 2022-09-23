@@ -52,12 +52,12 @@ class DopplerVolumeLevelNumber(DopplerEntity, NumberEntity):
     # @property
     # def value(self) -> int:
     #     """Return the current value."""
-    #     return self.coordinator.data[self.device.device_info.dsn][ATTR_VOLUME_LEVEL]
+    #     return self.device_data[ATTR_VOLUME_LEVEL]
 
     @property
     def native_value(self) -> float | None:
         """Return the current value"""
-        return self.coordinator.data[self.device.device_info.dsn][ATTR_VOLUME_LEVEL]
+        return self.device_data[ATTR_VOLUME_LEVEL]
 
     async def async_set_native_value(self, value: float) -> None:
         """Update the current volume value"""
@@ -76,7 +76,7 @@ class DopplerTimeOffsetNumber(DopplerEntity, NumberEntity):
     @property
     def native_value(self) -> int:
         """Return the current value"""
-        return self.coordinator.data[self.device.device_info.dsn][ATTR_TIMEOFFSET]
+        return self.device_data[ATTR_TIMEOFFSET]
 
     async def async_set_native_value(self, value: int) -> None:
         """Update the current volume value"""

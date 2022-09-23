@@ -66,9 +66,7 @@ class DopplerDisplayLightDay(BaseDopplerLight):
     @property
     def rgb_color(self) -> tuple[int, int, int] | None:
         """Return the rgb color value [int, int, int]."""
-        color: Color | None = self.coordinator.data[self.device.device_info.dsn][
-            ATTR_DAY_DISPLAY_COLOR
-        ]
+        color: Color | None = self.device_data[ATTR_DAY_DISPLAY_COLOR]
         if not color:
             return None
         return (color.red, color.green, color.blue)
@@ -76,9 +74,7 @@ class DopplerDisplayLightDay(BaseDopplerLight):
     @property
     def brightness(self) -> int:
         """Return the brightness of this light between 0..255."""
-        brightness = self.coordinator.data[self.device.device_info.dsn][
-            ATTR_DAY_DISPLAY_BRIGHTNESS
-        ]
+        brightness = self.device_data[ATTR_DAY_DISPLAY_BRIGHTNESS]
         if brightness is not None:
             return round((brightness / 100) * 255)
         return 0
@@ -107,9 +103,7 @@ class DopplerDisplayLightNight(BaseDopplerLight):
     @property
     def rgb_color(self) -> tuple[int, int, int] | None:
         """Return the rgb color value [int, int, int]."""
-        color: Color | None = self.coordinator.data[self.device.device_info.dsn][
-            ATTR_NIGHT_DISPLAY_COLOR
-        ]
+        color: Color | None = self.device_data[ATTR_NIGHT_DISPLAY_COLOR]
         if not color:
             return None
         return (color.red, color.green, color.blue)
@@ -117,9 +111,7 @@ class DopplerDisplayLightNight(BaseDopplerLight):
     @property
     def brightness(self) -> int:
         """Return the brightness of this light between 0..255."""
-        brightness = self.coordinator.data[self.device.device_info.dsn][
-            ATTR_NIGHT_DISPLAY_BRIGHTNESS
-        ]
+        brightness = self.device_data[ATTR_NIGHT_DISPLAY_BRIGHTNESS]
         if brightness is not None:
             return round((brightness / 100) * 255)
         return 0
@@ -148,9 +140,7 @@ class DopplerButtonLightDay(BaseDopplerLight):
     @property
     def rgb_color(self) -> tuple[int, int, int] | None:
         """Return the rgb color value [int, int, int]."""
-        color: Color | None = self.coordinator.data[self.device.device_info.dsn][
-            ATTR_DAY_BUTTON_COLOR
-        ]
+        color: Color | None = self.device_data[ATTR_DAY_BUTTON_COLOR]
         if not color:
             return None
         return (color.red, color.green, color.blue)
@@ -158,9 +148,7 @@ class DopplerButtonLightDay(BaseDopplerLight):
     @property
     def brightness(self) -> int:
         """Return the brightness of this light between 0..255."""
-        brightness = self.coordinator.data[self.device.device_info.dsn][
-            ATTR_DAY_BUTTON_BRIGHTNESS
-        ]
+        brightness = self.device_data[ATTR_DAY_BUTTON_BRIGHTNESS]
         if brightness is not None:
             return round((brightness / 100) * 255)
         return 0
@@ -192,9 +180,7 @@ class DopplerButtonLightNight(BaseDopplerLight):
     @property
     def rgb_color(self) -> tuple[int, int, int] | None:
         """Return the rgb color value [int, int, int]."""
-        color: Color | None = self.coordinator.data[self.device.device_info.dsn][
-            ATTR_NIGHT_BUTTON_COLOR
-        ]
+        color: Color | None = self.device_data[ATTR_NIGHT_BUTTON_COLOR]
         if not color:
             return None
         return (color.red, color.green, color.blue)
@@ -202,9 +188,7 @@ class DopplerButtonLightNight(BaseDopplerLight):
     @property
     def brightness(self) -> int:
         """Return the brightness of this light between 0..255."""
-        brightness = self.coordinator.data[self.device.device_info.dsn][
-            ATTR_NIGHT_BUTTON_BRIGHTNESS
-        ]
+        brightness = self.device_data[ATTR_NIGHT_BUTTON_BRIGHTNESS]
         if brightness is not None:
             return round((brightness / 100) * 255)
         return 0

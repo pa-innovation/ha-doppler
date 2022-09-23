@@ -53,7 +53,7 @@ class DopplerTimeModeNumber(DopplerEntity, SelectEntity):
     @property
     def current_option(self) -> str:
         """Return the current option."""
-        return str(self.coordinator.data[self.device.device_info.dsn][ATTR_TIME_MODE])
+        return str(self.device_data[ATTR_TIME_MODE])
 
     async def async_select_option(self, option: str) -> None:
         """Change the selected option."""
@@ -74,9 +74,7 @@ class DopplerSoundPresetSelect(DopplerEntity, SelectEntity):
     @property
     def current_option(self) -> str:
         """Return the current option."""
-        return str(
-            self.coordinator.data[self.device.device_info.dsn][ATTR_SOUND_PRESET]
-        )
+        return str(self.device_data[ATTR_SOUND_PRESET])
 
     async def async_select_option(self, option: str) -> None:
         """Change the selected option."""
@@ -100,9 +98,7 @@ class DopplerWeatherModeSelect(DopplerEntity, SelectEntity):
     @property
     def current_option(self) -> str:
         """Return the current option."""
-        return str(
-            self.coordinator.data[self.device.device_info.dsn][ATTR_WEATHER].mode.name
-        )
+        return str(self.device_data[ATTR_WEATHER].mode.name)
 
     async def async_select_option(self, option: str) -> str:
         """Change the selected option."""
@@ -167,7 +163,7 @@ class DopplerTimezoneSelect(DopplerEntity, SelectEntity):
     @property
     def current_option(self) -> str:
         """Return the current option."""
-        return str(self.coordinator.data[self.device.device_info.dsn][ATTR_TIMEZONE])
+        return str(self.device_data[ATTR_TIMEZONE])
 
     async def async_select_option(self, option: str) -> str:
         """Change the selected option."""

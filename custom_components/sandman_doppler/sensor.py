@@ -64,9 +64,7 @@ class DopplerLightSensor(DopplerEntity, SensorEntity):
 
     @property
     def native_value(self):
-        return self.coordinator.data[self.device.device_info.dsn][
-            ATTR_LIGHTSENSOR_VALUE
-        ]
+        return self.device_data[ATTR_LIGHTSENSOR_VALUE]
 
 
 class DopplerDayNightSensor(DopplerEntity, SensorEntity):
@@ -75,9 +73,7 @@ class DopplerDayNightSensor(DopplerEntity, SensorEntity):
 
     @property
     def native_value(self):
-        return self.coordinator.data[self.device.device_info.dsn][
-            ATTR_DAYNIGHTMODE_VALUE
-        ]
+        return self.device_data[ATTR_DAYNIGHTMODE_VALUE]
 
 
 class DopplerWifiUptimeSensor(DopplerEntity, SensorEntity):
@@ -86,7 +82,7 @@ class DopplerWifiUptimeSensor(DopplerEntity, SensorEntity):
 
     @property
     def native_value(self):
-        return self.coordinator.data[self.device.device_info.dsn][ATTR_WIFI].uptime
+        return self.device_data[ATTR_WIFI].uptime
 
 
 class DopplerWifiSSIDSensor(DopplerEntity, SensorEntity):
@@ -95,7 +91,7 @@ class DopplerWifiSSIDSensor(DopplerEntity, SensorEntity):
 
     @property
     def native_value(self):
-        return self.coordinator.data[self.device.device_info.dsn][ATTR_WIFI].ssid
+        return self.device_data[ATTR_WIFI].ssid
 
 
 class DopplerWifiSignalStrengthSensor(DopplerEntity, SensorEntity):
@@ -104,9 +100,7 @@ class DopplerWifiSignalStrengthSensor(DopplerEntity, SensorEntity):
 
     @property
     def native_value(self):
-        return self.coordinator.data[self.device.device_info.dsn][
-            ATTR_WIFI
-        ].signal_strength
+        return self.device_data[ATTR_WIFI].signal_strength
 
 
 # class DopplerAlarmsSensor(DopplerEntity,SensorEntity):
@@ -115,5 +109,5 @@ class DopplerWifiSignalStrengthSensor(DopplerEntity, SensorEntity):
 
 #     @property
 #     def native_value(self):
-#         mylist =[Alarm.to_dict(alarm) for alarm in self.coordinator.data[self.device.device_info.dsn][ATTR_ALARMS]]
+#         mylist =[Alarm.to_dict(alarm) for alarm in self.device_data[ATTR_ALARMS]]
 #         return mylist

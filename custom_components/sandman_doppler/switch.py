@@ -77,7 +77,7 @@ class ColonBlinkSwitch(DopplerEntity, SwitchEntity):
     @property
     def is_on(self):
         """Return true if device is on."""
-        return self.coordinator.data[self.device.device_info.dsn][ATTR_COLON_BLINK]
+        return self.device_data[ATTR_COLON_BLINK]
 
 
 class UseColonSwitch(DopplerEntity, SwitchEntity):
@@ -96,7 +96,7 @@ class UseColonSwitch(DopplerEntity, SwitchEntity):
     @property
     def is_on(self):
         """Return true if device is on."""
-        return self.coordinator.data[self.device.device_info.dsn][ATTR_USE_COLON]
+        return self.device_data[ATTR_USE_COLON]
 
 
 class UseLeadingZeroSwitch(DopplerEntity, SwitchEntity):
@@ -115,7 +115,7 @@ class UseLeadingZeroSwitch(DopplerEntity, SwitchEntity):
     @property
     def is_on(self):
         """Return true if device is on."""
-        return self.coordinator.data[self.device.device_info.dsn][ATTR_USE_LEADING_ZERO]
+        return self.device_data[ATTR_USE_LEADING_ZERO]
 
 
 class UseDisplaySecondsSwitch(DopplerEntity, SwitchEntity):
@@ -134,7 +134,7 @@ class UseDisplaySecondsSwitch(DopplerEntity, SwitchEntity):
     @property
     def is_on(self):
         """Return true if device is on."""
-        return self.coordinator.data[self.device.device_info.dsn][ATTR_DISPLAY_SECONDS]
+        return self.device_data[ATTR_DISPLAY_SECONDS]
 
 
 class UseAscendingAlarmsSwitch(DopplerEntity, SwitchEntity):
@@ -153,9 +153,7 @@ class UseAscendingAlarmsSwitch(DopplerEntity, SwitchEntity):
     @property
     def is_on(self):
         """Return true if device is on."""
-        return self.coordinator.data[self.device.device_info.dsn][
-            ATTR_ALEXA_USE_ASCENDING_ALARMS
-        ]
+        return self.device_data[ATTR_ALEXA_USE_ASCENDING_ALARMS]
 
 
 class UseTapTalkToneSwitch(DopplerEntity, SwitchEntity):
@@ -174,9 +172,7 @@ class UseTapTalkToneSwitch(DopplerEntity, SwitchEntity):
     @property
     def is_on(self):
         """Return true if device is on."""
-        return self.coordinator.data[self.device.device_info.dsn][
-            ATTR_ALEXA_TAPTALK_TONE
-        ]
+        return self.device_data[ATTR_ALEXA_TAPTALK_TONE]
 
 
 class UseWakewordToneSwitch(DopplerEntity, SwitchEntity):
@@ -195,9 +191,7 @@ class UseWakewordToneSwitch(DopplerEntity, SwitchEntity):
     @property
     def is_on(self):
         """Return true if device is on."""
-        return self.coordinator.data[self.device.device_info.dsn][
-            ATTR_ALEXA_WAKEWORD_TONE
-        ]
+        return self.device_data[ATTR_ALEXA_WAKEWORD_TONE]
 
 
 class SoundPresetModeSwitch(DopplerEntity, SwitchEntity):
@@ -216,10 +210,7 @@ class SoundPresetModeSwitch(DopplerEntity, SwitchEntity):
     @property
     def is_on(self):
         """Return true if device is on."""
-        if (
-            self.coordinator.data[self.device.device_info.dsn][ATTR_SOUND_PRESET_MODE]
-            == 1
-        ):
+        if self.device_data[ATTR_SOUND_PRESET_MODE] == 1:
             return True
         else:
             return False
@@ -242,4 +233,4 @@ class DopplerWeatherSwitch(DopplerEntity, SwitchEntity):
     @property
     def is_on(self):
         """Return true if device is on."""
-        return self.coordinator.data[self.device.device_info.dsn][ATTR_WEATHER].enabled
+        return self.device_data[ATTR_WEATHER].enabled

@@ -27,6 +27,8 @@ class DopplerEntity(CoordinatorEntity[DopplerDataUpdateCoordinator]):
         self.config_entry = config_entry
         self.device = device
 
+        self.device_data = coordinator.data[self.device.device_info.dsn]
+
         self._attr_name = name
         self._attr_unique_id = slugify(
             f"{self.config_entry.unique_id}_{self.device.device_info.dsn}_"
