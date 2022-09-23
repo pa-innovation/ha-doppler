@@ -1,0 +1,8 @@
+{
+  "state": {
+    "sandman_doppler__day_night": {
+      "on": "Day",
+      "off": "Night"
+    }
+  }
+}

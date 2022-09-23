@@ -1,12 +1,10 @@
 """Provides device triggers for sandman_doppler."""
 from __future__ import annotations
 
-from typing import Any
 import logging
+from typing import Any
 
 _LOGGER: logging.Logger = logging.getLogger(__package__)
-
-import voluptuous as vol
 
 from homeassistant.components.automation import (
     AutomationActionType,
@@ -24,17 +22,15 @@ from homeassistant.const import (
     STATE_ON,
 )
 from homeassistant.core import CALLBACK_TYPE, HomeAssistant
-from homeassistant.helpers import config_validation as cv, entity_registry
-from homeassistant.helpers import device_registry as dr
-from homeassistant.helpers.typing import ConfigType
-
-from .const import (
-    DOMAIN,
-    ATTR_DSN,
-    ATTR_BUTTON,
-    CONF_SUBTYPE,
+from homeassistant.helpers import (
+    config_validation as cv,
+    device_registry as dr,
+    entity_registry,
 )
+from homeassistant.helpers.typing import ConfigType
+import voluptuous as vol
 
+from .const import ATTR_BUTTON, ATTR_DSN, CONF_SUBTYPE, DOMAIN
 
 TRIGGER_TYPES = {"sandman_doppler_button"}
 

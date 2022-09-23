@@ -1,21 +1,20 @@
 """The Sandman Doppler integration."""
 from __future__ import annotations
 
-from typing import Any
 import asyncio
 from datetime import timedelta
 import logging
-from aiohttp.client import ClientTimeout, DEFAULT_TIMEOUT
+from typing import Any
 
+from aiohttp.client import DEFAULT_TIMEOUT, ClientTimeout
 from doppyler.client import DopplerClient
 from doppyler.exceptions import DopplerException
-from doppyler.model.doppler import Doppler
-from doppyler.model.alarm import Alarm, AlarmStatus, AlarmSource, AlarmDict
+from doppyler.model.alarm import Alarm, AlarmDict, AlarmSource, AlarmStatus
 from doppyler.model.color import Color, ColorDict
+from doppyler.model.doppler import Doppler
+from doppyler.model.light_bar import LightbarDisplayDict, LightbarDisplayEffect
 from doppyler.model.main_display_text import MainDisplayText, MainDisplayTextDict
 from doppyler.model.mini_display_number import MiniDisplayNumber, MiniDisplayNumberDict
-from doppyler.model.light_bar import LightbarDisplayDict, LightbarDisplayEffect
-
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_EMAIL, CONF_PASSWORD
 from homeassistant.core import HomeAssistant
@@ -24,7 +23,6 @@ from homeassistant.helpers.aiohttp_client import async_create_clientsession
 from homeassistant.helpers.service import ServiceCall
 from homeassistant.helpers.typing import ConfigType
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
-
 
 from .const import DOMAIN, PLATFORMS, STARTUP_MESSAGE
 

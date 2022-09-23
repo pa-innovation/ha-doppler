@@ -2,10 +2,10 @@
 from __future__ import annotations
 
 from doppyler.const import (
-    ATTR_TIME_MODE,
     ATTR_SOUND_PRESET,
-    ATTR_WEATHER,
+    ATTR_TIME_MODE,
     ATTR_TIMEZONE,
+    ATTR_WEATHER,
 )
 from homeassistant.components.select import SelectEntity
 from homeassistant.config_entries import ConfigEntry
@@ -13,7 +13,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import DopplerDataUpdateCoordinator
-from .const import WEATHER_OPTIONS, DOMAIN
+from .const import DOMAIN, WEATHER_OPTIONS
 from .entity import DopplerEntity
 
 
@@ -27,7 +27,7 @@ async def async_setup_entry(
     for device in coordinator.api.devices.values():
         entities.extend(
             [
-                DopplerTimeModeNumber(coordinator, entry, device, "Time Mode"),
+                DopplerTimeModeSelect(coordinator, entry, device, "Time Mode"),
                 DopplerSoundPresetSelect(coordinator, entry, device, "Audio Preset"),
                 DopplerWeatherModeSelect(coordinator, entry, device, "Weather Mode"),
                 DopplerTimezoneSelect(coordinator, entry, device, "Timezone"),
@@ -36,7 +36,7 @@ async def async_setup_entry(
     async_add_devices(entities)
 
 
-class DopplerTimeModeNumber(DopplerEntity, SelectEntity):
+class DopplerTimeModeSelect(DopplerEntity, SelectEntity):
     """Doppler Time Mode Select class."""
 
     _attr_options = ["12", "24"]
@@ -48,7 +48,9 @@ class DopplerTimeModeNumber(DopplerEntity, SelectEntity):
 
     async def async_select_option(self, option: str) -> None:
         """Change the selected option."""
-        await self.device.set_time_mode(self.device, int(option))
+        self.device_data[ATTR_TIME_MODE] = await self.device.set_time_mode(
+            self.device, int(option)
+        )
 
 
 class DopplerSoundPresetSelect(DopplerEntity, SelectEntity):

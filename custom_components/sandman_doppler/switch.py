@@ -1,21 +1,26 @@
 """Switch platform for Doppler Sandman."""
 from __future__ import annotations
 
+from dataclasses import dataclass
 import logging
-from typing import Any
 
 from doppyler.const import (
+    ATTR_ALEXA_TAP_TO_TALK_TONE_ENABLED,
+    ATTR_ALEXA_USE_ASCENDING_ALARMS,
+    ATTR_ALEXA_WAKE_WORD_TONE_ENABLED,
     ATTR_COLON_BLINK,
+    ATTR_DISPLAY_SECONDS,
+    ATTR_SOUND_PRESET_MODE,
     ATTR_USE_COLON,
     ATTR_USE_LEADING_ZERO,
-    ATTR_DISPLAY_SECONDS,
-    ATTR_ALEXA_USE_ASCENDING_ALARMS,
-    ATTR_ALEXA_TAP_TO_TALK_TONE_ENABLED,
-    ATTR_ALEXA_WAKE_WORD_TONE_ENABLED,
-    ATTR_SOUND_PRESET_MODE,
     ATTR_WEATHER,
 )
-from homeassistant.components.switch import SwitchEntity
+from doppyler.model.doppler import Doppler
+from homeassistant.components.switch import (
+    SwitchDeviceClass,
+    SwitchEntity,
+    SwitchEntityDescription,
+)
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -27,6 +32,74 @@ from .entity import DopplerEntity
 _LOGGER = logging.getLogger(__name__)
 
 
+@dataclass
+class DopplerSwitchEntityDescription(SwitchEntityDescription):
+    """Class to describe Doppler switch entities."""
+
+    state_attr_name: str | None = None
+    set_value_func_name: str | None = None
+    is_on_attr_name: str | None = None
+
+
+ENTITY_DESCRIPTIONS = [
+    DopplerSwitchEntityDescription(
+        "Blink Colon",
+        name="Blink Colon",
+        state_attr_name=ATTR_COLON_BLINK,
+        set_value_func_name="set_colon_blink_mode",
+    ),
+    DopplerSwitchEntityDescription(
+        "Use Colon",
+        name="Use Colon",
+        state_attr_name=ATTR_USE_COLON,
+        set_value_func_name="set_use_colon_mode",
+    ),
+    DopplerSwitchEntityDescription(
+        "Use Leading Zero",
+        name="Use Leading Zero",
+        state_attr_name=ATTR_USE_LEADING_ZERO,
+        set_value_func_name="set_use_leading_zero_mode",
+    ),
+    DopplerSwitchEntityDescription(
+        "Display Seconds",
+        name="Display Seconds",
+        state_attr_name=ATTR_DISPLAY_SECONDS,
+        set_value_func_name="set_display_seconds_mode",
+    ),
+    DopplerSwitchEntityDescription(
+        "Alexa: Ascending Alarms",
+        name="Alexa Ascending Alarms",
+        state_attr_name=ATTR_ALEXA_USE_ASCENDING_ALARMS,
+        set_value_func_name="set_alexa_ascending_alarms_mode",
+    ),
+    DopplerSwitchEntityDescription(
+        "Alexa: Tap to Talk Tone",
+        name="Alexa Tap to Talk Tone",
+        state_attr_name=ATTR_ALEXA_TAP_TO_TALK_TONE_ENABLED,
+        set_value_func_name="set_alexa_tap_to_talk_tone_enabled",
+    ),
+    DopplerSwitchEntityDescription(
+        "Alexa: Wake Word Tone",
+        name="Alexa Wake Word Tone",
+        state_attr_name=ATTR_ALEXA_WAKE_WORD_TONE_ENABLED,
+        set_value_func_name="set_alexa_wake_word_tone_enabled",
+    ),
+    DopplerSwitchEntityDescription(
+        "Volume Dependent EQ",
+        name="Volume Dependent EQ",
+        state_attr_name=ATTR_SOUND_PRESET_MODE,
+        set_value_func_name="set_sound_preset_mode",
+    ),
+    DopplerSwitchEntityDescription(
+        "Weather Service",
+        name="Weather Service",
+        state_attr_name=ATTR_WEATHER,
+        set_value_func_name="set_weather_mode",
+        is_on_attr_name="enabled",
+    ),
+]
+
+
 async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_devices: AddEntitiesCallback
 ) -> None:
@@ -36,199 +109,48 @@ async def async_setup_entry(
     for device in coordinator.api.devices.values():
         entities.extend(
             [
-                ColonBlinkSwitch(coordinator, entry, device, "Blink Colon"),
-                UseColonSwitch(coordinator, entry, device, "Use Colon"),
-                UseLeadingZeroSwitch(coordinator, entry, device, "Use Leading Zero"),
-                UseDisplaySecondsSwitch(coordinator, entry, device, "Display Seconds"),
-                UseAscendingAlarmsSwitch(
-                    coordinator, entry, device, "Alexa Use Ascending Alarms"
-                ),
-                UseTapTalkToneSwitch(
-                    coordinator, entry, device, "Alexa Tap to Talk Tone"
-                ),
-                UseWakewordToneSwitch(
-                    coordinator, entry, device, "Alexa Wakeword Tone"
-                ),
-                SoundPresetModeSwitch(
-                    coordinator, entry, device, "Use Volume Dependent EQ"
-                ),
-                DopplerWeatherSwitch(
-                    coordinator, entry, device, "Turn Weather Service ON/OFF"
-                ),
+                BaseDopplerSwitch(coordinator, entry, device, description)
+                for description in ENTITY_DESCRIPTIONS
             ]
         )
     async_add_devices(entities)
 
 
-class ColonBlinkSwitch(DopplerEntity, SwitchEntity):
-    """Doppler ColonBlink class."""
+class BaseDopplerSwitch(DopplerEntity, SwitchEntity):
+    """Base class for Doppler switches."""
 
-    _attr_device_class = "switch"
+    _attr_device_class: SwitchDeviceClass.SWITCH
 
-    async def async_turn_on(self, **kwargs):
-        """Turn Colon Blinking On"""
-        await self.device.set_colon_blink_mode(self.device, True)
-
-    async def async_turn_off(self, **kwargs):
-        """Turn Colon Blink Off"""
-        await self.device.set_colon_blink_mode(self.device, False)
-
-    @property
-    def is_on(self):
-        """Return true if device is on."""
-        return self.device_data[ATTR_COLON_BLINK]
-
-
-class UseColonSwitch(DopplerEntity, SwitchEntity):
-    """Doppler UseColon class."""
-
-    _attr_device_class = "switch"
-
-    async def async_turn_on(self, **kwargs):
-        """Turn Colon On"""
-        await self.device.set_use_colon_mode(self.device, True)
-
-    async def async_turn_off(self, **kwargs):
-        """Turn Colon Off"""
-        await self.device.set_use_colon_mode(self.device, False)
+    def __init__(
+        self,
+        coordinator: DopplerDataUpdateCoordinator,
+        entry: ConfigEntry,
+        device: Doppler,
+        description: DopplerSwitchEntityDescription,
+    ) -> None:
+        """Initialize the switch."""
+        super().__init__(coordinator, entry, device, description.name)
+        self.entity_description: DopplerSwitchEntityDescription = description
+        self._state_attr_name = description.state_attr_name
+        self._set_value_func_name = description.set_value_func_name
+        self._is_on_attr_name = description.is_on_attr_name
 
     @property
-    def is_on(self):
-        """Return true if device is on."""
-        return self.device_data[ATTR_USE_COLON]
+    def is_on(self) -> bool:
+        """Return true if switch is on."""
+        is_on = self.device_data[self._state_attr_name]
+        if self._is_on_attr_name:
+            getattr(is_on, self._is_on_attr_name)
+        return is_on
 
+    async def async_turn_on(self, **kwargs) -> None:
+        """Turn the switch on."""
+        self.device_data[self._state_attr_name] = await getattr(
+            self.device, self._set_value_func_name
+        )(**{self._is_on_attr_name: True} if self._is_on_attr_name else True)
 
-class UseLeadingZeroSwitch(DopplerEntity, SwitchEntity):
-    """Doppler UseLeadingZero class."""
-
-    _attr_device_class = "switch"
-
-    async def async_turn_on(self, **kwargs):
-        """Turn Colon On"""
-        await self.device.set_use_leading_zero_mode(self.device, True)
-
-    async def async_turn_off(self, **kwargs):
-        """Turn Colon Off"""
-        await self.device.set_use_leading_zero_mode(self.device, False)
-
-    @property
-    def is_on(self):
-        """Return true if device is on."""
-        return self.device_data[ATTR_USE_LEADING_ZERO]
-
-
-class UseDisplaySecondsSwitch(DopplerEntity, SwitchEntity):
-    """Doppler UseLeadingZero class."""
-
-    _attr_device_class = "switch"
-
-    async def async_turn_on(self, **kwargs):
-        """Turn Colon On"""
-        await self.device.set_display_seconds_mode(self.device, True)
-
-    async def async_turn_off(self, **kwargs):
-        """Turn Colon Off"""
-        await self.device.set_display_seconds_mode(self.device, False)
-
-    @property
-    def is_on(self):
-        """Return true if device is on."""
-        return self.device_data[ATTR_DISPLAY_SECONDS]
-
-
-class UseAscendingAlarmsSwitch(DopplerEntity, SwitchEntity):
-    """Doppler UseAscendingAlarms class."""
-
-    _attr_device_class = "switch"
-
-    async def async_turn_on(self, **kwargs):
-        """Turn Ascending Alarms On"""
-        await self.device.set_alexa_ascending_alarms_mode(self.device, True)
-
-    async def async_turn_off(self, **kwargs):
-        """Turn Ascending Alarms Off"""
-        await self.device.set_alexa_ascending_alarms_mode(self.device, False)
-
-    @property
-    def is_on(self):
-        """Return true if device is on."""
-        return self.device_data[ATTR_ALEXA_USE_ASCENDING_ALARMS]
-
-
-class UseTapTalkToneSwitch(DopplerEntity, SwitchEntity):
-    """Doppler UseTapTalkTone class."""
-
-    _attr_device_class = "switch"
-
-    async def async_turn_on(self, **kwargs):
-        """Turn TapTalk Tone On"""
-        await self.device.set_alexa_taptalk_tone_mode(self.device, True)
-
-    async def async_turn_off(self, **kwargs):
-        """Turn TapTalk Tone Off"""
-        await self.device.set_alexa_taptalk_tone_mode(self.device, False)
-
-    @property
-    def is_on(self):
-        """Return true if device is on."""
-        return self.device_data[ATTR_ALEXA_TAP_TO_TALK_TONE_ENABLED]
-
-
-class UseWakewordToneSwitch(DopplerEntity, SwitchEntity):
-    """Doppler UseWakewordTone class."""
-
-    _attr_device_class = "switch"
-
-    async def async_turn_on(self, **kwargs):
-        """Turn TapTalk Tone On"""
-        await self.device.set_alexa_wakeword_tone_mode(self.device, True)
-
-    async def async_turn_off(self, **kwargs):
-        """Turn TapTalk Tone Off"""
-        await self.device.set_alexa_wakeword_tone_mode(self.device, False)
-
-    @property
-    def is_on(self):
-        """Return true if device is on."""
-        return self.device_data[ATTR_ALEXA_WAKE_WORD_TONE_ENABLED]
-
-
-class SoundPresetModeSwitch(DopplerEntity, SwitchEntity):
-    """Doppler SoundPresetMode class."""
-
-    _attr_device_class = "switch"
-
-    async def async_turn_on(self, **kwargs):
-        """Turn Volume Dependent EQ On"""
-        await self.device.set_sound_preset_mode(self.device, 1)
-
-    async def async_turn_off(self, **kwargs):
-        """Turn Volume Dependent EQ Off"""
-        await self.device.set_sound_preset_mode(self.device, 0)
-
-    @property
-    def is_on(self):
-        """Return true if device is on."""
-        if self.device_data[ATTR_SOUND_PRESET_MODE] == 1:
-            return True
-        else:
-            return False
-
-
-class DopplerWeatherSwitch(DopplerEntity, SwitchEntity):
-    """Doppler WeatherSwitch class."""
-
-    _attr_device_class = "switch"
-
-    async def async_turn_on(self, **kwargs):
-        """Turn Weather On"""
-        await self.device.set_weather_configuration(self.device, enabled=True)
-
-    async def async_turn_off(self, **kwargs):
-        """Turn Weather Off"""
-        await self.device.set_weather_configuration(self.device, enabled=False)
-
-    @property
-    def is_on(self):
-        """Return true if device is on."""
-        return self.device_data[ATTR_WEATHER].enabled
+    async def async_turn_off(self, **kwargs) -> None:
+        """Turn the switch off."""
+        self.device_data[self._state_attr_name] = await getattr(
+            self.device, self._set_value_func_name
+        )(**{self._is_on_attr_name: False} if self._is_on_attr_name else False)

@@ -2,13 +2,13 @@
 from __future__ import annotations
 
 import logging
-from typing import Any
 
-from doppyler.const import ATTR_VOLUME_LEVEL, ATTR_TIME_OFFSET
-from doppyler.model.color import Color
-from homeassistant.components.number import NumberEntity
+from doppyler.const import ATTR_TIME_OFFSET, ATTR_VOLUME_LEVEL
+from homeassistant.components.number import NumberEntity, NumberMode
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import PERCENTAGE
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import DopplerDataUpdateCoordinator
@@ -34,52 +34,43 @@ async def async_setup_entry(
     async_add_devices(entities)
 
 
-#    async_add_devices(
-#        [
-#            DopplerVolumeLevelNumber(coordinator, entry, device, "Volume Level"),
-#            DopplerTimeOffsetNumber(coordinator, entry, device, "Time Offset"),
-#            for device in coordinator.api.devices.values()
-#        ]
-#    )
-
-
 class DopplerVolumeLevelNumber(DopplerEntity, NumberEntity):
     """Doppler Volume Level Number class."""
 
     _attr_native_step = 1
     _attr_native_min_value = 0
     _attr_native_max_value = 100
-
-    # @property
-    # def value(self) -> int:
-    #     """Return the current value."""
-    #     return self.device_data[ATTR_VOLUME_LEVEL]
+    _attr_native_unit_of_measurement = PERCENTAGE
 
     @property
-    def native_value(self) -> float | None:
+    def native_value(self) -> int:
         """Return the current value"""
         return self.device_data[ATTR_VOLUME_LEVEL]
 
-    async def async_set_native_value(self, value: float) -> None:
+    async def async_set_native_value(self, value: int) -> None:
         """Update the current volume value"""
-        self._attr_native_value = value
-        await self.device.set_volume_level(self.device, int(value))
+        self.device_data[ATTR_VOLUME_LEVEL] = await self.device.set_volume_level(
+            self.device, value
+        )
 
 
 class DopplerTimeOffsetNumber(DopplerEntity, NumberEntity):
     """Doppler Time Offset class."""
 
     _attr_native_step = 1
-    _attr_native_min_value = -128
-    _attr_native_max_value = +127
-    _attr_mode = "box"
+    _attr_native_min_value = -60
+    _attr_native_max_value = 60
+    _attr_mode = NumberMode.BOX
+    _attr_entity_category: EntityCategory.CONFIG
+    _attr_native_unit_of_measurement = "minutes"
 
     @property
     def native_value(self) -> int:
         """Return the current value"""
-        return self.device_data[ATTR_TIME_OFFSET]
+        return self.device_data[ATTR_TIME_OFFSET].total_seconds() // 60
 
     async def async_set_native_value(self, value: int) -> None:
         """Update the current volume value"""
-        self._attr_native_value = value
-        await self.device.set_offset(self.device, int(value))
+        self.device_data[ATTR_TIME_OFFSET] = await self.device.set_offset(
+            self.device, int(value)
+        )

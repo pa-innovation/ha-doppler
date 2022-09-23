@@ -10,6 +10,7 @@ ISSUE_URL = "https://github.com/pa-innovation/ha-doppler/issues"
 
 # Platforms
 PLATFORMS = [
+    Platform.BINARY_SENSOR,
     Platform.LIGHT,
     Platform.NUMBER,
     Platform.SELECT,
