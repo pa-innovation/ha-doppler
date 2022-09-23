@@ -47,7 +47,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     password = entry.data[CONF_PASSWORD]
 
     session = async_create_clientsession(hass, timeout=ClientTimeout(DEFAULT_TIMEOUT))
-    client = DopplerClient(email, password, client_session=session, local_control=False)
+    client = DopplerClient(email, password, client_session=session, local_control=True)
 
     coordinator = DopplerDataUpdateCoordinator(hass, entry, client)
     await coordinator.async_config_entry_first_refresh()
