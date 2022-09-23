@@ -1,29 +1,20 @@
 """Select platform for Doppler Sandman."""
 from __future__ import annotations
 
-import logging
-from typing import Any
-
-from doppyler.model.color import Color
+from doppyler.const import (
+    ATTR_TIME_MODE,
+    ATTR_SOUND_PRESET,
+    ATTR_WEATHER,
+    ATTR_TIMEZONE,
+)
 from homeassistant.components.select import SelectEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import DopplerDataUpdateCoordinator
-from .const import (
-    ATTR_TIME_MODE,
-    ATTR_VOLUME_LEVEL,
-    ATTR_SOUND_PRESET,
-    ATTR_WEATHER,
-    ATTR_WEATHER_MODE,
-    ATTR_TIMEZONE,
-    WEATHER_OPTIONS,
-    DOMAIN,
-)
+from .const import WEATHER_OPTIONS, DOMAIN
 from .entity import DopplerEntity
-
-_LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(

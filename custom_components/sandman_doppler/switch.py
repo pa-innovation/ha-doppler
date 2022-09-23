@@ -4,25 +4,24 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from homeassistant.components.switch import SwitchEntity
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.const import CONF_LATITUDE, CONF_LONGITUDE
-from . import DopplerDataUpdateCoordinator
-from .const import (
+from doppyler.const import (
     ATTR_COLON_BLINK,
     ATTR_USE_COLON,
     ATTR_USE_LEADING_ZERO,
     ATTR_DISPLAY_SECONDS,
     ATTR_ALEXA_USE_ASCENDING_ALARMS,
-    ATTR_ALEXA_TAPTALK_TONE,
-    ATTR_ALEXA_WAKEWORD_TONE,
+    ATTR_ALEXA_TAP_TO_TALK_TONE_ENABLED,
+    ATTR_ALEXA_WAKE_WORD_TONE_ENABLED,
     ATTR_SOUND_PRESET_MODE,
     ATTR_WEATHER,
-    ATTR_WEATHER_ON,
-    DOMAIN,
 )
+from homeassistant.components.switch import SwitchEntity
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity_platform import AddEntitiesCallback
+
+from . import DopplerDataUpdateCoordinator
+from .const import DOMAIN
 from .entity import DopplerEntity
 
 _LOGGER = logging.getLogger(__name__)
@@ -172,7 +171,7 @@ class UseTapTalkToneSwitch(DopplerEntity, SwitchEntity):
     @property
     def is_on(self):
         """Return true if device is on."""
-        return self.device_data[ATTR_ALEXA_TAPTALK_TONE]
+        return self.device_data[ATTR_ALEXA_TAP_TO_TALK_TONE_ENABLED]
 
 
 class UseWakewordToneSwitch(DopplerEntity, SwitchEntity):
@@ -191,7 +190,7 @@ class UseWakewordToneSwitch(DopplerEntity, SwitchEntity):
     @property
     def is_on(self):
         """Return true if device is on."""
-        return self.device_data[ATTR_ALEXA_WAKEWORD_TONE]
+        return self.device_data[ATTR_ALEXA_WAKE_WORD_TONE_ENABLED]
 
 
 class SoundPresetModeSwitch(DopplerEntity, SwitchEntity):
@@ -224,7 +223,6 @@ class DopplerWeatherSwitch(DopplerEntity, SwitchEntity):
     async def async_turn_on(self, **kwargs):
         """Turn Weather On"""
         await self.device.set_weather_configuration(self.device, enabled=True)
-        _LOGGER.warning(self.config_entry.data[CONF_LATITUDE])
 
     async def async_turn_off(self, **kwargs):
         """Turn Weather Off"""

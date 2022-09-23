@@ -2,16 +2,13 @@
 from __future__ import annotations
 
 import logging
-from typing import Any
 
-from doppyler.model.alarm import Alarm
-from doppyler.model.alarm import RepeatDayOfWeek
-from doppyler.model.alarm import AlarmStatus
-from doppyler.model.alarm import AlarmSource
-from doppyler.model.alarm import AlarmDict
-from doppyler.model.color import Color
-from doppyler.model.color import ColorDict
-
+from doppyler.const import (
+    ATTR_LIGHT_SENSOR_VALUE,
+    ATTR_DAY_NIGHT_MODE_VALUE,
+    ATTR_ALARMS,
+    ATTR_WIFI,
+)
 from homeassistant.components.sensor import (
     SensorDeviceClass,
     SensorEntity,
@@ -24,13 +21,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import DopplerDataUpdateCoordinator
-from .const import (
-    ATTR_LIGHTSENSOR_VALUE,
-    ATTR_DAYNIGHTMODE_VALUE,
-    ATTR_ALARMS,
-    ATTR_WIFI,
-    DOMAIN,
-)
+from .const import DOMAIN
 from .entity import DopplerEntity
 
 _LOGGER = logging.getLogger(__name__)
@@ -64,7 +55,7 @@ class DopplerLightSensor(DopplerEntity, SensorEntity):
 
     @property
     def native_value(self):
-        return self.device_data[ATTR_LIGHTSENSOR_VALUE]
+        return self.device_data[ATTR_LIGHT_SENSOR_VALUE]
 
 
 class DopplerDayNightSensor(DopplerEntity, SensorEntity):
@@ -73,7 +64,7 @@ class DopplerDayNightSensor(DopplerEntity, SensorEntity):
 
     @property
     def native_value(self):
-        return self.device_data[ATTR_DAYNIGHTMODE_VALUE]
+        return self.device_data[ATTR_DAY_NIGHT_MODE_VALUE]
 
 
 class DopplerWifiUptimeSensor(DopplerEntity, SensorEntity):

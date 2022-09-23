@@ -1,4 +1,6 @@
 """Constants for Sandman Doppler Clocks."""
+from homeassistant.const import Platform
+
 # Base component constants
 NAME = "Sandman Doppler"
 DOMAIN = "sandman_doppler"
@@ -7,40 +9,13 @@ VERSION = "0.0.1"
 ISSUE_URL = "https://github.com/pa-innovation/ha-doppler/issues"
 
 # Platforms
-PLATFORMS = ["light", "number", "select", "switch", "sensor"]
-
-# Data keys
-ATTR_DAY_BUTTON_COLOR = "day_button_color"
-ATTR_NIGHT_BUTTON_COLOR = "night_button_color"
-ATTR_DAY_DISPLAY_COLOR = "day_display_color"
-ATTR_NIGHT_DISPLAY_COLOR = "night_display_color"
-ATTR_DAY_DISPLAY_BRIGHTNESS = "day_display_brightness"
-ATTR_NIGHT_DISPLAY_BRIGHTNESS = "night_display_brightness"
-ATTR_DAY_BUTTON_BRIGHTNESS = "day_button_brightness"
-ATTR_NIGHT_BUTTON_BRIGHTNESS = "night_button_brightness"
-ATTR_AUTO_BRIGHTNESS_ENABLED = "auto_brightness_enabled"
-ATTR_VOLUME_LEVEL = "volume_level"
-ATTR_ALARMS = "alarms"
-ATTR_ALARM_SOUNDS = "alarm_sounds"
-ATTR_TIME_MODE = "time_mode"
-ATTR_DOTW_STATUS = "dotw_status"
-ATTR_WEATHER = "weather"
-ATTR_WIFI = "wifi"
-ATTR_COLON_BLINK = "colon_blink"
-ATTR_USE_COLON = "use_colon"
-ATTR_USE_LEADING_ZERO = "use_leading_zero"
-ATTR_DISPLAY_SECONDS = "display_seconds"
-ATTR_ALEXA_USE_ASCENDING_ALARMS = "alexa_ascending_alarms"
-ATTR_ALEXA_TAPTALK_TONE = "alexa_taptalk_tone"
-ATTR_ALEXA_WAKEWORD_TONE = "alexa_wakeword_tone"
-ATTR_SOUND_PRESET = "sound_preset"
-ATTR_SOUND_PRESET_MODE = "sound_preset_mode"
-ATTR_WEATHER_ON = "weather_on"
-ATTR_WEATHER_MODE = "weather_mode"
-ATTR_LIGHTSENSOR_VALUE = "lightsensor"
-ATTR_DAYNIGHTMODE_VALUE = "daynight"
-ATTR_TIMEOFFSET = "timeoffset"
-ATTR_TIMEZONE = "timezone"
+PLATFORMS = [
+    Platform.LIGHT,
+    Platform.NUMBER,
+    Platform.SELECT,
+    Platform.SENSOR,
+    Platform.SWITCH,
+]
 
 # Configuration and options
 CONF_ENABLED = "enabled"

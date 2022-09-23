@@ -8,6 +8,7 @@ import logging
 from aiohttp.client import ClientTimeout, DEFAULT_TIMEOUT
 
 from doppyler.client import DopplerClient
+from doppyler.exceptions import DopplerException
 from doppyler.model.doppler import Doppler
 from doppyler.model.alarm import Alarm, AlarmStatus, AlarmSource, AlarmDict
 from doppyler.model.color import Color, ColorDict
@@ -16,7 +17,7 @@ from doppyler.model.mini_display_number import MiniDisplayNumber, MiniDisplayNum
 from doppyler.model.light_bar import LightbarDisplayDict, LightbarDisplayEffect
 
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_EMAIL, CONF_PASSWORD, CONF_LATITUDE, CONF_LONGITUDE
+from homeassistant.const import CONF_EMAIL, CONF_PASSWORD
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import config_validation as cv, device_registry as dr
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
@@ -25,43 +26,7 @@ from homeassistant.helpers.typing import ConfigType
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 
-from .const import (
-    ATTR_ALARM_SOUNDS,
-    ATTR_ALARMS,
-    ATTR_AUTO_BRIGHTNESS_ENABLED,
-    ATTR_DAY_BUTTON_COLOR,
-    ATTR_NIGHT_BUTTON_COLOR,
-    ATTR_DAY_DISPLAY_BRIGHTNESS,
-    ATTR_NIGHT_DISPLAY_BRIGHTNESS,
-    ATTR_DAY_BUTTON_BRIGHTNESS,
-    ATTR_NIGHT_BUTTON_BRIGHTNESS,
-    ATTR_DAY_DISPLAY_COLOR,
-    ATTR_NIGHT_DISPLAY_COLOR,
-    ATTR_DOTW_STATUS,
-    ATTR_TIME_MODE,
-    ATTR_VOLUME_LEVEL,
-    ATTR_WEATHER,
-    ATTR_WIFI,
-    ATTR_COLON_BLINK,
-    ATTR_USE_COLON,
-    ATTR_USE_LEADING_ZERO,
-    ATTR_DISPLAY_SECONDS,
-    ATTR_ALEXA_USE_ASCENDING_ALARMS,
-    ATTR_ALEXA_TAPTALK_TONE,
-    ATTR_ALEXA_WAKEWORD_TONE,
-    ATTR_SOUND_PRESET,
-    ATTR_SOUND_PRESET_MODE,
-    ATTR_WEATHER_ON,
-    ATTR_WEATHER_MODE,
-    ATTR_LIGHTSENSOR_VALUE,
-    ATTR_DAYNIGHTMODE_VALUE,
-    ATTR_TIMEOFFSET,
-    ATTR_TIMEZONE,
-    WEATHER_OPTIONS,
-    DOMAIN,
-    PLATFORMS,
-    STARTUP_MESSAGE,
-)
+from .const import DOMAIN, PLATFORMS, STARTUP_MESSAGE
 
 SCAN_INTERVAL = timedelta(seconds=900)
 
@@ -740,7 +705,7 @@ class DopplerDataUpdateCoordinator(DataUpdateCoordinator):
         if not self._dev_reg:
             self._dev_reg = dr.async_get(self.hass)
 
-        data: dict[str, Any] = {}
+        data: dict[dict[str, Any]] = {}
         devices: dict[str, Doppler] = {}
         if self.api.devices:
             devices = self.api.devices
@@ -753,146 +718,17 @@ class DopplerDataUpdateCoordinator(DataUpdateCoordinator):
             for device in self.api.devices.values():
                 self._dev_reg.async_get_or_create(
                     config_entry_id=self._entry.entry_id,
-                    identifiers={(DOMAIN, device.device_info.dsn)},
+                    identifiers={(DOMAIN, device.dsn)},
                     manufacturer=device.device_info.manufacturer,
                     model=device.device_info.model_number,
                     sw_version=device.device_info.software_version,
                     hw_version=device.device_info.firmware_version,
                     name=device.name,
                 )
-                device_data = data.setdefault(device.device_info.dsn, {})
-                await asyncio.sleep(0.1)
-                device_data[ATTR_DAY_BUTTON_COLOR] = await device.get_day_button_color()
-                await asyncio.sleep(0.1)
-                # _LOGGER.warning("_async_update_data after get_day_button_color")
-                # _LOGGER.warning(device_data[ATTR_DAY_BUTTON_COLOR])
-                device_data[
-                    ATTR_NIGHT_BUTTON_COLOR
-                ] = await device.get_night_button_color()
-                await asyncio.sleep(0.1)
-
-                device_data[
-                    ATTR_DAY_DISPLAY_COLOR
-                ] = await device.get_day_display_color()
-                await asyncio.sleep(0.1)
-                device_data[
-                    ATTR_NIGHT_DISPLAY_COLOR
-                ] = await device.get_night_display_color()
-                await asyncio.sleep(0.1)
-                device_data[
-                    ATTR_DAY_DISPLAY_BRIGHTNESS
-                ] = await device.get_day_display_brightness()
-                await asyncio.sleep(0.1)
-                device_data[
-                    ATTR_NIGHT_DISPLAY_BRIGHTNESS
-                ] = await device.get_night_display_brightness()
-                await asyncio.sleep(0.1)
-                device_data[
-                    ATTR_DAY_BUTTON_BRIGHTNESS
-                ] = await device.get_day_button_brightness()
-                await asyncio.sleep(0.1)
-
-                device_data[
-                    ATTR_NIGHT_BUTTON_BRIGHTNESS
-                ] = await device.get_night_button_brightness()
-                await asyncio.sleep(0.1)
-                # device_data[
-                #     ATTR_DOTW_STATUS
-                # ] = await device.get_day_of_the_week_status()
-                # await asyncio.sleep(0.1)
-                device_data[ATTR_VOLUME_LEVEL] = await device.get_volume_level()
-                await asyncio.sleep(0.1)
-                device_data[ATTR_TIME_MODE] = await device.get_time_mode()
-                await asyncio.sleep(0.1)
-
-                # device_data[ATTR_ALARMS] = await device.get_all_alarms()
-                # await asyncio.sleep(0.1)
-
-                # device_data[ATTR_WEATHER] = await device.get_weather_configuration(
-                #     device
-                # )
-                # await asyncio.sleep(0.1)
-                device_data[ATTR_WIFI] = await device.get_wifi_status()
-                await asyncio.sleep(0.1)
-
-                device_data[ATTR_COLON_BLINK] = await device.get_colon_blink_mode()
-                await asyncio.sleep(0.1)
-
-                device_data[ATTR_USE_COLON] = await device.get_use_colon_mode()
-                await asyncio.sleep(0.1)
-
-                device_data[
-                    ATTR_USE_LEADING_ZERO
-                ] = await device.get_use_leading_zero_mode()
-                await asyncio.sleep(0.1)
-
-                device_data[
-                    ATTR_DISPLAY_SECONDS
-                ] = await device.get_display_seconds_mode()
-                await asyncio.sleep(0.1)
-
-                device_data[
-                    ATTR_ALEXA_USE_ASCENDING_ALARMS
-                ] = await device.get_alexa_ascending_alarms_mode()
-                await asyncio.sleep(0.1)
-
-                device_data[
-                    ATTR_ALEXA_TAPTALK_TONE
-                ] = await device.get_is_alexa_tap_to_talk_tone_enabled()
-                await asyncio.sleep(0.1)
-
-                device_data[
-                    ATTR_ALEXA_WAKEWORD_TONE
-                ] = await device.get_is_alexa_wake_word_tone_enabled()
-                await asyncio.sleep(0.1)
-
-                preset = await device.get_sound_preset()
-                if preset == "PRESET1":
-                    device_data[ATTR_SOUND_PRESET] = "Preset 1 Balanced"
-                elif preset == "PRESET2":
-                    device_data[ATTR_SOUND_PRESET] = "Preset 2 Bass Boost"
-                elif preset == "PRESET3":
-                    device_data[ATTR_SOUND_PRESET] = "Preset 3 Treble Boost"
-                elif preset == "PRESET4":
-                    device_data[ATTR_SOUND_PRESET] = "Preset 4 Mids Boost"
-                elif preset == "PRESET5":
-                    device_data[ATTR_SOUND_PRESET] = "Preset 5 Untuned"
-
-                await asyncio.sleep(0.1)
-                # _LOGGER.warning("Before api.get_sound_preset_mode")
-                device_data[
-                    ATTR_SOUND_PRESET_MODE
-                ] = await device.get_sound_preset_mode()
-                await asyncio.sleep(0.1)
-
-                # _LOGGER.warning("Before api.get_weather_status")
-                device_data[ATTR_WEATHER] = await device.get_weather_configuration()
-                # device_data[ATTR_WEATHER_ON] = True
-                await asyncio.sleep(0.1)
-
-                # device_data[ATTR_WEATHER_MODE] = 15
-                await asyncio.sleep(0.1)
-                # _LOGGER.warning("Before api.get_lightsensor_value")
-                device_data[
-                    ATTR_LIGHTSENSOR_VALUE
-                ] = await device.get_light_sensor_value()
-                await asyncio.sleep(0.1)
-
-                device_data[
-                    ATTR_DAYNIGHTMODE_VALUE
-                ] = await device.get_day_night_mode_status()
-                await asyncio.sleep(0.1)
-
-                device_data[ATTR_TIMEOFFSET] = await device.get_offset()
-                await asyncio.sleep(0.1)
-                # _LOGGER.warning("Before api.get_timezone")
-                device_data[ATTR_TIMEZONE] = await device.get_timezone()
-                _LOGGER.warning("DONE loop for device %s", device)
-
-        except Exception as exception:
-            _LOGGER.debug("%s: %s", type(exception), exception)
-            raise UpdateFailed() from exception
-        # _LOGGER.warning("sandman_doppler Completed _async_update_data")
+                data[device.dsn] = await device.get_all_data()
+        except DopplerException as exc:
+            _LOGGER.debug("Exception received during update (%s: %s)", type(exc), exc)
+            raise UpdateFailed() from exc
         return data
 
 

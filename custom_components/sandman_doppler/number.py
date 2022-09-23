@@ -4,6 +4,7 @@ from __future__ import annotations
 import logging
 from typing import Any
 
+from doppyler.const import ATTR_VOLUME_LEVEL, ATTR_TIME_OFFSET
 from doppyler.model.color import Color
 from homeassistant.components.number import NumberEntity
 from homeassistant.config_entries import ConfigEntry
@@ -11,7 +12,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import DopplerDataUpdateCoordinator
-from .const import ATTR_VOLUME_LEVEL, ATTR_TIMEOFFSET, DOMAIN
+from .const import DOMAIN
 from .entity import DopplerEntity
 
 _LOGGER = logging.getLogger(__name__)
@@ -76,7 +77,7 @@ class DopplerTimeOffsetNumber(DopplerEntity, NumberEntity):
     @property
     def native_value(self) -> int:
         """Return the current value"""
-        return self.device_data[ATTR_TIMEOFFSET]
+        return self.device_data[ATTR_TIME_OFFSET]
 
     async def async_set_native_value(self, value: int) -> None:
         """Update the current volume value"""

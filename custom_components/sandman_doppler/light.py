@@ -4,6 +4,16 @@ from __future__ import annotations
 import logging
 from typing import Any
 
+from doppyler.const import (
+    ATTR_DAY_BUTTON_COLOR,
+    ATTR_NIGHT_BUTTON_COLOR,
+    ATTR_DAY_DISPLAY_BRIGHTNESS,
+    ATTR_NIGHT_DISPLAY_BRIGHTNESS,
+    ATTR_DAY_BUTTON_BRIGHTNESS,
+    ATTR_NIGHT_BUTTON_BRIGHTNESS,
+    ATTR_DAY_DISPLAY_COLOR,
+    ATTR_NIGHT_DISPLAY_COLOR,
+)
 from doppyler.model.color import Color
 from homeassistant.components.light import (
     ATTR_BRIGHTNESS,
@@ -16,17 +26,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import DopplerDataUpdateCoordinator
-from .const import (
-    ATTR_DAY_BUTTON_COLOR,
-    ATTR_NIGHT_BUTTON_COLOR,
-    ATTR_DAY_DISPLAY_BRIGHTNESS,
-    ATTR_NIGHT_DISPLAY_BRIGHTNESS,
-    ATTR_DAY_BUTTON_BRIGHTNESS,
-    ATTR_NIGHT_BUTTON_BRIGHTNESS,
-    ATTR_DAY_DISPLAY_COLOR,
-    ATTR_NIGHT_DISPLAY_COLOR,
-    DOMAIN,
-)
+from .const import DOMAIN
 from .entity import DopplerEntity
 
 _LOGGER = logging.getLogger(__name__)
