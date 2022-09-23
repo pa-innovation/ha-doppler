@@ -60,7 +60,7 @@ class DopplerLightSaturationSensor(DopplerEntity, SensorEntity):
 class DopplerWifiConnectedSinceSensor(DopplerEntity, SensorEntity):
     """Doppler Wifi Connected Since Sensor class."""
 
-    _attr_entity_category: EntityCategory.DIAGNOSTIC
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
 
     @property
     def native_value(self) -> datetime:
@@ -71,7 +71,7 @@ class DopplerWifiConnectedSinceSensor(DopplerEntity, SensorEntity):
 class DopplerWifiSSIDSensor(DopplerEntity, SensorEntity):
     """Doppler Wifi SSID Sensor class."""
 
-    _attr_entity_category: EntityCategory.DIAGNOSTIC
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
 
     @property
     def native_value(self) -> str:
@@ -82,7 +82,7 @@ class DopplerWifiSSIDSensor(DopplerEntity, SensorEntity):
 class DopplerWifiSignalStrengthSensor(DopplerEntity, SensorEntity):
     """Doppler Wifi Signal Strength Sensor class."""
 
-    _attr_entity_category: EntityCategory.DIAGNOSTIC
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
     _attr_native_unit_of_measurement = PERCENTAGE
 
     @property

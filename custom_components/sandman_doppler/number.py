@@ -61,7 +61,7 @@ class DopplerTimeOffsetNumber(DopplerEntity, NumberEntity):
     _attr_native_min_value = -60
     _attr_native_max_value = 60
     _attr_mode = NumberMode.BOX
-    _attr_entity_category: EntityCategory.CONFIG
+    _attr_entity_category = EntityCategory.CONFIG
     _attr_native_unit_of_measurement = "minutes"
 
     @property

@@ -17,6 +17,7 @@ from doppyler.model.weather import WeatherMode
 from homeassistant.components.select import SelectEntity, SelectEntityDescription
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import DopplerDataUpdateCoordinator
@@ -78,6 +79,8 @@ async def async_setup_entry(
 class DopplerEnumSelect(DopplerEntity, SelectEntity):
     """Doppler Select class for enum attributes."""
 
+    _attr_entity_category = EntityCategory.CONFIG
+
     def __init__(
         self,
         coordinator: DopplerDataUpdateCoordinator,
@@ -121,6 +124,8 @@ class DopplerEnumSelect(DopplerEntity, SelectEntity):
 class DopplerTimeModeSelect(DopplerEntity, SelectEntity):
     """Doppler Time Mode Select class."""
 
+    _attr_entity_category = EntityCategory.CONFIG
+
     _attr_options = ["12", "24"]
 
     @property
@@ -135,6 +140,8 @@ class DopplerTimeModeSelect(DopplerEntity, SelectEntity):
 
 class DopplerTimezoneSelect(DopplerEntity, SelectEntity):
     """Doppler Timezone Select class."""
+
+    _attr_entity_category = EntityCategory.CONFIG
 
     @property
     def options(self) -> list[str]:
