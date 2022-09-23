@@ -75,14 +75,14 @@ WEATHER_OPTIONS = [
     "Hourly C",  # 10
     "Hourly Humidity",  # 11
     "Hourly AQI",  # 12
-    "NWS Daily Forecast F",# 13
-    "NWS Daily Forecast C", #14
-    "NWS Hourly Observation F", #15
-    "NWS Hourly Observation C", #16
-    "NWS Hourly Humidity", #17
+    "NWS Daily Forecast F",  # 13
+    "NWS Daily Forecast C",  # 14
+    "NWS Hourly Observation F",  # 15
+    "NWS Hourly Observation C",  # 16
+    "NWS Hourly Humidity",  # 17
 ]
 
 SANDMAN_DOPPLER_BUTTON = "sandman_doppler_button"
 ATTR_DSN = "dsn"
 ATTR_BUTTON = "button"
-CONF_SUBTYPE= "subtype"
+CONF_SUBTYPE = "subtype"

@@ -64,7 +64,9 @@ class DopplerLightSensor(DopplerEntity, SensorEntity):
 
     @property
     def native_value(self):
-        return self.coordinator.data[self.device.device_info.dsn][ATTR_LIGHTSENSOR_VALUE]
+        return self.coordinator.data[self.device.device_info.dsn][
+            ATTR_LIGHTSENSOR_VALUE
+        ]
 
 
 class DopplerDayNightSensor(DopplerEntity, SensorEntity):
@@ -73,7 +75,9 @@ class DopplerDayNightSensor(DopplerEntity, SensorEntity):
 
     @property
     def native_value(self):
-        return self.coordinator.data[self.device.device_info.dsn][ATTR_DAYNIGHTMODE_VALUE]
+        return self.coordinator.data[self.device.device_info.dsn][
+            ATTR_DAYNIGHTMODE_VALUE
+        ]
 
 
 class DopplerWifiUptimeSensor(DopplerEntity, SensorEntity):
@@ -100,7 +104,9 @@ class DopplerWifiSignalStrengthSensor(DopplerEntity, SensorEntity):
 
     @property
     def native_value(self):
-        return self.coordinator.data[self.device.device_info.dsn][ATTR_WIFI].signalstrength
+        return self.coordinator.data[self.device.device_info.dsn][
+            ATTR_WIFI
+        ].signal_strength
 
 
 # class DopplerAlarmsSensor(DopplerEntity,SensorEntity):

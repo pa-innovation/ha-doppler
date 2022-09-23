@@ -62,7 +62,7 @@ class DopplerVolumeLevelNumber(DopplerEntity, NumberEntity):
     async def async_set_native_value(self, value: float) -> None:
         """Update the current volume value"""
         self._attr_native_value = value
-        await self.coordinator.api.set_volume_level(self.device, int(value))
+        await self.device.set_volume_level(self.device, int(value))
 
 
 class DopplerTimeOffsetNumber(DopplerEntity, NumberEntity):
@@ -81,4 +81,4 @@ class DopplerTimeOffsetNumber(DopplerEntity, NumberEntity):
     async def async_set_native_value(self, value: int) -> None:
         """Update the current volume value"""
         self._attr_native_value = value
-        await self.coordinator.api.set_offset(self.device, int(value))
+        await self.device.set_offset(self.device, int(value))

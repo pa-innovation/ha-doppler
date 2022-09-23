@@ -19,8 +19,9 @@ from .const import (
     ATTR_ALEXA_TAPTALK_TONE,
     ATTR_ALEXA_WAKEWORD_TONE,
     ATTR_SOUND_PRESET_MODE,
+    ATTR_WEATHER,
     ATTR_WEATHER_ON,
-    DOMAIN
+    DOMAIN,
 )
 from .entity import DopplerEntity
 
@@ -32,7 +33,7 @@ async def async_setup_entry(
 ) -> None:
     """Setup sensor platform."""
     coordinator: DopplerDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]
-    entities= []
+    entities = []
     for device in coordinator.api.devices.values():
         entities.extend(
             [
@@ -40,12 +41,21 @@ async def async_setup_entry(
                 UseColonSwitch(coordinator, entry, device, "Use Colon"),
                 UseLeadingZeroSwitch(coordinator, entry, device, "Use Leading Zero"),
                 UseDisplaySecondsSwitch(coordinator, entry, device, "Display Seconds"),
-                UseAscendingAlarmsSwitch(coordinator, entry, device, "Alexa Use Ascending Alarms"),
-                UseTapTalkToneSwitch(coordinator, entry, device, "Alexa Tap to Talk Tone"),
-                UseWakewordToneSwitch(coordinator, entry, device, "Alexa Wakeword Tone"),
-                SoundPresetModeSwitch(coordinator, entry, device, "Use Volume Dependent EQ"),
-                DopplerWeatherSwitch(coordinator, entry, device, "Turn Weather Service ON/OFF"),
-                
+                UseAscendingAlarmsSwitch(
+                    coordinator, entry, device, "Alexa Use Ascending Alarms"
+                ),
+                UseTapTalkToneSwitch(
+                    coordinator, entry, device, "Alexa Tap to Talk Tone"
+                ),
+                UseWakewordToneSwitch(
+                    coordinator, entry, device, "Alexa Wakeword Tone"
+                ),
+                SoundPresetModeSwitch(
+                    coordinator, entry, device, "Use Volume Dependent EQ"
+                ),
+                DopplerWeatherSwitch(
+                    coordinator, entry, device, "Turn Weather Service ON/OFF"
+                ),
             ]
         )
     async_add_devices(entities)
@@ -53,19 +63,16 @@ async def async_setup_entry(
 
 class ColonBlinkSwitch(DopplerEntity, SwitchEntity):
     """Doppler ColonBlink class."""
-    _attr_device_class="switch"
+
+    _attr_device_class = "switch"
 
     async def async_turn_on(self, **kwargs):
         """Turn Colon Blinking On"""
-        await self.coordinator.api.set_colon_blink_mode(
-            self.device, True)
-
+        await self.device.set_colon_blink_mode(self.device, True)
 
     async def async_turn_off(self, **kwargs):
         """Turn Colon Blink Off"""
-        await self.coordinator.api.set_colon_blink_mode(
-            self.device, False)
-        
+        await self.device.set_colon_blink_mode(self.device, False)
 
     @property
     def is_on(self):
@@ -75,19 +82,16 @@ class ColonBlinkSwitch(DopplerEntity, SwitchEntity):
 
 class UseColonSwitch(DopplerEntity, SwitchEntity):
     """Doppler UseColon class."""
-    _attr_device_class="switch"
+
+    _attr_device_class = "switch"
 
     async def async_turn_on(self, **kwargs):
         """Turn Colon On"""
-        await self.coordinator.api.set_use_colon_mode(
-            self.device, True)
-
+        await self.device.set_use_colon_mode(self.device, True)
 
     async def async_turn_off(self, **kwargs):
         """Turn Colon Off"""
-        await self.coordinator.api.set_use_colon_mode(
-            self.device, False)
-        
+        await self.device.set_use_colon_mode(self.device, False)
 
     @property
     def is_on(self):
@@ -97,19 +101,16 @@ class UseColonSwitch(DopplerEntity, SwitchEntity):
 
 class UseLeadingZeroSwitch(DopplerEntity, SwitchEntity):
     """Doppler UseLeadingZero class."""
-    _attr_device_class="switch"
+
+    _attr_device_class = "switch"
 
     async def async_turn_on(self, **kwargs):
         """Turn Colon On"""
-        await self.coordinator.api.set_use_leading_zero_mode(
-            self.device, True)
-
+        await self.device.set_use_leading_zero_mode(self.device, True)
 
     async def async_turn_off(self, **kwargs):
         """Turn Colon Off"""
-        await self.coordinator.api.set_use_leading_zero_mode(
-            self.device, False)
-        
+        await self.device.set_use_leading_zero_mode(self.device, False)
 
     @property
     def is_on(self):
@@ -117,22 +118,18 @@ class UseLeadingZeroSwitch(DopplerEntity, SwitchEntity):
         return self.coordinator.data[self.device.device_info.dsn][ATTR_USE_LEADING_ZERO]
 
 
-
 class UseDisplaySecondsSwitch(DopplerEntity, SwitchEntity):
     """Doppler UseLeadingZero class."""
-    _attr_device_class="switch"
+
+    _attr_device_class = "switch"
 
     async def async_turn_on(self, **kwargs):
         """Turn Colon On"""
-        await self.coordinator.api.set_display_seconds_mode(
-            self.device, True)
-
+        await self.device.set_display_seconds_mode(self.device, True)
 
     async def async_turn_off(self, **kwargs):
         """Turn Colon Off"""
-        await self.coordinator.api.set_display_seconds_mode(
-            self.device, False)
-        
+        await self.device.set_display_seconds_mode(self.device, False)
 
     @property
     def is_on(self):
@@ -142,112 +139,107 @@ class UseDisplaySecondsSwitch(DopplerEntity, SwitchEntity):
 
 class UseAscendingAlarmsSwitch(DopplerEntity, SwitchEntity):
     """Doppler UseAscendingAlarms class."""
-    _attr_device_class="switch"
+
+    _attr_device_class = "switch"
 
     async def async_turn_on(self, **kwargs):
         """Turn Ascending Alarms On"""
-        await self.coordinator.api.set_alexa_ascending_alarms_mode(
-            self.device, True)
-
+        await self.device.set_alexa_ascending_alarms_mode(self.device, True)
 
     async def async_turn_off(self, **kwargs):
         """Turn Ascending Alarms Off"""
-        await self.coordinator.api.set_alexa_ascending_alarms_mode(
-            self.device, False)
-        
+        await self.device.set_alexa_ascending_alarms_mode(self.device, False)
 
     @property
     def is_on(self):
         """Return true if device is on."""
-        return self.coordinator.data[self.device.device_info.dsn][ATTR_ALEXA_USE_ASCENDING_ALARMS]
+        return self.coordinator.data[self.device.device_info.dsn][
+            ATTR_ALEXA_USE_ASCENDING_ALARMS
+        ]
 
 
 class UseTapTalkToneSwitch(DopplerEntity, SwitchEntity):
     """Doppler UseTapTalkTone class."""
-    _attr_device_class="switch"
+
+    _attr_device_class = "switch"
 
     async def async_turn_on(self, **kwargs):
         """Turn TapTalk Tone On"""
-        await self.coordinator.api.set_alexa_taptalk_tone_mode(
-            self.device, True)
-
+        await self.device.set_alexa_taptalk_tone_mode(self.device, True)
 
     async def async_turn_off(self, **kwargs):
         """Turn TapTalk Tone Off"""
-        await self.coordinator.api.set_alexa_taptalk_tone_mode(
-            self.device, False)
-        
+        await self.device.set_alexa_taptalk_tone_mode(self.device, False)
 
     @property
     def is_on(self):
         """Return true if device is on."""
-        return self.coordinator.data[self.device.device_info.dsn][ATTR_ALEXA_TAPTALK_TONE]
+        return self.coordinator.data[self.device.device_info.dsn][
+            ATTR_ALEXA_TAPTALK_TONE
+        ]
 
 
 class UseWakewordToneSwitch(DopplerEntity, SwitchEntity):
     """Doppler UseWakewordTone class."""
-    _attr_device_class="switch"
+
+    _attr_device_class = "switch"
 
     async def async_turn_on(self, **kwargs):
         """Turn TapTalk Tone On"""
-        await self.coordinator.api.set_alexa_wakeword_tone_mode(
-            self.device, True)
-
+        await self.device.set_alexa_wakeword_tone_mode(self.device, True)
 
     async def async_turn_off(self, **kwargs):
         """Turn TapTalk Tone Off"""
-        await self.coordinator.api.set_alexa_wakeword_tone_mode(
-            self.device, False)
-        
+        await self.device.set_alexa_wakeword_tone_mode(self.device, False)
 
     @property
     def is_on(self):
         """Return true if device is on."""
-        return self.coordinator.data[self.device.device_info.dsn][ATTR_ALEXA_WAKEWORD_TONE]
+        return self.coordinator.data[self.device.device_info.dsn][
+            ATTR_ALEXA_WAKEWORD_TONE
+        ]
 
 
 class SoundPresetModeSwitch(DopplerEntity, SwitchEntity):
     """Doppler SoundPresetMode class."""
-    _attr_device_class="switch"
+
+    _attr_device_class = "switch"
 
     async def async_turn_on(self, **kwargs):
         """Turn Volume Dependent EQ On"""
-        await self.coordinator.api.set_sound_preset_mode(
-            self.device, 1)
-
+        await self.device.set_sound_preset_mode(self.device, 1)
 
     async def async_turn_off(self, **kwargs):
         """Turn Volume Dependent EQ Off"""
-        await self.coordinator.api.set_sound_preset_mode(
-            self.device, 0)
-        
+        await self.device.set_sound_preset_mode(self.device, 0)
 
     @property
     def is_on(self):
         """Return true if device is on."""
-        if self.coordinator.data[self.device.device_info.dsn][ATTR_SOUND_PRESET_MODE]==1:
+        if (
+            self.coordinator.data[self.device.device_info.dsn][ATTR_SOUND_PRESET_MODE]
+            == 1
+        ):
             return True
         else:
             return False
 
+
 class DopplerWeatherSwitch(DopplerEntity, SwitchEntity):
     """Doppler WeatherSwitch class."""
-    _attr_device_class="switch"
-    
+
+    _attr_device_class = "switch"
+
     async def async_turn_on(self, **kwargs):
         """Turn Weather On"""
-        await self.coordinator.api.set_weather_status(
-            self.device, True)
+        await self.device.set_weather_status(self.device, True)
         _LOGGER.warning(self.config_entry.data[CONF_LATITUDE])
 
     async def async_turn_off(self, **kwargs):
         """Turn Weather Off"""
-        await self.coordinator.api.set_weather_status(
-            self.device, False)
-        
+        await self.device.set_weather_status(self.device, False)
 
     @property
     def is_on(self):
         """Return true if device is on."""
-        return self.coordinator.data[self.device.device_info.dsn][ATTR_WEATHER_ON]
-    
+        return self.coordinator.data[self.device.device_info.dsn][ATTR_WEATHER].enabled

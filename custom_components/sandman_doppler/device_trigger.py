@@ -41,9 +41,9 @@ TRIGGER_TYPES = {"sandman_doppler_button"}
 TRIGGER_SCHEMA = DEVICE_TRIGGER_BASE_SCHEMA.extend(
     {
         vol.Required(CONF_TYPE): vol.In(TRIGGER_TYPES),
-        vol.Required(ATTR_DSN): vol.Match(r'Doppler-[a-f0-9]{8}'),
-        vol.Required(ATTR_BUTTON): vol.In({1,2}),
-        vol.Required(CONF_SUBTYPE): vol.In({1,2}),
+        vol.Required(ATTR_DSN): vol.Match(r"Doppler-[a-f0-9]{8}"),
+        vol.Required(ATTR_BUTTON): vol.In({1, 2}),
+        vol.Required(CONF_SUBTYPE): vol.In({1, 2}),
     }
 )
 
@@ -62,7 +62,6 @@ async def async_get_triggers(
     assert device_entry
     _LOGGER.warning(f"device_entry.identifiers={device_entry.identifiers}")
 
-    
     for id in device_entry.identifiers:
         if id[1].startswith("Doppler"):
             dsn = id[1]
@@ -84,6 +83,7 @@ async def async_get_triggers(
     _LOGGER.warning(f"triggers= {triggers}")
     return triggers
 
+
 async def async_attach_trigger(
     hass: HomeAssistant,
     config: ConfigType,
@@ -99,18 +99,18 @@ async def async_attach_trigger(
     #        if id.startswith("Doppler"):
     #            dsn=id
     _LOGGER.warning(f"config= {config}")
-    event_config = event_trigger.TRIGGER_SCHEMA({
+    event_config = event_trigger.TRIGGER_SCHEMA(
+        {
             event_trigger.CONF_PLATFORM: "event",
             event_trigger.CONF_EVENT_TYPE: "sandman_doppler_button",
             event_trigger.CONF_EVENT_DATA: {
                 ATTR_DSN: config[ATTR_DSN],
                 ATTR_BUTTON: config[ATTR_BUTTON],
-
-#                CONF_DEVICE_ID: config[CONF_DEVICE_ID],
-#                CONF_TYPE: config[CONF_TYPE],
-
+                #                CONF_DEVICE_ID: config[CONF_DEVICE_ID],
+                #                CONF_TYPE: config[CONF_TYPE],
             },
-    })
+        }
+    )
 
     _LOGGER.warning(f"event_config={event_config}")
 

@@ -88,12 +88,12 @@ class DopplerDisplayLightDay(BaseDopplerLight):
         brightness = kwargs.get(ATTR_BRIGHTNESS)
         rgb_color = kwargs.get(ATTR_RGB_COLOR)
         if brightness is not None:
-            await self.coordinator.api.set_day_display_brightness(
+            await self.device.set_day_display_brightness(
                 self.device,
                 int(100 * brightness / 255),
             )
         if rgb_color is not None:
-            await self.coordinator.api.set_day_display_color(
+            await self.device.set_day_display_color(
                 self.device, Color(rgb_color[0], rgb_color[1], rgb_color[2])
             )
 
@@ -129,12 +129,12 @@ class DopplerDisplayLightNight(BaseDopplerLight):
         brightness = kwargs.get(ATTR_BRIGHTNESS)
         rgb_color = kwargs.get(ATTR_RGB_COLOR)
         if brightness is not None:
-            await self.coordinator.api.set_night_display_brightness(
+            await self.device.set_night_display_brightness(
                 self.device,
                 int(100 * brightness / 255),
             )
         if rgb_color is not None:
-            await self.coordinator.api.set_night_display_color(
+            await self.device.set_night_display_color(
                 self.device, Color(rgb_color[0], rgb_color[1], rgb_color[2])
             )
 
@@ -158,7 +158,9 @@ class DopplerButtonLightDay(BaseDopplerLight):
     @property
     def brightness(self) -> int:
         """Return the brightness of this light between 0..255."""
-        brightness = self.coordinator.data[self.device.device_info.dsn][ATTR_DAY_BUTTON_BRIGHTNESS]
+        brightness = self.coordinator.data[self.device.device_info.dsn][
+            ATTR_DAY_BUTTON_BRIGHTNESS
+        ]
         if brightness is not None:
             return round((brightness / 100) * 255)
         return 0
@@ -168,15 +170,15 @@ class DopplerButtonLightDay(BaseDopplerLight):
         brightness = kwargs.get(ATTR_BRIGHTNESS)
         rgb_color = kwargs.get(ATTR_RGB_COLOR)
         if brightness is not None:
-            await self.coordinator.api.set_day_button_brightness(
+            await self.device.set_day_button_brightness(
                 self.device,
                 int(100 * brightness / 255),
             )
 
         if rgb_color is not None:
 
-            await self.coordinator.api.set_sync_button_display_color(self.device, False)
-            await self.coordinator.api.set_day_button_color(
+            await self.device.set_sync_button_display_color(self.device, False)
+            await self.device.set_day_button_color(
                 self.device, Color(rgb_color[0], rgb_color[1], rgb_color[2])
             )
 
@@ -212,13 +214,13 @@ class DopplerButtonLightNight(BaseDopplerLight):
         brightness = kwargs.get(ATTR_BRIGHTNESS)
         rgb_color = kwargs.get(ATTR_RGB_COLOR)
         if brightness is not None:
-            await self.coordinator.api.set_night_button_brightness(
+            await self.device.set_night_button_brightness(
                 self.device,
                 int(100 * brightness / 255),
             )
         if rgb_color is not None:
 
-            await self.coordinator.api.set_sync_button_display_color(self.device, False)
-            await self.coordinator.api.set_night_button_color(
+            await self.device.set_sync_button_display_color(self.device, False)
+            await self.device.set_night_button_color(
                 self.device, Color(rgb_color[0], rgb_color[1], rgb_color[2])
             )

@@ -15,6 +15,7 @@ from .const import (
     ATTR_TIME_MODE,
     ATTR_VOLUME_LEVEL,
     ATTR_SOUND_PRESET,
+    ATTR_WEATHER,
     ATTR_WEATHER_MODE,
     ATTR_TIMEZONE,
     WEATHER_OPTIONS,
@@ -56,7 +57,7 @@ class DopplerTimeModeNumber(DopplerEntity, SelectEntity):
 
     async def async_select_option(self, option: str) -> None:
         """Change the selected option."""
-        await self.coordinator.api.set_time_mode(self.device, int(option))
+        await self.device.set_time_mode(self.device, int(option))
 
 
 class DopplerSoundPresetSelect(DopplerEntity, SelectEntity):
@@ -73,20 +74,22 @@ class DopplerSoundPresetSelect(DopplerEntity, SelectEntity):
     @property
     def current_option(self) -> str:
         """Return the current option."""
-        return str(self.coordinator.data[self.device.device_info.dsn][ATTR_SOUND_PRESET])
+        return str(
+            self.coordinator.data[self.device.device_info.dsn][ATTR_SOUND_PRESET]
+        )
 
     async def async_select_option(self, option: str) -> None:
         """Change the selected option."""
         if option == "Preset 1 Balanced":
-            await self.coordinator.api.set_sound_preset(self.device, "PRESET1")
+            await self.device.set_sound_preset(self.device, "PRESET1")
         elif option == "Preset 2 Bass Boost":
-            await self.coordinator.api.set_sound_preset(self.device, "PRESET2")
+            await self.device.set_sound_preset(self.device, "PRESET2")
         elif option == "Preset 3 Treble Boost":
-            await self.coordinator.api.set_sound_preset(self.device, "PRESET3")
+            await self.device.set_sound_preset(self.device, "PRESET3")
         elif option == "Preset 4 Mids Boost":
-            await self.coordinator.api.set_sound_preset(self.device, "PRESET4")
+            await self.device.set_sound_preset(self.device, "PRESET4")
         elif option == "Preset 5 Untuned":
-            await self.coordinator.api.set_sound_preset(self.device, "PRESET5")
+            await self.device.set_sound_preset(self.device, "PRESET5")
 
 
 class DopplerWeatherModeSelect(DopplerEntity, SelectEntity):
@@ -97,11 +100,13 @@ class DopplerWeatherModeSelect(DopplerEntity, SelectEntity):
     @property
     def current_option(self) -> str:
         """Return the current option."""
-        return str(self.coordinator.data[self.device.device_info.dsn][ATTR_WEATHER_MODE])
+        return str(
+            self.coordinator.data[self.device.device_info.dsn][ATTR_WEATHER].mode.name
+        )
 
     async def async_select_option(self, option: str) -> str:
         """Change the selected option."""
-        mode = await self.coordinator.api.set_weather_mode(
+        mode = await self.device.set_weather_mode(
             self.device, self._attr_options.index(option)
         )
         return self._attr_options[mode]
@@ -166,5 +171,5 @@ class DopplerTimezoneSelect(DopplerEntity, SelectEntity):
 
     async def async_select_option(self, option: str) -> str:
         """Change the selected option."""
-        mode = await self.coordinator.api.set_timezone(self.device, option)
+        mode = await self.device.set_timezone(self.device, option)
         return str(mode)
