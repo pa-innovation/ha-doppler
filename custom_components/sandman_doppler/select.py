@@ -1,6 +1,8 @@
 """Select platform for Doppler Sandman."""
 from __future__ import annotations
 
+from dataclasses import dataclass
+from enum import Enum
 import zoneinfo
 
 from doppyler.const import (
@@ -9,14 +11,47 @@ from doppyler.const import (
     ATTR_TIMEZONE,
     ATTR_WEATHER,
 )
-from homeassistant.components.select import SelectEntity
+from doppyler.model.doppler import Doppler
+from doppyler.model.sound import SoundPreset
+from doppyler.model.weather import WeatherMode
+from homeassistant.components.select import SelectEntity, SelectEntityDescription
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import DopplerDataUpdateCoordinator
-from .const import DOMAIN, WEATHER_OPTIONS
+from .const import DOMAIN
 from .entity import DopplerEntity
+from .helpers import get_enum_from_name, normalize_enum_name
+
+
+@dataclass
+class DopplerEnumSelectEntityDescription(SelectEntityDescription):
+    """Doppler Enum Select Entity Description."""
+
+    enum_cls: Enum | None = None
+    state_key: str | None = None
+    set_value_func_name: str | None = None
+    option_attr_name: str | None = None
+
+
+ENTITY_DESCRIPTIONS = [
+    DopplerEnumSelectEntityDescription(
+        "Sound Preset",
+        name="Sound Preset",
+        enum_cls=SoundPreset,
+        state_key=ATTR_SOUND_PRESET,
+        set_value_func_name="set_sound_preset",
+    ),
+    DopplerEnumSelectEntityDescription(
+        "Weather Mode",
+        name="Weather Mode",
+        enum_cls=WeatherMode,
+        state_key=ATTR_WEATHER,
+        option_attr_name="mode",
+        set_value_func_name="set_weather_configuration",
+    ),
+]
 
 
 async def async_setup_entry(
@@ -30,12 +65,57 @@ async def async_setup_entry(
         entities.extend(
             [
                 DopplerTimeModeSelect(coordinator, entry, device, "Time Mode"),
-                DopplerSoundPresetSelect(coordinator, entry, device, "Audio Preset"),
-                DopplerWeatherModeSelect(coordinator, entry, device, "Weather Mode"),
                 DopplerTimezoneSelect(coordinator, entry, device, "Timezone"),
+                *(
+                    DopplerEnumSelect(coordinator, entry, device, description)
+                    for description in ENTITY_DESCRIPTIONS
+                ),
             ]
         )
     async_add_devices(entities)
+
+
+class DopplerEnumSelect(DopplerEntity, SelectEntity):
+    """Doppler Select class for enum attributes."""
+
+    def __init__(
+        self,
+        coordinator: DopplerDataUpdateCoordinator,
+        entry: ConfigEntry,
+        device: Doppler,
+        description: DopplerEnumSelectEntityDescription,
+    ) -> None:
+        """Initialize the select."""
+        super().__init__(coordinator, entry, device, description.name)
+        self.entity_description: DopplerEnumSelectEntityDescription = description
+        self._enum_cls = description.enum_cls
+        self._state_key = description.state_key
+        self._set_value_func_name = description.set_value_func_name
+        self._option_attr_name = description.option_attr_name
+
+        self._attr_options = [
+            normalize_enum_name(enum_val) for enum_val in self._enum_cls
+        ]
+
+    @property
+    def current_option(self) -> str:
+        """Return the current option."""
+        current_option = self.device_data[self._state_key]
+        if self._option_attr_name:
+            return normalize_enum_name(getattr(current_option, self._option_attr_name))
+        return normalize_enum_name(current_option)
+
+    async def async_select_option(self, option: str) -> None:
+        """Change the selected option."""
+        enum_val = get_enum_from_name(self._enum_cls, option)
+        if self._option_attr_name:
+            self.device_data[self._state_key] = await getattr(
+                self.device, self._set_value_func_name
+            )(**{self._option_attr_name: enum_val})
+        else:
+            self.device_data[self._state_key] = await getattr(
+                self.device, self._set_value_func_name
+            )(enum_val)
 
 
 class DopplerTimeModeSelect(DopplerEntity, SelectEntity):
@@ -50,57 +130,7 @@ class DopplerTimeModeSelect(DopplerEntity, SelectEntity):
 
     async def async_select_option(self, option: str) -> None:
         """Change the selected option."""
-        self.device_data[ATTR_TIME_MODE] = await self.device.set_time_mode(
-            self.device, int(option)
-        )
-
-
-class DopplerSoundPresetSelect(DopplerEntity, SelectEntity):
-    """Doppler Time Mode Select class."""
-
-    _attr_options = [
-        "Preset 1 Balanced",
-        "Preset 2 Bass Boost",
-        "Preset 3 Treble Boost",
-        "Preset 4 Mids Boost",
-        "Preset 5 Untuned",
-    ]
-
-    @property
-    def current_option(self) -> str:
-        """Return the current option."""
-        return str(self.device_data[ATTR_SOUND_PRESET])
-
-    async def async_select_option(self, option: str) -> None:
-        """Change the selected option."""
-        if option == "Preset 1 Balanced":
-            await self.device.set_sound_preset(self.device, "PRESET1")
-        elif option == "Preset 2 Bass Boost":
-            await self.device.set_sound_preset(self.device, "PRESET2")
-        elif option == "Preset 3 Treble Boost":
-            await self.device.set_sound_preset(self.device, "PRESET3")
-        elif option == "Preset 4 Mids Boost":
-            await self.device.set_sound_preset(self.device, "PRESET4")
-        elif option == "Preset 5 Untuned":
-            await self.device.set_sound_preset(self.device, "PRESET5")
-
-
-class DopplerWeatherModeSelect(DopplerEntity, SelectEntity):
-    """Doppler Time Mode Select class."""
-
-    _attr_options = WEATHER_OPTIONS
-
-    @property
-    def current_option(self) -> str:
-        """Return the current option."""
-        return str(self.device_data[ATTR_WEATHER].mode.name)
-
-    async def async_select_option(self, option: str) -> str:
-        """Change the selected option."""
-        mode = await self.device.set_weather_configuration(
-            self.device, mode=self._attr_options.index(option)
-        )
-        return self._attr_options[mode]
+        self.device_data[ATTR_TIME_MODE] = await self.device.set_time_mode(int(option))
 
 
 class DopplerTimezoneSelect(DopplerEntity, SelectEntity):
@@ -118,4 +148,4 @@ class DopplerTimezoneSelect(DopplerEntity, SelectEntity):
 
     async def async_select_option(self, option: str) -> None:
         """Change the selected option."""
-        self.device_data[ATTR_TIMEZONE] = await self.device.set_timezone(self.device, option)
+        self.device_data[ATTR_TIMEZONE] = await self.device.set_timezone(option)
