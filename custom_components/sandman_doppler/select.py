@@ -1,6 +1,8 @@
 """Select platform for Doppler Sandman."""
 from __future__ import annotations
 
+import zoneinfo
+
 from doppyler.const import (
     ATTR_SOUND_PRESET,
     ATTR_TIME_MODE,
@@ -104,61 +106,16 @@ class DopplerWeatherModeSelect(DopplerEntity, SelectEntity):
 class DopplerTimezoneSelect(DopplerEntity, SelectEntity):
     """Doppler Timezone Select class."""
 
-    _attr_options = [
-        "UTC",
-        "US/Samoa",
-        "US/Hawaii",
-        "US/Aleutian",
-        "Pacific/Marquesas",
-        "Pacific/Gambier",
-        "US/Alaska",
-        "US/Pacific",
-        "US/Arizona",
-        "US/Mountain",
-        "Canada/Saskatchewan",
-        "US/Central",
-        "America/Panama",
-        "US/Eastern",
-        "America/Puerto_Rico",
-        "America/Caracas",
-        "Canada/Newfoundland",
-        "Canada/Atlantic",
-        "Brazil",
-        "Brazil/DeNoronha",
-        "Atlantic/Cape_Verde",
-        "Europe/London",
-        "Europe/Prague",
-        "Africa/Harare",
-        "Asia/Jerusalem",
-        "Asia/Baghdad",
-        "Asia/Muscat",
-        "Asia/Tehran",
-        "Asia/Kabul",
-        "Asia/Tashkent",
-        "Asia/Kolkata",
-        "Asia/Kathmandu",
-        "Asia/Dhaka",
-        "Asia/Rangoon",
-        "Asia/Bangkok",
-        "Australia/Perth",
-        "Australia/Eucla",
-        "Asia/Seoul",
-        "Australia/Darwin",
-        "Australia/Queensland",
-        "Australia/Adelaide",
-        "Asia/Magadan",
-        "Australia/Sydney",
-        "Pacific/Auckland",
-        "Pacific/Tongatapu",
-        "Pacific/Chatham",
-    ]
+    @property
+    def options(self) -> list[str]:
+        """Return a list of available options."""
+        return sorted(list(zoneinfo.available_timezones()))
 
     @property
     def current_option(self) -> str:
         """Return the current option."""
         return str(self.device_data[ATTR_TIMEZONE])
 
-    async def async_select_option(self, option: str) -> str:
+    async def async_select_option(self, option: str) -> None:
         """Change the selected option."""
-        mode = await self.device.set_timezone(self.device, option)
-        return str(mode)
+        self.device_data[ATTR_TIMEZONE] = await self.device.set_timezone(self.device, option)
