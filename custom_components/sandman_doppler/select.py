@@ -102,8 +102,8 @@ class DopplerWeatherModeSelect(DopplerEntity, SelectEntity):
 
     async def async_select_option(self, option: str) -> str:
         """Change the selected option."""
-        mode = await self.device.set_weather_mode(
-            self.device, self._attr_options.index(option)
+        mode = await self.device.set_weather_configuration(
+            self.device, mode=self._attr_options.index(option)
         )
         return self._attr_options[mode]
 
