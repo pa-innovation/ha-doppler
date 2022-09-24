@@ -1,8 +1,10 @@
 """Switch platform for Doppler Sandman."""
 from __future__ import annotations
 
+from collections.abc import Callable, Coroutine
 from dataclasses import dataclass
 import logging
+from typing import Any
 
 from doppyler.const import (
     ATTR_ALEXA_TAP_TO_TALK_TONE_ENABLED,
@@ -11,7 +13,11 @@ from doppyler.const import (
     ATTR_COLON_BLINK,
     ATTR_DISPLAY_SECONDS,
     ATTR_SOUND_PRESET_MODE,
+    ATTR_SYNC_BUTTON_AND_DISPLAY_BRIGHTNESS,
+    ATTR_SYNC_BUTTON_AND_DISPLAY_COLOR,
+    ATTR_SYNC_DAY_AND_NIGHT_COLOR,
     ATTR_USE_COLON,
+    ATTR_USE_FADE_TIME,
     ATTR_USE_LEADING_ZERO,
     ATTR_WEATHER,
 )
@@ -38,22 +44,30 @@ class DopplerSwitchEntityDescription(SwitchEntityDescription):
     """Class to describe Doppler switch entities."""
 
     state_key: str | None = None
+    state_func: Callable[[Any], Any] = lambda x: x
+    set_value_func: Coroutine[Any, Any, Any] | None = None
     set_value_func_name: str | None = None
     is_on_attr_name: str | None = None
 
 
 ENTITY_DESCRIPTIONS = [
     DopplerSwitchEntityDescription(
-        "Blink Colon",
-        name="Blink Colon",
+        "Colon: Blink",
+        name="Colon: Blink",
         state_key=ATTR_COLON_BLINK,
         set_value_func_name="set_colon_blink_mode",
     ),
     DopplerSwitchEntityDescription(
-        "Use Colon",
-        name="Use Colon",
+        "Colon: Show",
+        name="Colon: Show",
         state_key=ATTR_USE_COLON,
         set_value_func_name="set_use_colon_mode",
+    ),
+    DopplerSwitchEntityDescription(
+        "Fade Time Between Changes",
+        name="Fade Time Between Changes",
+        state_key=ATTR_USE_FADE_TIME,
+        set_value_func_name="set_use_fade_time",
     ),
     DopplerSwitchEntityDescription(
         "Use Leading Zero",
@@ -95,8 +109,26 @@ ENTITY_DESCRIPTIONS = [
         "Weather Service",
         name="Weather Service",
         state_key=ATTR_WEATHER,
-        set_value_func_name="set_weather_mode",
-        is_on_attr_name="enabled",
+        state_func=lambda x: x.enabled,
+        set_value_func=lambda dev, val: dev.set_weather_mode(enabled=val),
+    ),
+    DopplerSwitchEntityDescription(
+        "Sync: Button and Display Brightness",
+        name="Sync: Button and Display Brightness",
+        state_key=ATTR_SYNC_BUTTON_AND_DISPLAY_BRIGHTNESS,
+        set_value_func_name="set_sync_button_display_brightness",
+    ),
+    DopplerSwitchEntityDescription(
+        "Sync: Button and Display Color",
+        name="Sync: Button and Display Color",
+        state_key=ATTR_SYNC_BUTTON_AND_DISPLAY_COLOR,
+        set_value_func_name="set_sync_button_display_color",
+    ),
+    DopplerSwitchEntityDescription(
+        "Sync: Day and Night Color",
+        name="Sync: Day and Night Color",
+        state_key=ATTR_SYNC_DAY_AND_NIGHT_COLOR,
+        set_value_func_name="set_sync_day_night_color",
     ),
 ]
 
@@ -110,14 +142,14 @@ async def async_setup_entry(
     for device in coordinator.api.devices.values():
         entities.extend(
             [
-                BaseDopplerSwitch(coordinator, entry, device, description)
+                DopplerSwitch(coordinator, entry, device, description)
                 for description in ENTITY_DESCRIPTIONS
             ]
         )
     async_add_devices(entities)
 
 
-class BaseDopplerSwitch(DopplerEntity, SwitchEntity):
+class DopplerSwitch(DopplerEntity, SwitchEntity):
     """Base class for Doppler switches."""
 
     _attr_device_class: SwitchDeviceClass.SWITCH
@@ -132,32 +164,31 @@ class BaseDopplerSwitch(DopplerEntity, SwitchEntity):
     ) -> None:
         """Initialize the switch."""
         super().__init__(coordinator, entry, device, description.name)
-        self.entity_description: DopplerSwitchEntityDescription = description
-        self._state_key = description.state_key
+        self.entity_description = description
+        self._state_key: str = description.state_key
+        self._state_func = description.state_func
+        self._set_value_func = description.set_value_func
         self._set_value_func_name = description.set_value_func_name
-        self._is_on_attr_name = description.is_on_attr_name
 
     @property
     def is_on(self) -> bool:
         """Return true if switch is on."""
-        is_on = self.device_data[self._state_key]
-        if self._is_on_attr_name:
-            getattr(is_on, self._is_on_attr_name)
-        return is_on
+        return self._state_func(self.device_data[self._state_key])
 
     async def async_turn_on(self, **kwargs) -> None:
         """Turn the switch on."""
-        if self._is_on_attr_name:
-            self.device_data[self._state_key] = await getattr(
-                self.device, self._set_value_func_name
-            )(**{self._is_on_attr_name: True})
+        if self._set_value_func:
+            new_val = await self._set_value_func(self.device, True)
         else:
-            self.device_data[self._state_key] = await getattr(
-                self.device, self._set_value_func_name
-            )(True)
+            new_val = await getattr(self.device, self._set_value_func_name)(True)
+
+        self.device_data[self._state_key] = new_val
 
     async def async_turn_off(self, **kwargs) -> None:
         """Turn the switch off."""
-        self.device_data[self._state_key] = await getattr(
-            self.device, self._set_value_func_name
-        )(**{self._is_on_attr_name: False} if self._is_on_attr_name else False)
+        if self._set_value_func:
+            new_val = await self._set_value_func(self.device, False)
+        else:
+            new_val = await getattr(self.device, self._set_value_func_name)(False)
+
+        self.device_data[self._state_key] = new_val

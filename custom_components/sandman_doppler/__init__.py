@@ -60,16 +60,16 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         await device.set_sync_day_night_color(False)
         await device.set_sync_button_display_brightness(False)
 
-    def get_device_from_call_data(call: ServiceCall ):
+    def get_device_from_call_data(call: ServiceCall):
         device_registry = dr.async_get(hass)
         device_entry = device_registry.async_get(call.data["doppler_device_id"])
-        dsn=next(id for id in device_entry.identifiers)[1]
-        #_LOGGER.warning(f"device_entry.identifiers is {device_entry.identifiers}")
-        #_LOGGER.warning(f"dsn is {dsn}")
+        dsn = next(id for id in device_entry.identifiers)[1]
+        # _LOGGER.warning(f"device_entry.identifiers is {device_entry.identifiers}")
+        # _LOGGER.warning(f"dsn is {dsn}")
         return client.devices[dsn]
 
     async def handle_set_alarm_service(call: ServiceCall) -> None:
-        device=get_device_from_call_data(call)
+        device = get_device_from_call_data(call)
         if "repeat" in call.data:
             r = call.data["repeat"]
         else:
@@ -95,11 +95,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         _LOGGER.warning(f"alarm result was {result}")
 
     async def handle_delete_alarm_service(call: ServiceCall) -> None:
-        device=get_device_from_call_data(call)
+        device = get_device_from_call_data(call)
         await device.delete_alarm(int(call.data["alarm_id"]))
 
     async def handle_set_main_display_service(call: ServiceCall) -> None:
-        device= get_device_from_call_data(call)
+        device = get_device_from_call_data(call)
         _LOGGER.warning(f"Called handle_set_main_display_service")
         mdt_dict = MainDisplayTextDict(
             {
@@ -114,12 +114,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             }
         )
 
-        await device.set_main_display_text(
-            MainDisplayText.from_dict(mdt_dict)
-        )
+        await device.set_main_display_text(MainDisplayText.from_dict(mdt_dict))
 
     async def handle_set_mini_display_service(call: ServiceCall) -> None:
-        device= get_device_from_call_data(call)
+        device = get_device_from_call_data(call)
         _LOGGER.warning(f"Called handle_display_num_mini_service")
         mdn_dict = MiniDisplayNumberDict(
             {
@@ -133,13 +131,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             }
         )
 
-        await device.set_mini_display_number(
-            MiniDisplayNumber.from_dict(mdn_dict)
-        )
+        await device.set_mini_display_number(MiniDisplayNumber.from_dict(mdn_dict))
 
     async def handle_set_lightbar_color_service(call: ServiceCall) -> None:
 
-        device=get_device_from_call_data(call)
+        device = get_device_from_call_data(call)
         _LOGGER.warning(f"data was {call.data}")
         _LOGGER.warning(f"Called handle_set_lightbar_color_service")
         color_list = []
@@ -253,7 +249,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     async def handle_set_lightbar_blink_service(call: ServiceCall) -> None:
 
-        device=get_device_from_call_data(call)
+        device = get_device_from_call_data(call)
         _LOGGER.warning(f"data was {call.data}")
         _LOGGER.warning(f"Called handle_set_lightbar_color_service")
         color_list = []
@@ -303,7 +299,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         _LOGGER.warning(f"retval={retval.to_dict()}")
 
     async def handle_set_lightbar_pulse_service(call: ServiceCall) -> None:
-        device=get_device_from_call_data(call)
+        device = get_device_from_call_data(call)
 
         _LOGGER.warning(f"data was {call.data}")
         _LOGGER.warning(f"Called handle_set_lightbar_pulse_service")
@@ -357,7 +353,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         _LOGGER.warning(f"retval={retval.to_dict()}")
 
     async def handle_set_lightbar_comet_service(call: ServiceCall) -> None:
-        device=get_device_from_call_data(call)
+        device = get_device_from_call_data(call)
         _LOGGER.warning(f"data was {call.data}")
         _LOGGER.warning(f"Called handle_set_lightbar_pulse_service")
         color_list = []
@@ -481,14 +477,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     async def handle_set_display_color_service(call: ServiceCall) -> None:
         device = get_device_from_call_data(call)
-        
+
         dayornight = call.data.get("display_day_or_night")
         colorval = call.data.get("display_color")
 
         if dayornight == "Day":
-            retval = await device.set_day_display_color(
-                Color.from_list(colorval)
-            )
+            retval = await device.set_day_display_color(Color.from_list(colorval))
         elif dayornight == "Night":
             retval = await device.set_night_display_color(
                 device, Color.from_list(colorval)
@@ -498,24 +492,20 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     async def handle_set_button_color_service(call: ServiceCall) -> None:
         device = get_device_from_call_data(call)
-        
+
         dayornight = call.data.get("button_day_or_night")
         colorval = call.data.get("button_color")
 
         if dayornight == "Day":
-            retval = await device.set_day_button_color(
-                Color.from_list(colorval)
-            )
+            retval = await device.set_day_button_color(Color.from_list(colorval))
         elif dayornight == "Night":
-            retval = await device.set_night_button_color(
-                Color.from_list(colorval)
-            )
+            retval = await device.set_night_button_color(Color.from_list(colorval))
         else:
             raise Exception("Got None for Dayornight")
 
     async def handle_set_display_brightness_service(call: ServiceCall) -> None:
-        device=get_device_from_call_data(call)
-        
+        device = get_device_from_call_data(call)
+
         dayornight = call.data.get("display_day_or_night")
         brightness = call.data.get("display_brightness")
 
@@ -528,7 +518,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     async def handle_set_button_brightness_service(call: ServiceCall) -> None:
 
-        device=get_device_from_call_data(call)
+        device = get_device_from_call_data(call)
         dayornight = call.data.get("display_day_or_night")
         brightness = call.data.get("button_brightness")
 
@@ -539,8 +529,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         else:
             raise Exception("Got None for Dayornight")
 
-    hass.services.async_register(
-        DOMAIN, "setalarmservice", handle_set_alarm_service)
+    hass.services.async_register(DOMAIN, "setalarmservice", handle_set_alarm_service)
     hass.services.async_register(
         DOMAIN, "deletealarmservice", handle_delete_alarm_service
     )

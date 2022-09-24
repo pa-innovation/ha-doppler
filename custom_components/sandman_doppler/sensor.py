@@ -1,11 +1,19 @@
 """Sensor platform for Doppler Sandman."""
 from __future__ import annotations
 
-from datetime import datetime
+from collections.abc import Callable
+from dataclasses import dataclass
 import logging
+from typing import Any
 
 from doppyler.const import ATTR_ALARMS, ATTR_LIGHT_SENSOR_VALUE, ATTR_WIFI
-from homeassistant.components.sensor import SensorEntity, SensorStateClass
+from doppyler.model.doppler import Doppler
+from homeassistant.components.sensor import (
+    SensorDeviceClass,
+    SensorEntity,
+    SensorEntityDescription,
+    SensorStateClass,
+)
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import PERCENTAGE
 from homeassistant.core import HomeAssistant
@@ -20,6 +28,49 @@ from .entity import DopplerEntity
 _LOGGER = logging.getLogger(__name__)
 
 
+@dataclass
+class DopplerSensorEntityDescription(SensorEntityDescription):
+    """Class describing Doppler sensor entities."""
+
+    state_key: str | None = None
+    state_func: Callable[[Any], Any] | None = None
+
+
+SENSOR_ENTITY_DESCRIPTIONS = [
+    DopplerSensorEntityDescription(
+        "Light Saturation",
+        name="Light Saturation",
+        state_class=SensorStateClass.MEASUREMENT,
+        native_unit_of_measurement=PERCENTAGE,
+        state_key=ATTR_LIGHT_SENSOR_VALUE,
+        state_func=lambda x: round(x, 2),
+    ),
+    DopplerSensorEntityDescription(
+        "Wifi Connected Since",
+        name="Wifi Connected Since",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        device_class=SensorDeviceClass.TIMESTAMP,
+        state_key=ATTR_WIFI,
+        state_func=lambda x: dt_util.now() - x.uptime,
+    ),
+    DopplerSensorEntityDescription(
+        "Wifi SSID",
+        name="Wifi SSID",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        state_key=ATTR_WIFI,
+        state_func=lambda x: x.ssid,
+    ),
+    DopplerSensorEntityDescription(
+        "Wifi Signal Strength",
+        name="Wifi Signal Strength",
+        entity_category=EntityCategory.DIAGNOSTIC,
+        native_unit_of_measurement=PERCENTAGE,
+        state_key=ATTR_WIFI,
+        state_func=lambda x: int(x.signal_strength),
+    ),
+]
+
+
 async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_devices: AddEntitiesCallback
 ) -> None:
@@ -29,66 +80,33 @@ async def async_setup_entry(
     for device in coordinator.api.devices.values():
         entities.extend(
             [
-                DopplerLightSaturationSensor(
-                    coordinator, entry, device, "Light Saturation"
-                ),
-                DopplerWifiConnectedSinceSensor(
-                    coordinator, entry, device, "Wifi Connected Since"
-                ),
-                DopplerWifiSSIDSensor(coordinator, entry, device, "Wifi SSID"),
-                DopplerWifiSignalStrengthSensor(
-                    coordinator, entry, device, "Wifi Signal Strength"
-                ),
-                #                DopplerAlarmsSensor(coordinator, entry, device, "Alarms"),
+                DopplerSensor(coordinator, entry, device, description)
+                for description in SENSOR_ENTITY_DESCRIPTIONS
             ]
         )
     async_add_devices(entities)
 
 
-class DopplerLightSaturationSensor(DopplerEntity, SensorEntity):
-    """Doppler Light Saturation Sensor class."""
+class DopplerSensor(DopplerEntity, SensorEntity):
+    """Doppler sensor class."""
 
-    _attr_state_class = SensorStateClass.MEASUREMENT
-    _attr_native_unit_of_measurement = PERCENTAGE
-
-    @property
-    def native_value(self) -> float:
-        """Return the native value of the sensor."""
-        return round(self.device_data[ATTR_LIGHT_SENSOR_VALUE], 1)
-
-
-class DopplerWifiConnectedSinceSensor(DopplerEntity, SensorEntity):
-    """Doppler Wifi Connected Since Sensor class."""
-
-    _attr_entity_category = EntityCategory.DIAGNOSTIC
-
-    @property
-    def native_value(self) -> datetime:
-        """Return the native value of the sensor."""
-        return dt_util.now() - self.device_data[ATTR_WIFI].uptime
-
-
-class DopplerWifiSSIDSensor(DopplerEntity, SensorEntity):
-    """Doppler Wifi SSID Sensor class."""
-
-    _attr_entity_category = EntityCategory.DIAGNOSTIC
+    def __init__(
+        self,
+        coordinator: DopplerDataUpdateCoordinator,
+        entry: ConfigEntry,
+        device: Doppler,
+        description: DopplerSensorEntityDescription,
+    ):
+        """Initialize."""
+        super().__init__(coordinator, entry, device, description.name)
+        self.entity_description = description
+        self._state_key: str = description.state_key
+        self._state_func: Callable[[Any], Any] = description.state_func
 
     @property
-    def native_value(self) -> str:
+    def native_value(self) -> Any:
         """Return the native value of the sensor."""
-        return self.device_data[ATTR_WIFI].ssid
-
-
-class DopplerWifiSignalStrengthSensor(DopplerEntity, SensorEntity):
-    """Doppler Wifi Signal Strength Sensor class."""
-
-    _attr_entity_category = EntityCategory.DIAGNOSTIC
-    _attr_native_unit_of_measurement = PERCENTAGE
-
-    @property
-    def native_value(self) -> int:
-        """Return the native value of the sensor."""
-        return int(self.device_data[ATTR_WIFI].signal_strength)
+        return self._state_func(self.device_data[self._state_key])
 
 
 # class DopplerAlarmsSensor(DopplerEntity,SensorEntity):

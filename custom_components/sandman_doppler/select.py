@@ -1,8 +1,10 @@
 """Select platform for Doppler Sandman."""
 from __future__ import annotations
 
+from collections.abc import Callable, Coroutine
 from dataclasses import dataclass
 from enum import Enum
+from typing import Any
 import zoneinfo
 
 from doppyler.const import (
@@ -32,25 +34,26 @@ class DopplerEnumSelectEntityDescription(SelectEntityDescription):
 
     enum_cls: Enum | None = None
     state_key: str | None = None
-    set_value_func_name: str | None = None
-    option_attr_name: str | None = None
+    state_func: Callable[[Enum], str] = lambda x: x
+    set_value_func: Callable[[Doppler, int], Coroutine[Any, Any, Enum]] = lambda x: x
 
 
-ENTITY_DESCRIPTIONS = [
+ENUM_SELECT_ENTITY_DESCRIPTIONS = [
     DopplerEnumSelectEntityDescription(
         "Sound Preset",
         name="Sound Preset",
         enum_cls=SoundPreset,
         state_key=ATTR_SOUND_PRESET,
-        set_value_func_name="set_sound_preset",
+        state_func=lambda x: normalize_enum_name(x),
+        set_value_func=lambda dev, val: dev.set_sound_preset(val),
     ),
     DopplerEnumSelectEntityDescription(
         "Weather Mode",
         name="Weather Mode",
         enum_cls=WeatherMode,
         state_key=ATTR_WEATHER,
-        option_attr_name="mode",
-        set_value_func_name="set_weather_configuration",
+        state_func=lambda x: normalize_enum_name(x.mode),
+        set_value_func=lambda dev, val: dev.set_weather_configuration(mode=val),
     ),
 ]
 
@@ -69,7 +72,7 @@ async def async_setup_entry(
                 DopplerTimezoneSelect(coordinator, entry, device, "Timezone"),
                 *(
                     DopplerEnumSelect(coordinator, entry, device, description)
-                    for description in ENTITY_DESCRIPTIONS
+                    for description in ENUM_SELECT_ENTITY_DESCRIPTIONS
                 ),
             ]
         )
@@ -90,11 +93,11 @@ class DopplerEnumSelect(DopplerEntity, SelectEntity):
     ) -> None:
         """Initialize the select."""
         super().__init__(coordinator, entry, device, description.name)
-        self.entity_description: DopplerEnumSelectEntityDescription = description
-        self._enum_cls = description.enum_cls
-        self._state_key = description.state_key
-        self._set_value_func_name = description.set_value_func_name
-        self._option_attr_name = description.option_attr_name
+        self.entity_description = description
+        self._enum_cls: Enum = description.enum_cls
+        self._state_key: str = description.state_key
+        self._state_func = description.state_func
+        self._set_value_func = description.set_value_func
 
         self._attr_options = [
             normalize_enum_name(enum_val) for enum_val in self._enum_cls
@@ -104,21 +107,14 @@ class DopplerEnumSelect(DopplerEntity, SelectEntity):
     def current_option(self) -> str:
         """Return the current option."""
         current_option = self.device_data[self._state_key]
-        if self._option_attr_name:
-            return normalize_enum_name(getattr(current_option, self._option_attr_name))
-        return normalize_enum_name(current_option)
+        return self._state_func(current_option)
 
     async def async_select_option(self, option: str) -> None:
         """Change the selected option."""
         enum_val = get_enum_from_name(self._enum_cls, option)
-        if self._option_attr_name:
-            self.device_data[self._state_key] = await getattr(
-                self.device, self._set_value_func_name
-            )(**{self._option_attr_name: enum_val})
-        else:
-            self.device_data[self._state_key] = await getattr(
-                self.device, self._set_value_func_name
-            )(enum_val)
+        self.device_data[self._state_key] = await self._set_value_func(
+            self.device, enum_val
+        )
 
 
 class DopplerTimeModeSelect(DopplerEntity, SelectEntity):

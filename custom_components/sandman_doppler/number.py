@@ -1,10 +1,23 @@
 """Number platform for Doppler Sandman."""
 from __future__ import annotations
 
+from collections.abc import Callable, Coroutine
+from dataclasses import dataclass
 import logging
+from typing import Any
 
-from doppyler.const import ATTR_TIME_OFFSET, ATTR_VOLUME_LEVEL
-from homeassistant.components.number import NumberEntity, NumberMode
+from doppyler.const import (
+    ATTR_DAY_TO_NIGHT_TRANSITION_VALUE,
+    ATTR_NIGHT_TO_DAY_TRANSITION_VALUE,
+    ATTR_TIME_OFFSET,
+    ATTR_VOLUME_LEVEL,
+)
+from doppyler.model.doppler import Doppler
+from homeassistant.components.number import (
+    NumberEntity,
+    NumberEntityDescription,
+    NumberMode,
+)
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import PERCENTAGE
 from homeassistant.core import HomeAssistant
@@ -18,6 +31,74 @@ from .entity import DopplerEntity
 _LOGGER = logging.getLogger(__name__)
 
 
+@dataclass
+class DopplerNumberEntityDescription(NumberEntityDescription):
+    """Class to describe Doppler number entities."""
+
+    state_key: str | None = None
+    state_func: Callable[[Any], int] = lambda x: x
+    set_value_func: Callable[[Doppler, int], Coroutine[Any, Any, int]] | None = None
+    mode: NumberMode = NumberMode.AUTO
+
+
+NUMBER_ENTITY_DESCRIPTIONS = [
+    DopplerNumberEntityDescription(
+        "Volume Level",
+        name="Volume Level",
+        icon="mdi:volume-high",
+        native_min_value=0,
+        native_max_value=100,
+        native_step=1,
+        mode=NumberMode.SLIDER,
+        native_unit_of_measurement=PERCENTAGE,
+        state_key=ATTR_VOLUME_LEVEL,
+        set_value_func=lambda dev, val: dev.set_volume_level(int(val)),
+    ),
+    DopplerNumberEntityDescription(
+        "Time Offset",
+        name="Time Offset",
+        icon="mdi:clock",
+        native_min_value=-60,
+        native_max_value=60,
+        native_step=1,
+        mode=NumberMode.BOX,
+        native_unit_of_measurement="min",
+        entity_category=EntityCategory.CONFIG,
+        state_key=ATTR_TIME_OFFSET,
+        state_func=lambda x: x.total_seconds() // 60,
+        set_value_func=lambda dev, val: dev.set_offset(int(val)),
+    ),
+    DopplerNumberEntityDescription(
+        "Day to Night Transition",
+        name="Day to Night Transition",
+        icon="mdi:weather-night",
+        native_min_value=0,
+        native_max_value=100,
+        native_step=0.01,
+        mode=NumberMode.BOX,
+        native_unit_of_measurement=PERCENTAGE,
+        entity_category=EntityCategory.CONFIG,
+        state_key=ATTR_DAY_TO_NIGHT_TRANSITION_VALUE,
+        state_func=lambda x: round(x, 2),
+        set_value_func=lambda dev, val: dev.set_day_to_night_transition_value(val),
+    ),
+    DopplerNumberEntityDescription(
+        "Night to Day Transition",
+        name="Night to Day Transition",
+        icon="mdi:weather-sunny",
+        native_min_value=0,
+        native_max_value=100,
+        native_step=0.01,
+        mode=NumberMode.BOX,
+        native_unit_of_measurement=PERCENTAGE,
+        entity_category=EntityCategory.CONFIG,
+        state_key=ATTR_NIGHT_TO_DAY_TRANSITION_VALUE,
+        state_func=lambda x: round(x, 2),
+        set_value_func=lambda dev, val: dev.set_night_to_day_transition_value(val),
+    ),
+]
+
+
 async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_devices: AddEntitiesCallback
 ) -> None:
@@ -26,51 +107,44 @@ async def async_setup_entry(
     entities = []
     for device in coordinator.api.devices.values():
         entities.extend(
+            # [
+            #     DopplerVolumeLevelNumber(coordinator, entry, device, "Volume Level"),
+            #     DopplerTimeOffsetNumber(coordinator, entry, device, "Time Offset"),
+            # ]
             [
-                DopplerVolumeLevelNumber(coordinator, entry, device, "Volume Level"),
-                DopplerTimeOffsetNumber(coordinator, entry, device, "Time Offset"),
+                DopplerNumber(coordinator, entry, device, description)
+                for description in NUMBER_ENTITY_DESCRIPTIONS
             ]
         )
     async_add_devices(entities)
 
 
-class DopplerVolumeLevelNumber(DopplerEntity, NumberEntity):
-    """Doppler Volume Level Number class."""
+class DopplerNumber(DopplerEntity, NumberEntity):
+    """Doppler Number Entity."""
 
-    _attr_native_step = 1
-    _attr_native_min_value = 0
-    _attr_native_max_value = 100
-    _attr_native_unit_of_measurement = PERCENTAGE
+    def __init__(
+        self,
+        coordinator: DopplerDataUpdateCoordinator,
+        entry: ConfigEntry,
+        device,
+        description: DopplerNumberEntityDescription,
+    ) -> None:
+        """Initialize the entity."""
+        super().__init__(coordinator, entry, device, description.name)
+        self.entity_description = description
+        self._state_key = description.state_key
+        self._state_func = description.state_func
+        self._set_value_func = description.set_value_func
+
+        self._attr_mode = description.mode
 
     @property
-    def native_value(self) -> int:
-        """Return the current value"""
-        return self.device_data[ATTR_VOLUME_LEVEL]
+    def value(self) -> int:
+        """Return the value of the number."""
+        return self._state_func(self.device_data[self._state_key])
 
     async def async_set_native_value(self, value: int) -> None:
-        """Update the current volume value"""
-        self.device_data[ATTR_VOLUME_LEVEL] = await self.device.set_volume_level(
+        """Set the value of the number."""
+        self.device_data[self._state_key] = await self._set_value_func(
             self.device, value
-        )
-
-
-class DopplerTimeOffsetNumber(DopplerEntity, NumberEntity):
-    """Doppler Time Offset class."""
-
-    _attr_native_step = 1
-    _attr_native_min_value = -60
-    _attr_native_max_value = 60
-    _attr_mode = NumberMode.BOX
-    _attr_entity_category = EntityCategory.CONFIG
-    _attr_native_unit_of_measurement = "minutes"
-
-    @property
-    def native_value(self) -> int:
-        """Return the current value"""
-        return self.device_data[ATTR_TIME_OFFSET].total_seconds() // 60
-
-    async def async_set_native_value(self, value: int) -> None:
-        """Update the current volume value"""
-        self.device_data[ATTR_TIME_OFFSET] = await self.device.set_offset(
-            self.device, int(value)
         )
