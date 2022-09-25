@@ -4,7 +4,6 @@ Raman:
     - [ ] Weather wake up time sensor
     - [ ] Handle add and remove devices
     - [ ] Allow sync to work across affected entities
-    - [ ] Change the base entity description to accept an entity description instead of a name and fix everything upstream
     - [ ] Validate entity control works (make sure function lambdas work as expected)
     - [ ] Review services
 

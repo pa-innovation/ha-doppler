@@ -45,9 +45,8 @@ class DopplerSwitchEntityDescription(SwitchEntityDescription):
 
     state_key: str | None = None
     state_func: Callable[[Any], Any] = lambda x: x
-    set_value_func: Coroutine[Any, Any, Any] | None = None
+    set_value_func: Callable[[Doppler, bool], Coroutine[Any, Any, bool]] = None
     set_value_func_name: str | None = None
-    is_on_attr_name: str | None = None
 
 
 ENTITY_DESCRIPTIONS = [
@@ -110,7 +109,7 @@ ENTITY_DESCRIPTIONS = [
         name="Weather Service",
         state_key=ATTR_WEATHER,
         state_func=lambda x: x.enabled,
-        set_value_func=lambda dev, val: dev.set_weather_mode(enabled=val),
+        set_value_func=lambda dev, val: dev.set_weather_configuration(enabled=val),
     ),
     DopplerSwitchEntityDescription(
         "Sync: Button and Display Brightness",
@@ -149,46 +148,31 @@ async def async_setup_entry(
     async_add_devices(entities)
 
 
-class DopplerSwitch(DopplerEntity, SwitchEntity):
+class DopplerSwitch(DopplerEntity[DopplerSwitchEntityDescription], SwitchEntity):
     """Base class for Doppler switches."""
 
     _attr_device_class: SwitchDeviceClass.SWITCH
     _attr_entity_category = EntityCategory.CONFIG
 
-    def __init__(
-        self,
-        coordinator: DopplerDataUpdateCoordinator,
-        entry: ConfigEntry,
-        device: Doppler,
-        description: DopplerSwitchEntityDescription,
-    ) -> None:
-        """Initialize the switch."""
-        super().__init__(coordinator, entry, device, description.name)
-        self.entity_description = description
-        self._state_key: str = description.state_key
-        self._state_func = description.state_func
-        self._set_value_func = description.set_value_func
-        self._set_value_func_name = description.set_value_func_name
-
     @property
     def is_on(self) -> bool:
         """Return true if switch is on."""
-        return self._state_func(self.device_data[self._state_key])
+        return self.ed.state_func(self.device_data[self.ed.state_key])
 
     async def async_turn_on(self, **kwargs) -> None:
         """Turn the switch on."""
-        if self._set_value_func:
-            new_val = await self._set_value_func(self.device, True)
+        if self.ed.set_value_func:
+            new_val = await self.ed.set_value_func(self.device, True)
         else:
-            new_val = await getattr(self.device, self._set_value_func_name)(True)
+            new_val = await getattr(self.device, self.ed.set_value_func_name)(True)
 
-        self.device_data[self._state_key] = new_val
+        self.device_data[self.ed.state_key] = new_val
 
     async def async_turn_off(self, **kwargs) -> None:
         """Turn the switch off."""
-        if self._set_value_func:
-            new_val = await self._set_value_func(self.device, False)
+        if self.ed.set_value_func:
+            new_val = await self.ed.set_value_func(self.device, False)
         else:
-            new_val = await getattr(self.device, self._set_value_func_name)(False)
+            new_val = await getattr(self.device, self.ed.set_value_func_name)(False)
 
-        self.device_data[self._state_key] = new_val
+        self.device_data[self.ed.state_key] = new_val

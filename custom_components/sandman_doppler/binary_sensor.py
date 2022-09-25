@@ -63,22 +63,12 @@ async def async_setup_entry(
     async_add_devices(entities)
 
 
-class DopplerBinarySensor(DopplerEntity, BinarySensorEntity):
+class DopplerBinarySensor(
+    DopplerEntity[DopplerBinarySensorEntityDescription], BinarySensorEntity
+):
     """Doppler Day/Night Binary Sensor class."""
-
-    def __init__(
-        self,
-        coordinator: DopplerDataUpdateCoordinator,
-        entry: ConfigEntry,
-        device: Doppler,
-        description: DopplerBinarySensorEntityDescription,
-    ) -> None:
-        """Initialize the sensor."""
-        super().__init__(coordinator, entry, device, description.name)
-        self.entity_description = description
-        self._state_key = description.state_key
 
     @property
     def is_on(self) -> bool:
         """Return the state of the sensor."""
-        return self.device_data[self._state_key]
+        return self.device_data[self.ed.state_key]

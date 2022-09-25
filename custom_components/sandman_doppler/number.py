@@ -111,32 +111,21 @@ async def async_setup_entry(
     async_add_devices(entities)
 
 
-class DopplerNumber(DopplerEntity, NumberEntity):
+class DopplerNumber(DopplerEntity[DopplerNumberEntityDescription], NumberEntity):
     """Doppler Number Entity."""
 
-    def __init__(
-        self,
-        coordinator: DopplerDataUpdateCoordinator,
-        entry: ConfigEntry,
-        device,
-        description: DopplerNumberEntityDescription,
-    ) -> None:
-        """Initialize the entity."""
-        super().__init__(coordinator, entry, device, description.name)
-        self.entity_description = description
-        self._state_key = description.state_key
-        self._state_func = description.state_func
-        self._set_value_func = description.set_value_func
-
-        self._attr_mode = description.mode
+    @property
+    def mode(self) -> NumberMode:
+        """Return number mode."""
+        return self.ed.mode
 
     @property
     def native_value(self) -> int:
         """Return the value of the number."""
-        return self._state_func(self.device_data[self._state_key])
+        return self.ed.state_func(self.device_data[self.ed.state_key])
 
     async def async_set_native_value(self, value: int) -> None:
         """Set the value of the number."""
-        self.device_data[self._state_key] = await self._set_value_func(
+        self.device_data[self.ed.state_key] = await self.ed.set_value_func(
             self.device, value
         )

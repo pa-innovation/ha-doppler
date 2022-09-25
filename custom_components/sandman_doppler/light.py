@@ -122,42 +122,17 @@ async def async_setup_entry(
     async_add_devices(entities)
 
 
-class DopplerLight(DopplerEntity, LightEntity):
+class DopplerLight(DopplerEntity[DopplerLightEntityDescription], LightEntity):
     """Doppler Light class."""
 
     _attr_color_mode = COLOR_MODE_RGB
     _attr_supported_color_modes = {COLOR_MODE_RGB}
     _attr_is_on = True
 
-    def __init__(
-        self,
-        coordinator: DopplerDataUpdateCoordinator,
-        entry: ConfigEntry,
-        device: Doppler,
-        description: DopplerLightEntityDescription,
-    ) -> None:
-        """Initialize the light."""
-        super().__init__(coordinator, entry, device, description.name)
-        self.entity_description = description
-        self._color_key: str = description.color_key
-        self._set_color_func: Callable[
-            [Doppler, Color], Coroutine[Any, Any, Color]
-        ] = description.set_color_func
-        self._brightness_key: str = description.brightness_key
-        self._set_brightness_func: Callable[
-            [Doppler, Color], Coroutine[Any, Any, int | float]
-        ] = description.set_brightness_func
-        self._opposite_day_or_night: Literal[
-            "day", "night"
-        ] = description.opposite_day_or_night
-        self._opposite_display_or_button: Literal[
-            "display", "button"
-        ] = description.opposite_display_or_button
-
     @property
     def rgb_color(self) -> tuple[int, int, int] | None:
         """Return the rgb color value [int, int, int]."""
-        color: Color | None = self.device_data[self._color_key]
+        color: Color | None = self.device_data[self.ed.color_key]
         if not color:
             return None
         return (color.red, color.green, color.blue)
@@ -165,7 +140,7 @@ class DopplerLight(DopplerEntity, LightEntity):
     @property
     def brightness(self) -> int:
         """Return the brightness of this light between 0..255."""
-        brightness = self.device_data[self._brightness_key]
+        brightness = self.device_data[self.ed.brightness_key]
         if brightness is not None:
             return brightness * 255 // 100
         return 0
@@ -175,11 +150,11 @@ class DopplerLight(DopplerEntity, LightEntity):
         brightness = kwargs.get(ATTR_BRIGHTNESS)
         rgb_color = kwargs.get(ATTR_RGB_COLOR)
         if brightness is not None:
-            self.device_data[self._brightness_key] = await self._set_brightness_func(
-                self.device, brightness * 100 // 255
-            )
+            self.device_data[
+                self.ed.brightness_key
+            ] = await self.ed.set_brightness_func(self.device, brightness * 100 // 255)
         if rgb_color is not None:
-            self.device_data[self._color_key] = await self._set_color_func(
+            self.device_data[self.ed.color_key] = await self.ed.set_color_func(
                 self.device, Color(rgb_color[0], rgb_color[1], rgb_color[2])
             )
 
@@ -187,6 +162,6 @@ class DopplerLight(DopplerEntity, LightEntity):
         """Turn the device off."""
         _LOGGER.warning(
             "Turning off the Doppler %s %s is not supported.",
-            self._opposite_display_or_button,
-            "light" if self._opposite_display_or_button == "display" else "lights",
+            self.ed.opposite_display_or_button,
+            "light" if self.ed.opposite_display_or_button == "display" else "lights",
         )

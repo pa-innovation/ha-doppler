@@ -52,6 +52,7 @@ ENUM_SELECT_ENTITY_DESCRIPTIONS = [
     DopplerEnumSelectEntityDescription(
         "Sound Preset",
         name="Sound Preset",
+        entity_category=EntityCategory.CONFIG,
         enum_cls=SoundPreset,
         state_key=ATTR_SOUND_PRESET,
         state_func=lambda x: normalize_enum_name(x),
@@ -60,6 +61,7 @@ ENUM_SELECT_ENTITY_DESCRIPTIONS = [
     DopplerEnumSelectEntityDescription(
         "Weather Mode",
         name="Weather Mode",
+        entity_category=EntityCategory.CONFIG,
         enum_cls=WeatherMode,
         state_key=ATTR_WEATHER,
         state_func=lambda x: normalize_enum_name(x.mode),
@@ -71,16 +73,16 @@ SELECT_ENTITY_DESCRIPTIONS = [
     DopplerSelectEntityDescription(
         "Time Mode",
         name="Time Mode",
-        state_key=ATTR_TIME_MODE,
         entity_category=EntityCategory.CONFIG,
+        state_key=ATTR_TIME_MODE,
         options_func=lambda _: ["12", "24"],
         set_value_func=lambda dev, val: dev.set_time_mode(int(val)),
     ),
     DopplerSelectEntityDescription(
         "Timezone",
         name="Timezone",
-        state_key=ATTR_TIMEZONE,
         entity_category=EntityCategory.CONFIG,
+        state_key=ATTR_TIMEZONE,
         options_func=lambda _: sorted(list(zoneinfo.available_timezones())),
         set_value_func=lambda dev, val: dev.set_timezone(zoneinfo.ZoneInfo(val)),
     ),
@@ -110,74 +112,45 @@ async def async_setup_entry(
     async_add_devices(entities)
 
 
-class DopplerEnumSelect(DopplerEntity, SelectEntity):
+class DopplerEnumSelect(
+    DopplerEntity[DopplerEnumSelectEntityDescription], SelectEntity
+):
     """Doppler Select class for enum attributes."""
-
-    _attr_entity_category = EntityCategory.CONFIG
-
-    def __init__(
-        self,
-        coordinator: DopplerDataUpdateCoordinator,
-        entry: ConfigEntry,
-        device: Doppler,
-        description: DopplerEnumSelectEntityDescription,
-    ) -> None:
-        """Initialize the select."""
-        super().__init__(coordinator, entry, device, description.name)
-        self.entity_description = description
-        self._enum_cls: Enum = description.enum_cls
-        self._state_key: str = description.state_key
-        self._state_func = description.state_func
-        self._set_value_func = description.set_value_func
-
-        self._attr_options = [
-            normalize_enum_name(enum_val) for enum_val in self._enum_cls
-        ]
-
-    @property
-    def current_option(self) -> str:
-        """Return the current option."""
-        current_option = self.device_data[self._state_key]
-        return self._state_func(current_option)
-
-    async def async_select_option(self, option: str) -> None:
-        """Change the selected option."""
-        enum_val = get_enum_from_name(self._enum_cls, option)
-        self.device_data[self._state_key] = await self._set_value_func(
-            self.device, enum_val
-        )
-
-
-class DopplerSelect(DopplerEntity, SelectEntity):
-    """Doppler Select class."""
-
-    def __init__(
-        self,
-        coordinator: DopplerDataUpdateCoordinator,
-        entry: ConfigEntry,
-        device: Doppler,
-        description: DopplerSelectEntityDescription,
-    ) -> None:
-        """Initialize the select."""
-        super().__init__(coordinator, entry, device, description.name)
-        self.entity_description = description
-        self._state_key: str = description.state_key
-        self._options_func = description.options_func
-        self._state_func = description.state_func
-        self._set_value_func = description.set_value_func
 
     @property
     def options(self) -> list[str]:
         """Return a set of selectable options."""
-        return self._options_func(self.device)
+        return [normalize_enum_name(enum_val) for enum_val in self.ed.enum_cls]
 
     @property
     def current_option(self) -> str:
         """Return the current option."""
-        return self._state_func(self.device_data[self._state_key])
+        current_option = self.device_data[self.ed.state_key]
+        return self.ed.state_func(current_option)
 
     async def async_select_option(self, option: str) -> None:
         """Change the selected option."""
-        self.device_data[self._state_key] = await self._set_value_func(
+        enum_val = get_enum_from_name(self.ed.enum_cls, option)
+        self.device_data[self.ed.state_key] = await self.ed.set_value_func(
+            self.device, enum_val
+        )
+
+
+class DopplerSelect(DopplerEntity[DopplerSelectEntityDescription], SelectEntity):
+    """Doppler Select class."""
+
+    @property
+    def options(self) -> list[str]:
+        """Return a set of selectable options."""
+        return self.ed.options_func(self.device)
+
+    @property
+    def current_option(self) -> str:
+        """Return the current option."""
+        return self.ed.state_func(self.device_data[self.ed.state_key])
+
+    async def async_select_option(self, option: str) -> None:
+        """Change the selected option."""
+        self.device_data[self.ed.state_key] = await self.ed.set_value_func(
             self.device, option
         )

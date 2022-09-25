@@ -86,26 +86,13 @@ async def async_setup_entry(
     async_add_devices(entities)
 
 
-class DopplerSensor(DopplerEntity, SensorEntity):
+class DopplerSensor(DopplerEntity[DopplerSensorEntityDescription], SensorEntity):
     """Doppler sensor class."""
-
-    def __init__(
-        self,
-        coordinator: DopplerDataUpdateCoordinator,
-        entry: ConfigEntry,
-        device: Doppler,
-        description: DopplerSensorEntityDescription,
-    ):
-        """Initialize."""
-        super().__init__(coordinator, entry, device, description.name)
-        self.entity_description = description
-        self._state_key: str = description.state_key
-        self._state_func: Callable[[Any], Any] = description.state_func
 
     @property
     def native_value(self) -> Any:
         """Return the native value of the sensor."""
-        return self._state_func(self.device_data[self._state_key])
+        return self.ed.state_func(self.device_data[self.ed.state_key])
 
 
 # class DopplerAlarmsSensor(DopplerEntity,SensorEntity):
