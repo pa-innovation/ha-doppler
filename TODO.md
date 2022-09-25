@@ -4,7 +4,6 @@ Raman:
     - [ ] Allow sync to work across affected entities (test this logic and figure out the right logging)
     - [ ] Validate entity control works (make sure function lambdas work as expected)
     - [ ] Review services
-    - [ ] Update icons
 
 Cameron:
     - [ ] Review Raman's changes and ask any open questions

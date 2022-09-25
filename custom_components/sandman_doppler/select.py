@@ -35,7 +35,7 @@ class DopplerEnumSelectEntityDescription(SelectEntityDescription):
 
     enum_cls: Enum | None = None
     state_key: str | None = None
-    state_func: Callable[[Enum], str] = lambda x: x
+    state_func: Callable[[Any], int] = lambda x: x
     set_value_func: Callable[[Doppler, int], Coroutine[Any, Any, Enum]] = None
 
 
@@ -53,19 +53,20 @@ ENUM_SELECT_ENTITY_DESCRIPTIONS = [
     DopplerEnumSelectEntityDescription(
         "Sound Preset",
         name="Sound Preset",
+        icon="mdi:music",
         entity_category=EntityCategory.CONFIG,
         enum_cls=SoundPreset,
         state_key=ATTR_SOUND_PRESET,
-        state_func=lambda x: normalize_enum_name(x),
         set_value_func=lambda dev, val: dev.set_sound_preset(val),
     ),
     DopplerEnumSelectEntityDescription(
         "Weather Mode",
         name="Weather Mode",
+        icon="mdi:weather-partly-snowy-rainy",
         entity_category=EntityCategory.CONFIG,
         enum_cls=WeatherMode,
         state_key=ATTR_WEATHER,
-        state_func=lambda x: normalize_enum_name(x.mode),
+        state_func=lambda x: x.mode,
         set_value_func=lambda dev, val: dev.set_weather_configuration(mode=val),
     ),
 ]
@@ -74,6 +75,7 @@ SELECT_ENTITY_DESCRIPTIONS = [
     DopplerSelectEntityDescription(
         "Time Mode",
         name="Time Mode",
+        icon="mdi:clock",
         entity_category=EntityCategory.CONFIG,
         state_key=ATTR_TIME_MODE,
         options_func=lambda _: ["12", "24"],
@@ -82,6 +84,7 @@ SELECT_ENTITY_DESCRIPTIONS = [
     DopplerSelectEntityDescription(
         "Timezone",
         name="Timezone",
+        icon="mdi:map-clock",
         entity_category=EntityCategory.CONFIG,
         state_key=ATTR_TIMEZONE,
         options_func=lambda _: sorted(list(zoneinfo.available_timezones())),
@@ -132,7 +135,7 @@ class DopplerEnumSelect(
     def current_option(self) -> str:
         """Return the current option."""
         current_option = self.device_data[self.ed.state_key]
-        return self.ed.state_func(current_option)
+        return normalize_enum_name(self.ed.state_func(current_option))
 
     async def async_select_option(self, option: str) -> None:
         """Change the selected option."""

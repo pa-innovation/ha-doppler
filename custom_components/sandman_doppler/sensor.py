@@ -35,12 +35,14 @@ class DopplerSensorEntityDescription(SensorEntityDescription):
 
     state_key: str | None = None
     state_func: Callable[[Any], Any] | None = None
+    icon_func: Callable[[Any], Any] | None = None
 
 
 SENSOR_ENTITY_DESCRIPTIONS = [
     DopplerSensorEntityDescription(
         "Light Detected",
         name="Light Detected",
+        icon="mdi:lightbulb",
         state_class=SensorStateClass.MEASUREMENT,
         state_key=ATTR_LIGHT_SENSOR_VALUE,
         state_func=lambda x: round(x, 2),
@@ -48,6 +50,7 @@ SENSOR_ENTITY_DESCRIPTIONS = [
     DopplerSensorEntityDescription(
         "Wifi: Connected Since",
         name="Wifi Connected Since",
+        icon="mdi:connection",
         entity_category=EntityCategory.DIAGNOSTIC,
         device_class=SensorDeviceClass.TIMESTAMP,
         state_key=ATTR_WIFI,
@@ -56,6 +59,7 @@ SENSOR_ENTITY_DESCRIPTIONS = [
     DopplerSensorEntityDescription(
         "Wifi: SSID",
         name="Wifi SSID",
+        icon="mdi:wifi",
         entity_category=EntityCategory.DIAGNOSTIC,
         state_key=ATTR_WIFI,
         state_func=lambda x: x.ssid,
@@ -63,6 +67,7 @@ SENSOR_ENTITY_DESCRIPTIONS = [
     DopplerSensorEntityDescription(
         "Wifi: Signal Strength",
         name="Wifi Signal Strength",
+        icon_func=lambda x: f"mdi:wifi-strength-{(x // 25) + 1 if x else 'outline'}",
         entity_category=EntityCategory.DIAGNOSTIC,
         native_unit_of_measurement=PERCENTAGE,
         state_key=ATTR_WIFI,
@@ -95,6 +100,13 @@ async def async_setup_entry(
 
 class DopplerSensor(DopplerEntity[DopplerSensorEntityDescription], SensorEntity):
     """Doppler sensor class."""
+
+    @property
+    def icon(self) -> str | None:
+        """Return the icon for the entity."""
+        if self.ed.icon_func:
+            return self.ed.icon_func(self.native_value)
+        return super().icon
 
     @property
     def native_value(self) -> Any:

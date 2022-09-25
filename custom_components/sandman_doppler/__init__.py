@@ -10,19 +10,24 @@ from aiohttp.client import DEFAULT_TIMEOUT, ClientTimeout
 from doppyler.client import DopplerClient
 from doppyler.exceptions import DopplerException
 from doppyler.model.alarm import Alarm, AlarmDict, AlarmSource, AlarmStatus
-from doppyler.model.color import Color, ColorDict
+from doppyler.model.color import Color
 from doppyler.model.doppler import Doppler
 from doppyler.model.light_bar import LightbarDisplayDict, LightbarDisplayEffect
 from doppyler.model.main_display_text import MainDisplayText, MainDisplayTextDict
 from doppyler.model.mini_display_number import MiniDisplayNumber, MiniDisplayNumberDict
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_EMAIL, CONF_PASSWORD
+from homeassistant.const import (
+    ATTR_AREA_ID,
+    ATTR_DEVICE_ID,
+    ATTR_ENTITY_ID,
+    CONF_EMAIL,
+    CONF_PASSWORD,
+)
 from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers import config_validation as cv, device_registry as dr
+from homeassistant.helpers import device_registry as dr, entity_registry as er
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.service import ServiceCall
-from homeassistant.helpers.typing import ConfigType
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 from .const import DOMAIN, PLATFORMS
@@ -43,6 +48,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     client = DopplerClient(email, password, client_session=session, local_control=True)
 
     dev_reg = dr.async_get(hass)
+    ent_reg = er.async_get(hass)
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
@@ -72,15 +78,42 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     for device in client.devices.values():
         async_on_device_added(device)
 
-    def get_device_from_call_data(call: ServiceCall):
-        device_entry = dev_reg.async_get(call.data["doppler_device_id"])
-        dsn = next(id for id in device_entry.identifiers)[1]
-        # _LOGGER.warning(f"device_entry.identifiers is {device_entry.identifiers}")
-        # _LOGGER.warning(f"dsn is {dsn}")
-        return client.devices[dsn]
+    def get_dopplers_from_svc_targets(call: ServiceCall) -> set[Doppler]:
+        """Get dopplers from service targets."""
+        dopplers: set[Doppler] = set()
+        device_ids: set[str] = set()
+        device_ids.update(call.data.get(ATTR_DEVICE_ID, []))
+        device_ids.update(
+            {
+                entity_entry.device_id
+                for entity_id in call.data.get(ATTR_ENTITY_ID, [])
+                if (entity_entry := ent_reg.async_get(entity_id))
+                and entity_entry.device_id
+            }
+        )
+        device_ids.update(
+            {
+                dev.id
+                for area_id in call.data.get(ATTR_AREA_ID, [])
+                for dev in dr.async_entries_for_area(dev_reg, area_id)
+            }
+        )
+
+        for device_id in device_ids:
+            if not (device_entry := dev_reg.async_get(device_id)):
+                continue
+            identifier = next(id for id in device_entry.identifiers)
+            if identifier[0] != DOMAIN:
+                _LOGGER.warning(
+                    "Skipping device %s for service call because it is not a supported "
+                    "Sandman Doppler device"
+                )
+                continue
+            dopplers.add(client.devices[identifier[1]])
+
+        return dopplers
 
     async def handle_set_alarm_service(call: ServiceCall) -> None:
-        device = get_device_from_call_data(call)
         if "repeat" in call.data:
             r = call.data["repeat"]
         else:
@@ -91,7 +124,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             time_hr=int(call.data["alarm_time"].split(":")[0]),
             time_min=int(call.data["alarm_time"].split(":")[1]),
             repeat=r,
-            color=ColorDict(
+            color=Color(
                 red=int(call.data["color"][0]),
                 green=int(call.data["color"][1]),
                 blue=int(call.data["color"][2]),
@@ -101,17 +134,17 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             src=AlarmSource.APP,
             sound=call.data["sound"],
         )
-
-        result = await device.add_alarm(Alarm.from_dict(alarmdict))
-        _LOGGER.warning(f"alarm result was {result}")
+        for device in get_dopplers_from_svc_targets(call):
+            result = await device.add_alarm(Alarm.from_dict(alarmdict))
+            _LOGGER.warning(f"alarm result was {result}")
 
     async def handle_delete_alarm_service(call: ServiceCall) -> None:
-        device = get_device_from_call_data(call)
-        await device.delete_alarm(int(call.data["alarm_id"]))
+        for device in get_dopplers_from_svc_targets(call):
+            await device.delete_alarm(int(call.data["alarm_id"]))
 
     async def handle_set_main_display_service(call: ServiceCall) -> None:
-        device = get_device_from_call_data(call)
-        _LOGGER.warning(f"Called handle_set_main_display_service")
+
+        _LOGGER.warning(f"Called handle_set_main_display service")
         mdt_dict = MainDisplayTextDict(
             {
                 "text": str(call.data["display_text"]),
@@ -125,11 +158,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             }
         )
 
-        await device.set_main_display_text(MainDisplayText.from_dict(mdt_dict))
+        for device in get_dopplers_from_svc_targets(call):
+            await device.set_main_display_text(MainDisplayText.from_dict(mdt_dict))
 
     async def handle_set_mini_display_service(call: ServiceCall) -> None:
-        device = get_device_from_call_data(call)
-        _LOGGER.warning(f"Called handle_display_num_mini_service")
+        _LOGGER.warning(f"Called handle_display_num_mini service")
         mdn_dict = MiniDisplayNumberDict(
             {
                 "num": int(call.data["display_number"]),
@@ -142,13 +175,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             }
         )
 
-        await device.set_mini_display_number(MiniDisplayNumber.from_dict(mdn_dict))
+        for device in get_dopplers_from_svc_targets(call):
+            await device.set_mini_display_number(MiniDisplayNumber.from_dict(mdn_dict))
 
     async def handle_set_lightbar_color_service(call: ServiceCall) -> None:
-
-        device = get_device_from_call_data(call)
         _LOGGER.warning(f"data was {call.data}")
-        _LOGGER.warning(f"Called handle_set_lightbar_color_service")
+        _LOGGER.warning(f"Called handle_set_lightbar_color service")
         color_list = []
         for c in [
             call.data.get("lightbar_color1"),
@@ -188,16 +220,15 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             }
         )
         _LOGGER.warning(f"lbde_dict={lbde_dict}")
-        retval = await device.set_light_bar_effect(
-            LightbarDisplayEffect.from_dict(lbde_dict)
-        )
+        for device in get_dopplers_from_svc_targets(call):
+            retval = await device.set_light_bar_effect(
+                LightbarDisplayEffect.from_dict(lbde_dict)
+            )
         _LOGGER.warning(f"retval={retval.to_dict()}")
 
     async def handle_set_each_lightbar_color_service(call: ServiceCall) -> None:
-
-        device = get_device_from_call_data(call)
         _LOGGER.warning(f"data was {call.data}")
-        _LOGGER.warning(f"Called handle_set_lightbar_color_service")
+        _LOGGER.warning(f"Called handle_set_lightbar_color service")
         color_list = []
         for c in [
             call.data.get("lightbar_color1"),
@@ -254,16 +285,15 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             }
         )
         _LOGGER.warning(f"lbde_dict={lbde_dict}")
-        retval = await device.set_light_bar_effect(
-            LightbarDisplayEffect.from_dict(lbde_dict)
-        )
+        for device in get_dopplers_from_svc_targets(call):
+            retval = await device.set_light_bar_effect(
+                LightbarDisplayEffect.from_dict(lbde_dict)
+            )
         _LOGGER.warning(f"retval={retval.to_dict()}")
 
     async def handle_set_lightbar_blink_service(call: ServiceCall) -> None:
-
-        device = get_device_from_call_data(call)
         _LOGGER.warning(f"data was {call.data}")
-        _LOGGER.warning(f"Called handle_set_lightbar_color_service")
+        _LOGGER.warning(f"Called handle_set_lightbar_color service")
         color_list = []
         for c in [
             call.data.get("lightbar_color1"),
@@ -305,16 +335,15 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         )
 
         _LOGGER.warning(f"lbde_dict={lbde_dict}")
-        retval = await device.set_light_bar_effect(
-            LightbarDisplayEffect.from_dict(lbde_dict)
-        )
+        for device in get_dopplers_from_svc_targets(call):
+            retval = await device.set_light_bar_effect(
+                LightbarDisplayEffect.from_dict(lbde_dict)
+            )
         _LOGGER.warning(f"retval={retval.to_dict()}")
 
     async def handle_set_lightbar_pulse_service(call: ServiceCall) -> None:
-        device = get_device_from_call_data(call)
-
         _LOGGER.warning(f"data was {call.data}")
-        _LOGGER.warning(f"Called handle_set_lightbar_pulse_service")
+        _LOGGER.warning(f"Called handle_set_lightbar_pulse service")
         color_list = []
         for c in [
             call.data.get("lightbar_color1"),
@@ -359,15 +388,15 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         )
 
         _LOGGER.warning(f"lbde_dict={lbde_dict}")
-        retval = await device.set_light_bar_effect(
-            LightbarDisplayEffect.from_dict(lbde_dict)
-        )
+        for device in get_dopplers_from_svc_targets(call):
+            retval = await device.set_light_bar_effect(
+                LightbarDisplayEffect.from_dict(lbde_dict)
+            )
         _LOGGER.warning(f"retval={retval.to_dict()}")
 
     async def handle_set_lightbar_comet_service(call: ServiceCall) -> None:
-        device = get_device_from_call_data(call)
         _LOGGER.warning(f"data was {call.data}")
-        _LOGGER.warning(f"Called handle_set_lightbar_pulse_service")
+        _LOGGER.warning(f"Called handle_set_lightbar_pulse service")
         color_list = []
         for c in [
             call.data.get("lightbar_color1"),
@@ -418,16 +447,15 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         )
 
         _LOGGER.warning(f"lbde_dict={lbde_dict}")
-        retval = await device.set_light_bar_effect(
-            LightbarDisplayEffect.from_dict(lbde_dict)
-        )
+        for device in get_dopplers_from_svc_targets(call):
+            retval = await device.set_light_bar_effect(
+                LightbarDisplayEffect.from_dict(lbde_dict)
+            )
         _LOGGER.warning(f"retval={retval.to_dict()}")
 
     async def handle_set_lightbar_sweep_service(call: ServiceCall) -> None:
-        device = get_device_from_call_data(call)
-
         _LOGGER.warning(f"data was {call.data}")
-        _LOGGER.warning(f"Called handle_set_lightbar_sweep_service")
+        _LOGGER.warning(f"Called handle_set_lightbar_sweep service")
         color_list = []
         for c in [
             call.data.get("lightbar_color1"),
@@ -482,110 +510,67 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         )
 
         _LOGGER.warning(f"lbde_dict={lbde_dict}")
-        retval = await device.set_light_bar_effect(
-            LightbarDisplayEffect.from_dict(lbde_dict)
-        )
+        for device in get_dopplers_from_svc_targets(call):
+            retval = await device.set_light_bar_effect(
+                LightbarDisplayEffect.from_dict(lbde_dict)
+            )
         _LOGGER.warning(f"retval={retval.to_dict()}")
 
-    async def handle_set_display_color_service(call: ServiceCall) -> None:
-        device = get_device_from_call_data(call)
-
-        dayornight = call.data.get("display_day_or_night")
-        colorval = call.data.get("display_color")
-
-        if dayornight == "Day":
-            retval = await device.set_day_display_color(Color.from_list(colorval))
-        elif dayornight == "Night":
-            retval = await device.set_night_display_color(
-                device, Color.from_list(colorval)
-            )
-        else:
-            raise Exception("Got None for Dayornight")
-
-    async def handle_set_button_color_service(call: ServiceCall) -> None:
-        device = get_device_from_call_data(call)
-
-        dayornight = call.data.get("button_day_or_night")
-        colorval = call.data.get("button_color")
-
-        if dayornight == "Day":
-            retval = await device.set_day_button_color(Color.from_list(colorval))
-        elif dayornight == "Night":
-            retval = await device.set_night_button_color(Color.from_list(colorval))
-        else:
-            raise Exception("Got None for Dayornight")
-
-    async def handle_set_display_brightness_service(call: ServiceCall) -> None:
-        device = get_device_from_call_data(call)
-
-        dayornight = call.data.get("display_day_or_night")
-        brightness = call.data.get("display_brightness")
-
-        if dayornight == "Day":
-            retval = await device.set_day_display_brightness(brightness)
-        elif dayornight == "Night":
-            retval = await device.set_night_display_brightness(brightness)
-        else:
-            raise Exception("Got None for Dayornight")
-
-    async def handle_set_button_brightness_service(call: ServiceCall) -> None:
-
-        device = get_device_from_call_data(call)
-        dayornight = call.data.get("display_day_or_night")
-        brightness = call.data.get("button_brightness")
-
-        if dayornight == "Day":
-            retval = await device.set_day_button_brightness(brightness)
-        elif dayornight == "Night":
-            retval = await device.set_night_button_brightness(brightness)
-        else:
-            raise Exception("Got None for Dayornight")
-
-    hass.services.async_register(DOMAIN, "setalarmservice", handle_set_alarm_service)
+    hass.services.async_register(DOMAIN, "setalarm", handle_set_alarm_service)
     hass.services.async_register(
-        DOMAIN, "deletealarmservice", handle_delete_alarm_service
+        DOMAIN, "deletealarm", handle_delete_alarm_service
     )
     hass.services.async_register(
-        DOMAIN, "displaytextmainservice", handle_set_main_display_service
+        DOMAIN, "displaytextmain", handle_set_main_display_service
     )
     hass.services.async_register(
-        DOMAIN, "displaynumminiservice", handle_set_mini_display_service
+        DOMAIN, "displaynummini", handle_set_mini_display_service
     )
     hass.services.async_register(
-        DOMAIN, "setlightbarcolorservice", handle_set_lightbar_color_service
+        DOMAIN, "setlightbarcolor", handle_set_lightbar_color_service
     )
     hass.services.async_register(
-        DOMAIN, "seteachlightbarcolorservice", handle_set_each_lightbar_color_service
+        DOMAIN, "seteachlightbarcolor", handle_set_each_lightbar_color_service
     )
     hass.services.async_register(
-        DOMAIN, "setlightbarblinkservice", handle_set_lightbar_blink_service
+        DOMAIN, "setlightbarblink", handle_set_lightbar_blink_service
     )
     hass.services.async_register(
-        DOMAIN, "setlightbarpulseservice", handle_set_lightbar_pulse_service
+        DOMAIN, "setlightbarpulse", handle_set_lightbar_pulse_service
     )
     hass.services.async_register(
-        DOMAIN, "setlightbarcometservice", handle_set_lightbar_comet_service
+        DOMAIN, "setlightbarcomet", handle_set_lightbar_comet_service
     )
     hass.services.async_register(
-        DOMAIN, "setlightbarsweepservice", handle_set_lightbar_sweep_service
-    )
-    hass.services.async_register(
-        DOMAIN, "setdisplaycolorservice", handle_set_display_color_service
-    )
-    hass.services.async_register(
-        DOMAIN, "setbuttoncolorservice", handle_set_button_color_service
-    )
-    hass.services.async_register(
-        DOMAIN, "setdisplaybrightnessservice", handle_set_display_brightness_service
-    )
-    hass.services.async_register(
-        DOMAIN, "setbuttonbrightnessservice", handle_set_button_brightness_service
+        DOMAIN, "setlightbarsweep", handle_set_lightbar_sweep_service
     )
 
     return True
 
 
-class DopplerDataUpdateCoordinator(DataUpdateCoordinator):
+async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    """Handle removal of an entry."""
+    unloaded = all(
+        await asyncio.gather(
+            *[
+                hass.config_entries.async_forward_entry_unload(entry, platform)
+                for platform in PLATFORMS
+            ]
+        )
+    )
+    if unloaded:
+        hass.data[DOMAIN].pop(entry.entry_id)
+
+    return unloaded
+
+
+async def async_reload_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    """Reload config entry."""
+    await async_unload_entry(hass, entry)
+    await async_setup_entry(hass, entry)
+
+
+class DopplerDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
     """Class to manage fetching data from the API."""
 
     def __init__(
@@ -639,25 +624,3 @@ class DopplerDataUpdateCoordinator(DataUpdateCoordinator):
             )
             raise UpdateFailed() from exc
         return data
-
-
-async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    """Handle removal of an entry."""
-    unloaded = all(
-        await asyncio.gather(
-            *[
-                hass.config_entries.async_forward_entry_unload(entry, platform)
-                for platform in PLATFORMS
-            ]
-        )
-    )
-    if unloaded:
-        hass.data[DOMAIN].pop(entry.entry_id)
-
-    return unloaded
-
-
-async def async_reload_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
-    """Reload config entry."""
-    await async_unload_entry(hass, entry)
-    await async_setup_entry(hass, entry)

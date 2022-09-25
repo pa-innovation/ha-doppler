@@ -1,15 +1,12 @@
-setalarmservice:
+setalarm:
   name: Set Alarm
   description: Sets an Alarm on the Doppler
+  target:
+    device:
+      integration: sandman_doppler
+    entity:
+      integration: sandman_doppler
   fields:
-    doppler_device_id:
-      name: Doppler ID
-      description: ID of doppler to set alarm
-      required: true
-      advanced: false
-      selector:
-        device:
-          integration: sandman_doppler
     alarm_id:
       name: Alarm ID
       description: ID of the alarm to be set
@@ -110,18 +107,15 @@ setalarmservice:
             - 'Violin.mp3'
             - 'Waves.mp3'
 
-deletealarmservice:
+deletealarm:
   name: Delete Alarm
   description: Deletes the selected Alarm
+  target:
+    device:
+      integration: sandman_doppler
+    entity:
+      integration: sandman_doppler
   fields:
-    doppler_device_id:
-      name: Doppler ID
-      description: ID of doppler to set alarm
-      required: true
-      advanced: false
-      selector:
-        device:
-          integration: sandman_doppler
     alarm_id:
       name: Alarm ID
       description: ID of the alarm to be set
@@ -132,18 +126,16 @@ deletealarmservice:
           min: 1
           max: 255
           mode: box
-displaytextmainservice:
+
+displaytextmain:
   name: Main Display Text
   description: Display Text on Main Display
+  target:
+    device:
+      integration: sandman_doppler
+    entity:
+      integration: sandman_doppler
   fields:
-    doppler_device_id:
-      name: Doppler ID
-      description: ID of doppler whose display to write to
-      required: true
-      advanced: false
-      selector:
-        device:
-          integration: sandman_doppler
     display_text:
       name: Text to Display
       description: Text to Display
@@ -181,18 +173,15 @@ displaytextmainservice:
       selector:
         color_rgb:
 
-displaynumminiservice:
+displaynummini:
   name: Mini Display Number
   description: Display Number on Mini Display
+  target:
+    device:
+      integration: sandman_doppler
+    entity:
+      integration: sandman_doppler
   fields:
-    doppler_device_id:
-      name: Doppler ID
-      description: ID of doppler whose display to write to
-      required: true
-      advanced: false
-      selector:
-        device:
-          integration: sandman_doppler
     display_number:
       name: Number to Display
       description: Number to Display on Mini Display
@@ -221,18 +210,15 @@ displaynumminiservice:
       advanced: false
       selector:
         color_rgb:
-setlightbarcolorservice:
+setlightbarcolor:
   name: Lightbar color
   description: Sets lightbar to a single color and cycles colors if multiple colors are selected
+  target:
+    device:
+      integration: sandman_doppler
+    entity:
+      integration: sandman_doppler
   fields:
-    doppler_device_id:
-      name: Doppler ID
-      description: ID of doppler whose display to write to
-      required: true
-      advanced: false
-      selector:
-        device:
-          integration: sandman_doppler
     lightbar_color1:
       name: Color 1
       description: First color of lightbar
@@ -355,18 +341,16 @@ setlightbarcolorservice:
       advanced: false
       selector:
         boolean:
-seteachlightbarcolorservice:
+
+seteachlightbarcolor:
   name: Lightbar color Set Each
   description: Sets each dot on the lightbar individually for duration
+  target:
+    device:
+      integration: sandman_doppler
+    entity:
+      integration: sandman_doppler
   fields:
-    doppler_device_id:
-      name: Doppler ID
-      description: ID of doppler whose display to write to
-      required: true
-      advanced: false
-      selector:
-        device:
-          integration: sandman_doppler
     lightbar_color1:
       name: Color 1
       description: First color of lightbar
@@ -598,18 +582,16 @@ seteachlightbarcolorservice:
       advanced: false
       selector:
         boolean:
-setlightbarblinkservice:
+
+setlightbarblink:
   name: Lightbar Blink
   description: Sets lightbar to blink between one or more colors and black
+  target:
+    device:
+      integration: sandman_doppler
+    entity:
+      integration: sandman_doppler
   fields:
-    doppler_device_id:
-      name: Doppler ID
-      description: ID of doppler whose display to write to
-      required: true
-      advanced: false
-      selector:
-        device:
-          integration: sandman_doppler
     lightbar_color1:
       name: Color 1
       description: First color of lightbar
@@ -732,18 +714,16 @@ setlightbarblinkservice:
       advanced: false
       selector:
         boolean:
-setlightbarpulseservice:
+
+setlightbarpulse:
   name: Lightbar Pulse
   description: Sets lightbar to pulse between one or more colors and black
+  target:
+    device:
+      integration: sandman_doppler
+    entity:
+      integration: sandman_doppler
   fields:
-    doppler_device_id:
-      name: Doppler ID
-      description: ID of doppler whose display to write to
-      required: true
-      advanced: false
-      selector:
-        device:
-          integration: sandman_doppler
     lightbar_color1:
       name: Color 1
       description: First color of lightbar
@@ -876,18 +856,16 @@ setlightbarpulseservice:
       advanced: false
       selector:
         boolean:
-setlightbarcometservice:
+
+setlightbarcomet:
   name: Lightbar Comet
   description: Sets lightbar to display a comet
+  target:
+    device:
+      integration: sandman_doppler
+    entity:
+      integration: sandman_doppler
   fields:
-    doppler_device_id:
-      name: Doppler ID
-      description: ID of doppler whose display to write to
-      required: true
-      advanced: false
-      selector:
-        device:
-          integration: sandman_doppler
     lightbar_color1:
       name: Color 1
       description: First color of lightbar
@@ -1031,18 +1009,16 @@ setlightbarcometservice:
       advanced: false
       selector:
         boolean:
-setlightbarsweepservice:
+
+setlightbarsweep:
   name: Lightbar Sweep
   description: Sets lightbar to display a sweep
+  target:
+    device:
+      integration: sandman_doppler
+    entity:
+      integration: sandman_doppler
   fields:
-    doppler_device_id:
-      name: Doppler ID
-      description: ID of doppler whose display to write to
-      required: true
-      advanced: false
-      selector:
-        device:
-          integration: sandman_doppler
     lightbar_color1:
       name: Color 1
       description: First color of lightbar
@@ -1195,126 +1171,3 @@ setlightbarsweepservice:
       advanced: false
       selector:
         boolean:
-setdisplaycolorservice:
-  name: Set Display Color
-  description: Sets display color for day or night mode
-  fields:
-    doppler_device_id:
-      name: Doppler ID
-      description: ID of doppler to set color
-      required: true
-      advanced: false
-      selector:
-        device:
-          integration: sandman_doppler
-    display_day_or_night:
-      name: Day or Night
-      description: Whether to set color for day or night mode
-      required: true
-      advanced: false
-      selector:
-        select:
-          options:
-            - Day
-            - Night
-    display_color:
-      name: Display Color
-      description: Color to which to set the display 
-      required: true
-      advanced: false
-      selector:
-        color_rgb:
-setbuttoncolorservice:
-  name: Set Button Color
-  description: Sets Button color for day or night mode
-  fields:
-    doppler_device_id:
-      name: Doppler ID
-      description: ID of doppler to set color
-      required: true
-      advanced: false
-      selector:
-        device:
-          integration: sandman_doppler
-    button_day_or_night:
-      name: Day or Night
-      description: Whether to set color for day or night mode
-      required: true
-      advanced: false
-      selector:
-        select:
-          options:
-            - Day
-            - Night
-    button_color:
-      name: Button Color
-      description: Color to which to set the buttons
-      required: true
-      advanced: false
-      selector:
-        color_rgb:
-
-setdisplaybrightnessservice:
-  name: Set Display Brightness
-  description: Sets display brightness for day or night mode
-  fields:
-    doppler_device_id:
-      name: Doppler ID
-      description: ID of doppler to set brightness
-      required: true
-      advanced: false
-      selector:
-        device:
-          integration: sandman_doppler
-    display_day_or_night:
-      name: Day or Night
-      description: Whether to set brightness for day or night mode
-      required: true
-      advanced: false
-      selector:
-        select:
-          options:
-            - Day
-            - Night
-    display_brightness:
-      name: Display Brightness
-      description: Brightness to which to set the display 
-      required: true
-      advanced: false
-      selector:
-        number:
-          min: 0
-          max: 100
-          mode: box
-setbuttonbrightnessservice:
-  name: Set Button Brightness
-  description: Sets button brightness for day or night mode
-  fields:
-    doppler_device_id:
-      name: Doppler ID
-      description: ID of doppler to set brightness
-      required: true
-      advanced: false
-      selector:
-        device:
-          integration: sandman_doppler
-    display_day_or_night:
-      name: Day or Night
-      description: Whether to set brightness for day or night mode
-      required: true
-      advanced: false
-      selector:
-        select:
-          options:
-            - Day
-            - Night
-    button_brightness:
-      name: Display Brightness
-      description: Brightness to which to set the display 
-      required: true
-      advanced: false
-      selector:
-        number:
-          min: 0
-          max: 100
-          mode: box

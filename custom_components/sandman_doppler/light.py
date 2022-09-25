@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from collections.abc import Callable, Coroutine
 from dataclasses import dataclass
+import functools
 import logging
 from typing import Any, Literal
 
@@ -210,7 +211,7 @@ class DopplerLight(DopplerEntity[DopplerLightEntityDescription], LightEntity):
             signal_name = (
                 f"{self._sync_signal_prefix}_{slugify(self.ed.key)}_brightness"
             )
-            _LOGGER.error("%s sending %s signal", self.entity_id, signal_name)
+            _LOGGER.error("%s sending signal %s", self.entity_id, signal_name)
             async_dispatcher_send(self.hass, signal_name, self.entity_id, brightness)
         if rgb_color is not None:
             color = Color(rgb_color[0], rgb_color[1], rgb_color[2])
@@ -218,7 +219,7 @@ class DopplerLight(DopplerEntity[DopplerLightEntityDescription], LightEntity):
                 self.device, color
             )
             signal_name = f"{self._sync_signal_prefix}_{slugify(self.ed.key)}_color"
-            _LOGGER.error("%s sending %s signal", self.entity_id, signal_name)
+            _LOGGER.error("%s sending signal %s", self.entity_id, signal_name)
             async_dispatcher_send(self.hass, signal_name, self.entity_id, color)
         self.async_write_ha_state()
 
@@ -277,41 +278,41 @@ class DopplerLight(DopplerEntity[DopplerLightEntityDescription], LightEntity):
         self.device_data[getattr(self.ed, f"{light_property}_key")] = val
         self.async_write_ha_state()
 
-    @callback
-    def async_sync_from_day_night_color(self, src_entity_id: str, color: Color) -> None:
-        """Sync this entity from the day/night color."""
-        _LOGGER.error("%s called sync_from_day_night_color", self.entity_id)
-        self.async_sync_from_other_entity("day_night", "color", src_entity_id, color)
+    # @callback
+    # def async_sync_from_day_night_color(self, src_entity_id: str, color: Color) -> None:
+    #     """Sync this entity from the day/night color."""
+    #     _LOGGER.error("%s called sync_from_day_night_color", self.entity_id)
+    #     self.async_sync_from_other_entity("day_night", "color", src_entity_id, color)
 
-    @callback
-    def async_sync_from_button_display_color(
-        self, src_entity_id: str, color: Color
-    ) -> None:
-        """Sync this entity from the button/display color."""
-        _LOGGER.error("%s called sync_from_button_display_color for", self.entity_id)
-        self.async_sync_from_other_entity(
-            "button_display", "color", src_entity_id, color
-        )
+    # @callback
+    # def async_sync_from_button_display_color(
+    #     self, src_entity_id: str, color: Color
+    # ) -> None:
+    #     """Sync this entity from the button/display color."""
+    #     _LOGGER.error("%s called sync_from_button_display_color for", self.entity_id)
+    #     self.async_sync_from_other_entity(
+    #         "button_display", "color", src_entity_id, color
+    #     )
 
-    @callback
-    def async_sync_from_day_night_brightness(
-        self, src_entity_id: str, brightness: int
-    ) -> None:
-        """Sync this entity from the day/night brightness."""
-        _LOGGER.error("%s called sync_from_day_night_brightness", self.entity_id)
-        self.async_sync_from_other_entity(
-            "day_night", "brightness", src_entity_id, brightness
-        )
+    # @callback
+    # def async_sync_from_day_night_brightness(
+    #     self, src_entity_id: str, brightness: int
+    # ) -> None:
+    #     """Sync this entity from the day/night brightness."""
+    #     _LOGGER.error("%s called sync_from_day_night_brightness", self.entity_id)
+    #     self.async_sync_from_other_entity(
+    #         "day_night", "brightness", src_entity_id, brightness
+    #     )
 
-    @callback
-    def async_sync_from_button_display_brightness(
-        self, src_entity_id: str, brightness: int
-    ) -> None:
-        """Sync this entity from the button/display brightness."""
-        _LOGGER.error("%s called sync_from_button_display_brightness", self.entity_id)
-        self.async_sync_from_other_entity(
-            "button_display", "brightness", src_entity_id, brightness
-        )
+    # @callback
+    # def async_sync_from_button_display_brightness(
+    #     self, src_entity_id: str, brightness: int
+    # ) -> None:
+    #     """Sync this entity from the button/display brightness."""
+    #     _LOGGER.error("%s called sync_from_button_display_brightness", self.entity_id)
+    #     self.async_sync_from_other_entity(
+    #         "button_display", "brightness", src_entity_id, brightness
+    #     )
 
     async def async_added_to_hass(self) -> None:
         """When entity is added to hass."""
@@ -319,17 +320,20 @@ class DopplerLight(DopplerEntity[DopplerLightEntityDescription], LightEntity):
 
         self._ent_reg = er.async_get(self.hass)
         for light_property in ("color", "brightness"):
-            for light_type, func_type in zip(
+            for light_type, switch_type in zip(
                 get_sync_light_types(self.ed), ("day_night", "button_display")
             ):
                 signal_name = (
                     f"{self._sync_signal_prefix}_{light_type}_{light_property}"
                 )
-                _LOGGER.error("%s connected to %s signal", self.entity_id, signal_name)
-                listener_callback: Callable[[Color | int], None] = getattr(
-                    self,
-                    f"async_sync_from_{func_type}_{light_property}",
+                _LOGGER.error("%s connected to signal %s", self.entity_id, signal_name)
+                listener_callback: Callable[[Color | int], None] = functools.partial(
+                    self.async_sync_from_other_entity, switch_type, light_property
                 )
+                # getattr(
+                #     self,
+                #     f"async_sync_from_{switch_type}_{light_property}",
+                # )
                 self.async_on_remove(
                     async_dispatcher_connect(self.hass, signal_name, listener_callback)
                 )
