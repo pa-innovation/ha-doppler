@@ -41,7 +41,7 @@ SIREN_ENTITY_DESCRIPTIONS = [
     DopplerSirenEntityDescription(
         "Alarm",
         name="Alarm",
-        icon="mdi:volume-high",
+        icon="mdi:alarm",
         available_tones_key=ATTR_ALARM_SOUNDS,
         turn_on_func=lambda dev, sound, volume: dev.play_alarm_sound(sound, volume),
         turn_off_func=lambda dev: dev.stop_alarm_sound(),
