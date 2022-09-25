@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import logging
+from collections.abc import Callable
 
 from doppyler.const import ATTR_CONNECTED_TO_ALEXA, ATTR_IS_IN_DAY_MODE
 from doppyler.model.doppler import Doppler
@@ -29,6 +30,7 @@ class DopplerBinarySensorEntityDescription(BinarySensorEntityDescription):
     """Class to describe Doppler binary sensor entities."""
 
     state_key: str | None = None
+    icon_lambda: Callable[[bool], str] | None = None
 
 
 BINARY_SENSOR_ENTITY_DESCRIPTIONS = [
@@ -37,6 +39,7 @@ BINARY_SENSOR_ENTITY_DESCRIPTIONS = [
         name="Day/Night Mode",
         device_class="sandman_doppler__day_night",
         state_key=ATTR_IS_IN_DAY_MODE,
+        icon_lambda=lambda x: "mdi:weather-sunny" if x else "mdi:weather-night",
     ),
     DopplerBinarySensorEntityDescription(
         "Alexa",
@@ -79,3 +82,10 @@ class DopplerBinarySensor(
     def is_on(self) -> bool:
         """Return the state of the sensor."""
         return self.device_data[self.ed.state_key]
+
+    @property
+    def icon(self) -> str | None:
+        """Return the icon of the sensor."""
+        if self.ed.icon_lambda:
+            return self.ed.icon_lambda(self.is_on)
+        return super().icon
