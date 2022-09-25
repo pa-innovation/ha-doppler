@@ -616,7 +616,9 @@ class DopplerDataUpdateCoordinator(DataUpdateCoordinator):
                 )
                 data[device.dsn] = await device.get_all_data()
         except DopplerException as exc:
-            _LOGGER.debug("Exception received during update (%s: %s)", type(exc), exc)
+            _LOGGER.debug(
+                "Exception received during update (%s: %s)", type(exc).__name__, exc
+            )
             raise UpdateFailed() from exc
         return data
 

@@ -38,15 +38,14 @@ class DopplerSensorEntityDescription(SensorEntityDescription):
 
 SENSOR_ENTITY_DESCRIPTIONS = [
     DopplerSensorEntityDescription(
-        "Light Saturation",
-        name="Light Saturation",
+        "Light Detected",
+        name="Light Detected",
         state_class=SensorStateClass.MEASUREMENT,
-        native_unit_of_measurement=PERCENTAGE,
         state_key=ATTR_LIGHT_SENSOR_VALUE,
         state_func=lambda x: round(x, 2),
     ),
     DopplerSensorEntityDescription(
-        "Wifi Connected Since",
+        "Wifi: Connected Since",
         name="Wifi Connected Since",
         entity_category=EntityCategory.DIAGNOSTIC,
         device_class=SensorDeviceClass.TIMESTAMP,
@@ -54,14 +53,14 @@ SENSOR_ENTITY_DESCRIPTIONS = [
         state_func=lambda x: dt_util.now() - x.uptime,
     ),
     DopplerSensorEntityDescription(
-        "Wifi SSID",
+        "Wifi: SSID",
         name="Wifi SSID",
         entity_category=EntityCategory.DIAGNOSTIC,
         state_key=ATTR_WIFI,
         state_func=lambda x: x.ssid,
     ),
     DopplerSensorEntityDescription(
-        "Wifi Signal Strength",
+        "Wifi: Signal Strength",
         name="Wifi Signal Strength",
         entity_category=EntityCategory.DIAGNOSTIC,
         native_unit_of_measurement=PERCENTAGE,

@@ -35,7 +35,17 @@ class DopplerEnumSelectEntityDescription(SelectEntityDescription):
     enum_cls: Enum | None = None
     state_key: str | None = None
     state_func: Callable[[Enum], str] = lambda x: x
-    set_value_func: Callable[[Doppler, int], Coroutine[Any, Any, Enum]] = lambda x: x
+    set_value_func: Callable[[Doppler, int], Coroutine[Any, Any, Enum]] = None
+
+
+@dataclass
+class DopplerSelectEntityDescription(SelectEntityDescription):
+    """Class to describe Doppler select entities."""
+
+    state_key: str | None = None
+    options_func: Callable[[Doppler], list[str]] = None
+    state_func: Callable[[Any], str] = lambda x: str(x)
+    set_value_func: Callable[[Doppler, str], Coroutine[Any, Any, Any]] = None
 
 
 ENUM_SELECT_ENTITY_DESCRIPTIONS = [
@@ -57,6 +67,25 @@ ENUM_SELECT_ENTITY_DESCRIPTIONS = [
     ),
 ]
 
+SELECT_ENTITY_DESCRIPTIONS = [
+    DopplerSelectEntityDescription(
+        "Time Mode",
+        name="Time Mode",
+        state_key=ATTR_TIME_MODE,
+        entity_category=EntityCategory.CONFIG,
+        options_func=lambda _: ["12", "24"],
+        set_value_func=lambda dev, val: dev.set_time_mode(int(val)),
+    ),
+    DopplerSelectEntityDescription(
+        "Timezone",
+        name="Timezone",
+        state_key=ATTR_TIMEZONE,
+        entity_category=EntityCategory.CONFIG,
+        options_func=lambda _: sorted(list(zoneinfo.available_timezones())),
+        set_value_func=lambda dev, val: dev.set_timezone(zoneinfo.ZoneInfo(val)),
+    ),
+]
+
 
 async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_devices: AddEntitiesCallback
@@ -67,14 +96,16 @@ async def async_setup_entry(
     entities = []
     for device in coordinator.api.devices.values():
         entities.extend(
-            [
-                DopplerTimeModeSelect(coordinator, entry, device, "Time Mode"),
-                DopplerTimezoneSelect(coordinator, entry, device, "Timezone"),
-                *(
-                    DopplerEnumSelect(coordinator, entry, device, description)
-                    for description in ENUM_SELECT_ENTITY_DESCRIPTIONS
-                ),
-            ]
+            (
+                DopplerSelect(coordinator, entry, device, description)
+                for description in SELECT_ENTITY_DESCRIPTIONS
+            )
+        )
+        entities.extend(
+            (
+                DopplerEnumSelect(coordinator, entry, device, description)
+                for description in ENUM_SELECT_ENTITY_DESCRIPTIONS
+            )
         )
     async_add_devices(entities)
 
@@ -117,38 +148,36 @@ class DopplerEnumSelect(DopplerEntity, SelectEntity):
         )
 
 
-class DopplerTimeModeSelect(DopplerEntity, SelectEntity):
-    """Doppler Time Mode Select class."""
+class DopplerSelect(DopplerEntity, SelectEntity):
+    """Doppler Select class."""
 
-    _attr_entity_category = EntityCategory.CONFIG
-
-    _attr_options = ["12", "24"]
-
-    @property
-    def current_option(self) -> str:
-        """Return the current option."""
-        return str(self.device_data[ATTR_TIME_MODE])
-
-    async def async_select_option(self, option: str) -> None:
-        """Change the selected option."""
-        self.device_data[ATTR_TIME_MODE] = await self.device.set_time_mode(int(option))
-
-
-class DopplerTimezoneSelect(DopplerEntity, SelectEntity):
-    """Doppler Timezone Select class."""
-
-    _attr_entity_category = EntityCategory.CONFIG
+    def __init__(
+        self,
+        coordinator: DopplerDataUpdateCoordinator,
+        entry: ConfigEntry,
+        device: Doppler,
+        description: DopplerSelectEntityDescription,
+    ) -> None:
+        """Initialize the select."""
+        super().__init__(coordinator, entry, device, description.name)
+        self.entity_description = description
+        self._state_key: str = description.state_key
+        self._options_func = description.options_func
+        self._state_func = description.state_func
+        self._set_value_func = description.set_value_func
 
     @property
     def options(self) -> list[str]:
-        """Return a list of available options."""
-        return sorted(list(zoneinfo.available_timezones()))
+        """Return a set of selectable options."""
+        return self._options_func(self.device)
 
     @property
     def current_option(self) -> str:
         """Return the current option."""
-        return str(self.device_data[ATTR_TIMEZONE])
+        return self._state_func(self.device_data[self._state_key])
 
     async def async_select_option(self, option: str) -> None:
         """Change the selected option."""
-        self.device_data[ATTR_TIMEZONE] = await self.device.set_timezone(option)
+        self.device_data[self._state_key] = await self._set_value_func(
+            self.device, option
+        )

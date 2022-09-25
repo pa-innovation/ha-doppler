@@ -73,13 +73,11 @@ NUMBER_ENTITY_DESCRIPTIONS = [
         name="Day to Night Transition",
         icon="mdi:weather-night",
         native_min_value=0,
-        native_max_value=100,
-        native_step=0.01,
+        native_max_value=65535,
+        native_step=1,
         mode=NumberMode.BOX,
-        native_unit_of_measurement=PERCENTAGE,
         entity_category=EntityCategory.CONFIG,
         state_key=ATTR_DAY_TO_NIGHT_TRANSITION_VALUE,
-        state_func=lambda x: round(x, 2),
         set_value_func=lambda dev, val: dev.set_day_to_night_transition_value(val),
     ),
     DopplerNumberEntityDescription(
@@ -87,13 +85,11 @@ NUMBER_ENTITY_DESCRIPTIONS = [
         name="Night to Day Transition",
         icon="mdi:weather-sunny",
         native_min_value=0,
-        native_max_value=100,
-        native_step=0.01,
+        native_max_value=65535,
+        native_step=1,
         mode=NumberMode.BOX,
-        native_unit_of_measurement=PERCENTAGE,
         entity_category=EntityCategory.CONFIG,
         state_key=ATTR_NIGHT_TO_DAY_TRANSITION_VALUE,
-        state_func=lambda x: round(x, 2),
         set_value_func=lambda dev, val: dev.set_night_to_day_transition_value(val),
     ),
 ]
@@ -107,10 +103,6 @@ async def async_setup_entry(
     entities = []
     for device in coordinator.api.devices.values():
         entities.extend(
-            # [
-            #     DopplerVolumeLevelNumber(coordinator, entry, device, "Volume Level"),
-            #     DopplerTimeOffsetNumber(coordinator, entry, device, "Time Offset"),
-            # ]
             [
                 DopplerNumber(coordinator, entry, device, description)
                 for description in NUMBER_ENTITY_DESCRIPTIONS
@@ -139,7 +131,7 @@ class DopplerNumber(DopplerEntity, NumberEntity):
         self._attr_mode = description.mode
 
     @property
-    def value(self) -> int:
+    def native_value(self) -> int:
         """Return the value of the number."""
         return self._state_func(self.device_data[self._state_key])
 
