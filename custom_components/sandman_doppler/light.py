@@ -161,9 +161,7 @@ class DopplerLight(DopplerEntity[DopplerLightEntityDescription], LightEntity):
                 self.ed.brightness_key
             ] = await self.ed.set_brightness_func(self.device, brightness * 100 // 255)
         if rgb_color is not None:
-            self.device_data[
-                self.ed.color_key
-            ] = await self.ed.set_color_func(
+            self.device_data[self.ed.color_key] = await self.ed.set_color_func(
                 self.device, Color(rgb_color[0], rgb_color[1], rgb_color[2])
             )
 

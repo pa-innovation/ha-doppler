@@ -137,9 +137,9 @@ class DopplerEnumSelect(
     async def async_select_option(self, option: str) -> None:
         """Change the selected option."""
         enum_val = get_enum_from_name(self.ed.enum_cls, option)
-        self.device_data[
-            self.ed.state_key
-        ] = await self.ed.set_value_func(self.device, enum_val)
+        self.device_data[self.ed.state_key] = await self.ed.set_value_func(
+            self.device, enum_val
+        )
 
 
 class DopplerSelect(DopplerEntity[DopplerSelectEntityDescription], SelectEntity):
@@ -153,12 +153,10 @@ class DopplerSelect(DopplerEntity[DopplerSelectEntityDescription], SelectEntity)
     @property
     def current_option(self) -> str:
         """Return the current option."""
-        return self.ed.state_func(
-            self.device_data[self.ed.state_key]
-        )
+        return self.ed.state_func(self.device_data[self.ed.state_key])
 
     async def async_select_option(self, option: str) -> None:
         """Change the selected option."""
-        self.device_data[
-            self.ed.state_key
-        ] = await self.ed.set_value_func(self.device, option)
+        self.device_data[self.ed.state_key] = await self.ed.set_value_func(
+            self.device, option
+        )

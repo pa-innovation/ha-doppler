@@ -164,9 +164,7 @@ class DopplerSwitch(DopplerEntity[DopplerSwitchEntityDescription], SwitchEntity)
     @property
     def is_on(self) -> bool:
         """Return true if switch is on."""
-        return self.ed.state_func(
-            self.device_data[self.ed.state_key]
-        )
+        return self.ed.state_func(self.device_data[self.ed.state_key])
 
     async def async_turn_on(self, **kwargs) -> None:
         """Turn the switch on."""

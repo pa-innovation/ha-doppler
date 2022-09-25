@@ -129,12 +129,10 @@ class DopplerNumber(DopplerEntity[DopplerNumberEntityDescription], NumberEntity)
     @property
     def native_value(self) -> int:
         """Return the value of the number."""
-        return self.ed.state_func(
-            self.device_data[self.ed.state_key]
-        )
+        return self.ed.state_func(self.device_data[self.ed.state_key])
 
     async def async_set_native_value(self, value: int) -> None:
         """Set the value of the number."""
-        self.device_data[
-            self.ed.state_key
-        ] = await self.ed.set_value_func(self.device, value)
+        self.device_data[self.ed.state_key] = await self.ed.set_value_func(
+            self.device, value
+        )

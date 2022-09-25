@@ -25,17 +25,11 @@ from homeassistant.helpers.service import ServiceCall
 from homeassistant.helpers.typing import ConfigType
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
-from .const import DOMAIN, PLATFORMS, STARTUP_MESSAGE
+from .const import DOMAIN, PLATFORMS
 
 SCAN_INTERVAL = timedelta(seconds=900)
 
 _LOGGER = logging.getLogger(__name__)
-
-
-async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
-    """Setup integration."""
-    _LOGGER.info(STARTUP_MESSAGE)
-    return True
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:

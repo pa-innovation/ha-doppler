@@ -99,9 +99,7 @@ class DopplerSensor(DopplerEntity[DopplerSensorEntityDescription], SensorEntity)
     @property
     def native_value(self) -> Any:
         """Return the native value of the sensor."""
-        return self.ed.state_func(
-            self.device_data[self.ed.state_key]
-        )
+        return self.ed.state_func(self.device_data[self.ed.state_key])
 
 
 # class DopplerAlarmsSensor(DopplerEntity,SensorEntity):
