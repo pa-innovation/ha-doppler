@@ -17,9 +17,10 @@ from doppyler.model.main_display_text import MainDisplayText, MainDisplayTextDic
 from doppyler.model.mini_display_number import MiniDisplayNumber, MiniDisplayNumberDict
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_EMAIL, CONF_PASSWORD
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import config_validation as cv, device_registry as dr
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
+from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.service import ServiceCall
 from homeassistant.helpers.typing import ConfigType
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
@@ -47,22 +48,38 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     session = async_create_clientsession(hass, timeout=ClientTimeout(DEFAULT_TIMEOUT))
     client = DopplerClient(email, password, client_session=session, local_control=True)
 
-    coordinator = DopplerDataUpdateCoordinator(hass, entry, client)
+    dev_reg = dr.async_get(hass)
+
+    await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+
+    hass.data[DOMAIN][entry.entry_id] = coordinator = DopplerDataUpdateCoordinator(
+        hass, entry, client, dev_reg
+    )
     await coordinator.async_config_entry_first_refresh()
 
-    hass.data[DOMAIN][entry.entry_id] = coordinator
+    @callback
+    def async_on_device_added(device: Doppler) -> None:
+        """Handle device added."""
+        _LOGGER.debug("Device added: %s", device)
+        async_dispatcher_send(hass, f"{DOMAIN}_{entry.entry_id}_device_added", device)
 
-    hass.config_entries.async_setup_platforms(entry, PLATFORMS)
+    @callback
+    def async_on_device_removed(device: Doppler) -> None:
+        """Handle device removed."""
+        _LOGGER.debug("Device removed: %s", device)
+        dev_entry = dev_reg.async_get_device({(DOMAIN, device.dsn)})
+        assert dev_entry
+        dev_reg.async_remove_device(dev_entry.id)
 
-    mydevices = await client.get_devices()
-    for device in mydevices.values():
-        await device.set_sync_button_display_color(False)
-        await device.set_sync_day_night_color(False)
-        await device.set_sync_button_display_brightness(False)
+    entry.async_on_unload(client.on_device_added(async_on_device_added))
+    entry.async_on_unload(client.on_device_removed(async_on_device_removed))
+
+    # Load initial devices after the first refresh
+    for device in client.devices.values():
+        async_on_device_added(device)
 
     def get_device_from_call_data(call: ServiceCall):
-        device_registry = dr.async_get(hass)
-        device_entry = device_registry.async_get(call.data["doppler_device_id"])
+        device_entry = dev_reg.async_get(call.data["doppler_device_id"])
         dsn = next(id for id in device_entry.identifiers)[1]
         # _LOGGER.warning(f"device_entry.identifiers is {device_entry.identifiers}")
         # _LOGGER.warning(f"dsn is {dsn}")
@@ -184,6 +201,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     async def handle_set_each_lightbar_color_service(call: ServiceCall) -> None:
 
+        device = get_device_from_call_data(call)
         _LOGGER.warning(f"data was {call.data}")
         _LOGGER.warning(f"Called handle_set_lightbar_color_service")
         color_list = []
@@ -577,34 +595,31 @@ class DopplerDataUpdateCoordinator(DataUpdateCoordinator):
     """Class to manage fetching data from the API."""
 
     def __init__(
-        self, hass: HomeAssistant, entry: ConfigEntry, client: DopplerClient
+        self,
+        hass: HomeAssistant,
+        entry: ConfigEntry,
+        client: DopplerClient,
+        dev_reg: dr.DeviceRegistry,
     ) -> None:
         """Initialize."""
         self.data: dict[str, dict[str, Any]] = {}
         self.api = client
         self.platforms = []
-        self._dev_reg = None
+        self._dev_reg = dev_reg
         self._entry = entry
 
         super().__init__(hass, _LOGGER, name=DOMAIN, update_interval=SCAN_INTERVAL)
 
     async def _async_update_data(self) -> dict[str, Any]:
         """Update data via library."""
-        _LOGGER.debug("Started _async_update_data")
-        if not self._dev_reg:
-            self._dev_reg = dr.async_get(self.hass)
-
         data: dict[dict[str, Any]] = {}
-        devices: dict[str, Doppler] = {}
-        if self.api.devices:
-            devices = self.api.devices
         await self.api.get_devices()
-        if devices != self.api.devices:
-            # TODO: Signal add entities for the new device
-            pass
 
         try:
             for device in self.api.devices.values():
+                _LOGGER.debug(
+                    "Getting update for device %s (%s)", device.name, device.dsn
+                )
                 self._dev_reg.async_get_or_create(
                     config_entry_id=self._entry.entry_id,
                     identifiers={(DOMAIN, device.dsn)},
@@ -615,9 +630,18 @@ class DopplerDataUpdateCoordinator(DataUpdateCoordinator):
                     name=device.name,
                 )
                 data[device.dsn] = await device.get_all_data()
+                _LOGGER.debug(
+                    "Finished getting update for device %s (%s)",
+                    device.name,
+                    device.dsn,
+                )
         except DopplerException as exc:
             _LOGGER.debug(
-                "Exception received during update (%s: %s)", type(exc).__name__, exc
+                "Exception received during update for device %s (%s): %s: %s",
+                device.name,
+                device.dsn,
+                type(exc).__name__,
+                exc,
             )
             raise UpdateFailed() from exc
         return data

@@ -12,7 +12,8 @@ from homeassistant.components.binary_sensor import (
     BinarySensorEntityDescription,
 )
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
+from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
@@ -51,16 +52,22 @@ async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_devices: AddEntitiesCallback
 ) -> None:
     """Setup binary sensor platform."""
-    coordinator: DopplerDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]
-    entities = []
-    for device in coordinator.api.devices.values():
-        entities.extend(
-            [
-                DopplerBinarySensor(coordinator, entry, device, description)
-                for description in BINARY_SENSOR_ENTITY_DESCRIPTIONS
-            ]
+
+    @callback
+    def async_add_device(device: Doppler) -> None:
+        """Add Doppler binary sensor entities."""
+        coordinator: DopplerDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]
+        entities = [
+            DopplerBinarySensor(coordinator, entry, device, description)
+            for description in BINARY_SENSOR_ENTITY_DESCRIPTIONS
+        ]
+        async_add_devices(entities)
+
+    entry.async_on_unload(
+        async_dispatcher_connect(
+            hass, f"{DOMAIN}_{entry.entry_id}_device_added", async_add_device
         )
-    async_add_devices(entities)
+    )
 
 
 class DopplerBinarySensor(

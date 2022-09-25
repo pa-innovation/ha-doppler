@@ -18,7 +18,8 @@ from doppyler.model.sound import SoundPreset
 from doppyler.model.weather import WeatherMode
 from homeassistant.components.select import SelectEntity, SelectEntityDescription
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
+from homeassistant.helpers.dispatcher import async_dispatcher_connect
 from homeassistant.helpers.entity import EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
@@ -93,23 +94,28 @@ async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_devices: AddEntitiesCallback
 ) -> None:
     """Setup sensor platform."""
-    coordinator: DopplerDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]
 
-    entities = []
-    for device in coordinator.api.devices.values():
-        entities.extend(
-            (
-                DopplerSelect(coordinator, entry, device, description)
-                for description in SELECT_ENTITY_DESCRIPTIONS
-            )
-        )
+    @callback
+    def async_add_device(device: Doppler) -> None:
+        """Add Doppler binary sensor entities."""
+        coordinator: DopplerDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]
+        entities = [
+            DopplerSelect(coordinator, entry, device, description)
+            for description in SELECT_ENTITY_DESCRIPTIONS
+        ]
         entities.extend(
             (
                 DopplerEnumSelect(coordinator, entry, device, description)
                 for description in ENUM_SELECT_ENTITY_DESCRIPTIONS
             )
         )
-    async_add_devices(entities)
+        async_add_devices(entities)
+
+    entry.async_on_unload(
+        async_dispatcher_connect(
+            hass, f"{DOMAIN}_{entry.entry_id}_device_added", async_add_device
+        )
+    )
 
 
 class DopplerEnumSelect(
@@ -131,9 +137,9 @@ class DopplerEnumSelect(
     async def async_select_option(self, option: str) -> None:
         """Change the selected option."""
         enum_val = get_enum_from_name(self.ed.enum_cls, option)
-        self.device_data[self.ed.state_key] = await self.ed.set_value_func(
-            self.device, enum_val
-        )
+        self.device_data[
+            self.ed.state_key
+        ] = await self.ed.set_value_func(self.device, enum_val)
 
 
 class DopplerSelect(DopplerEntity[DopplerSelectEntityDescription], SelectEntity):
@@ -147,10 +153,12 @@ class DopplerSelect(DopplerEntity[DopplerSelectEntityDescription], SelectEntity)
     @property
     def current_option(self) -> str:
         """Return the current option."""
-        return self.ed.state_func(self.device_data[self.ed.state_key])
+        return self.ed.state_func(
+            self.device_data[self.ed.state_key]
+        )
 
     async def async_select_option(self, option: str) -> None:
         """Change the selected option."""
-        self.device_data[self.ed.state_key] = await self.ed.set_value_func(
-            self.device, option
-        )
+        self.device_data[
+            self.ed.state_key
+        ] = await self.ed.set_value_func(self.device, option)
