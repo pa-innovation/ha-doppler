@@ -113,20 +113,20 @@ ENTITY_DESCRIPTIONS = [
         set_value_func=lambda dev, val: dev.set_weather_configuration(enabled=val),
     ),
     DopplerSwitchEntityDescription(
-        "Sync: Button and Display Brightness",
-        name="Sync: Button and Display Brightness",
+        "Sync: Button/Display Brightness",
+        name="Sync: Button/Display Brightness",
         state_key=ATTR_SYNC_BUTTON_AND_DISPLAY_BRIGHTNESS,
         set_value_func_name="set_sync_button_display_brightness",
     ),
     DopplerSwitchEntityDescription(
-        "Sync: Button and Display Color",
-        name="Sync: Button and Display Color",
+        "Sync: Button/Display Color",
+        name="Sync: Button/Display Color",
         state_key=ATTR_SYNC_BUTTON_AND_DISPLAY_COLOR,
         set_value_func_name="set_sync_button_display_color",
     ),
     DopplerSwitchEntityDescription(
-        "Sync: Day and Night Color",
-        name="Sync: Day and Night Color",
+        "Sync: Day/Night Color",
+        name="Sync: Day/Night Color",
         state_key=ATTR_SYNC_DAY_AND_NIGHT_COLOR,
         set_value_func_name="set_sync_day_night_color",
     ),
@@ -174,6 +174,7 @@ class DopplerSwitch(DopplerEntity[DopplerSwitchEntityDescription], SwitchEntity)
             new_val = await getattr(self.device, self.ed.set_value_func_name)(True)
 
         self.device_data[self.ed.state_key] = new_val
+        self.async_write_ha_state()
 
     async def async_turn_off(self, **kwargs) -> None:
         """Turn the switch off."""
@@ -183,3 +184,4 @@ class DopplerSwitch(DopplerEntity[DopplerSwitchEntityDescription], SwitchEntity)
             new_val = await getattr(self.device, self.ed.set_value_func_name)(False)
 
         self.device_data[self.ed.state_key] = new_val
+        self.async_write_ha_state()

@@ -140,6 +140,7 @@ class DopplerEnumSelect(
         self.device_data[self.ed.state_key] = await self.ed.set_value_func(
             self.device, enum_val
         )
+        self.async_write_ha_state()
 
 
 class DopplerSelect(DopplerEntity[DopplerSelectEntityDescription], SelectEntity):
@@ -160,3 +161,4 @@ class DopplerSelect(DopplerEntity[DopplerSelectEntityDescription], SelectEntity)
         self.device_data[self.ed.state_key] = await self.ed.set_value_func(
             self.device, option
         )
+        self.async_write_ha_state()

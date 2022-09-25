@@ -25,10 +25,17 @@ from homeassistant.components.light import (
     LightEntity,
     LightEntityDescription,
 )
+from homeassistant.components.switch import DOMAIN as SWITCH_DOMAIN
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import STATE_ON
 from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers.dispatcher import async_dispatcher_connect
+from homeassistant.helpers import entity_registry as er
+from homeassistant.helpers.dispatcher import (
+    async_dispatcher_connect,
+    async_dispatcher_send,
+)
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.util import slugify
 
 from . import DopplerDataUpdateCoordinator
 from .const import DOMAIN
@@ -47,8 +54,6 @@ class DopplerLightEntityDescription(LightEntityDescription):
     set_brightness_func: Callable[
         [Doppler, Color], Coroutine[Any, Any, int | float]
     ] | None = None
-    opposite_day_or_night: Literal["day", "night"] | None = None
-    opposite_display_or_button: Literal["display", "button"] | None = None
 
 
 LIGHT_ENTITY_DESCRIPTIONS = [
@@ -62,8 +67,6 @@ LIGHT_ENTITY_DESCRIPTIONS = [
         set_brightness_func=lambda dev, brightness: dev.set_day_display_brightness(
             brightness
         ),
-        opposite_day_or_night="night",
-        opposite_display_or_button="button",
     ),
     DopplerLightEntityDescription(
         "Night Display",
@@ -75,8 +78,6 @@ LIGHT_ENTITY_DESCRIPTIONS = [
         set_brightness_func=lambda dev, brightness: dev.set_night_display_brightness(
             brightness
         ),
-        opposite_day_or_night="day",
-        opposite_display_or_button="button",
     ),
     DopplerLightEntityDescription(
         "Day Button",
@@ -88,8 +89,6 @@ LIGHT_ENTITY_DESCRIPTIONS = [
         set_brightness_func=lambda dev, brightness: dev.set_day_button_brightness(
             brightness
         ),
-        opposite_day_or_night="night",
-        opposite_display_or_button="display",
     ),
     DopplerLightEntityDescription(
         "Night Button",
@@ -101,10 +100,40 @@ LIGHT_ENTITY_DESCRIPTIONS = [
         set_brightness_func=lambda dev, brightness: dev.set_night_button_brightness(
             brightness
         ),
-        opposite_day_or_night="day",
-        opposite_display_or_button="display",
     ),
 ]
+
+
+def get_split_key(entity_description: DopplerLightEntityDescription) -> tuple[str, str]:
+    """Split entity description keys into day/night and button/display."""
+    split = entity_description.key.split(" ")
+    return (split[0].lower(), split[1].lower())
+
+
+def get_sync_light_types(
+    entity_description: DopplerLightEntityDescription,
+) -> tuple[str, str]:
+    """Get the light types to sync with for this entity."""
+    day_or_night, button_or_display = get_split_key(entity_description)
+    split = entity_description.key.split(" ")
+    return (
+        f"{get_opposite_day_or_night(split[0].lower())}_{button_or_display}",
+        f"{day_or_night}_{get_opposite_button_or_display(split[1].lower())}",
+    )
+
+
+def get_opposite_day_or_night(
+    day_or_night: Literal["day", "night"]
+) -> Literal["day", "night"]:
+    """Return the opposite day or night."""
+    return "day" if day_or_night == "night" else "night"
+
+
+def get_opposite_button_or_display(
+    button_or_display: Literal["button", "display"]
+) -> Literal["button", "display"]:
+    """Return the opposite button or display."""
+    return "button" if button_or_display == "display" else "display"
 
 
 async def async_setup_entry(
@@ -136,6 +165,23 @@ class DopplerLight(DopplerEntity[DopplerLightEntityDescription], LightEntity):
     _attr_supported_color_modes = {COLOR_MODE_RGB}
     _attr_is_on = True
 
+    def __init__(
+        self,
+        coordinator: DopplerDataUpdateCoordinator,
+        config_entry: ConfigEntry,
+        device: Doppler,
+        description: DopplerLightEntityDescription,
+    ):
+        """Initialize the Doppler Light."""
+        super().__init__(coordinator, config_entry, device, description)
+        self._ent_reg: er.EntityRegistry | None = None
+        self._sync_signal_prefix = (
+            f"{DOMAIN}_{self.config_entry.entry_id}_{self.device.dsn}_sync_from"
+        )
+        self._sync_unique_id_prefix = (
+            f"{self.config_entry.unique_id}_{self.device.dsn}_sync"
+        )
+
     @property
     def rgb_color(self) -> tuple[int, int, int] | None:
         """Return the rgb color value [int, int, int]."""
@@ -157,18 +203,133 @@ class DopplerLight(DopplerEntity[DopplerLightEntityDescription], LightEntity):
         brightness = kwargs.get(ATTR_BRIGHTNESS)
         rgb_color = kwargs.get(ATTR_RGB_COLOR)
         if brightness is not None:
+            brightness *= 100 // 255
             self.device_data[
                 self.ed.brightness_key
-            ] = await self.ed.set_brightness_func(self.device, brightness * 100 // 255)
-        if rgb_color is not None:
-            self.device_data[self.ed.color_key] = await self.ed.set_color_func(
-                self.device, Color(rgb_color[0], rgb_color[1], rgb_color[2])
+            ] = await self.ed.set_brightness_func(self.device, brightness)
+            signal_name = (
+                f"{self._sync_signal_prefix}_{slugify(self.ed.key)}_brightness"
             )
+            _LOGGER.error("%s sending %s signal", self.entity_id, signal_name)
+            async_dispatcher_send(self.hass, signal_name, self.entity_id, brightness)
+        if rgb_color is not None:
+            color = Color(rgb_color[0], rgb_color[1], rgb_color[2])
+            self.device_data[self.ed.color_key] = await self.ed.set_color_func(
+                self.device, color
+            )
+            signal_name = f"{self._sync_signal_prefix}_{slugify(self.ed.key)}_color"
+            _LOGGER.error("%s sending %s signal", self.entity_id, signal_name)
+            async_dispatcher_send(self.hass, signal_name, self.entity_id, color)
+        self.async_write_ha_state()
 
     async def async_turn_off(self, **kwargs: Any) -> None:
         """Turn the device off."""
         _LOGGER.warning(
-            "Turning off the Doppler %s %s is not supported.",
-            self.ed.opposite_display_or_button,
-            "light" if self.ed.opposite_display_or_button == "display" else "lights",
+            "Turning off the Doppler %s light is not supported.",
+            self.ed.key.lower(),
         )
+
+    @callback
+    def async_sync_from_other_entity(
+        self,
+        switch_type: str,
+        light_property: str,
+        src_entity_id: str,
+        val: int | Color,
+    ) -> None:
+        """Sync this entity from another entity."""
+        unique_id = slugify(
+            f"{self._sync_unique_id_prefix}_{switch_type}_{light_property}"
+        )
+        if not (
+            sync_entity_id := self._ent_reg.async_get_entity_id(
+                SWITCH_DOMAIN, DOMAIN, unique_id
+            )
+        ):
+            _LOGGER.debug(
+                (
+                    "No sync required for %s because sync entity with unique ID %s "
+                    "does not exist"
+                ),
+                self.entity_id,
+                unique_id,
+            )
+            return
+
+        if not (
+            (state := self.hass.states.get(sync_entity_id)) and state.state == STATE_ON
+        ):
+            _LOGGER.debug(
+                "No sync required for %s because sync entity %s is not on",
+                self.entity_id,
+                sync_entity_id,
+            )
+            return
+
+        _LOGGER.debug(
+            "Syncing %s %s from %s (%s) because sync entity %s is on",
+            self.entity_id,
+            light_property,
+            src_entity_id,
+            val,
+            sync_entity_id,
+        )
+        self.device_data[getattr(self.ed, f"{light_property}_key")] = val
+        self.async_write_ha_state()
+
+    @callback
+    def async_sync_from_day_night_color(self, src_entity_id: str, color: Color) -> None:
+        """Sync this entity from the day/night color."""
+        _LOGGER.error("%s called sync_from_day_night_color", self.entity_id)
+        self.async_sync_from_other_entity("day_night", "color", src_entity_id, color)
+
+    @callback
+    def async_sync_from_button_display_color(
+        self, src_entity_id: str, color: Color
+    ) -> None:
+        """Sync this entity from the button/display color."""
+        _LOGGER.error("%s called sync_from_button_display_color for", self.entity_id)
+        self.async_sync_from_other_entity(
+            "button_display", "color", src_entity_id, color
+        )
+
+    @callback
+    def async_sync_from_day_night_brightness(
+        self, src_entity_id: str, brightness: int
+    ) -> None:
+        """Sync this entity from the day/night brightness."""
+        _LOGGER.error("%s called sync_from_day_night_brightness", self.entity_id)
+        self.async_sync_from_other_entity(
+            "day_night", "brightness", src_entity_id, brightness
+        )
+
+    @callback
+    def async_sync_from_button_display_brightness(
+        self, src_entity_id: str, brightness: int
+    ) -> None:
+        """Sync this entity from the button/display brightness."""
+        _LOGGER.error("%s called sync_from_button_display_brightness", self.entity_id)
+        self.async_sync_from_other_entity(
+            "button_display", "brightness", src_entity_id, brightness
+        )
+
+    async def async_added_to_hass(self) -> None:
+        """When entity is added to hass."""
+        await super().async_added_to_hass()
+
+        self._ent_reg = er.async_get(self.hass)
+        for light_property in ("color", "brightness"):
+            for light_type, func_type in zip(
+                get_sync_light_types(self.ed), ("day_night", "button_display")
+            ):
+                signal_name = (
+                    f"{self._sync_signal_prefix}_{light_type}_{light_property}"
+                )
+                _LOGGER.error("%s connected to %s signal", self.entity_id, signal_name)
+                listener_callback: Callable[[Color | int], None] = getattr(
+                    self,
+                    f"async_sync_from_{func_type}_{light_property}",
+                )
+                self.async_on_remove(
+                    async_dispatcher_connect(self.hass, signal_name, listener_callback)
+                )

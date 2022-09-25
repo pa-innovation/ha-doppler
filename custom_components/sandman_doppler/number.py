@@ -136,3 +136,4 @@ class DopplerNumber(DopplerEntity[DopplerNumberEntityDescription], NumberEntity)
         self.device_data[self.ed.state_key] = await self.ed.set_value_func(
             self.device, value
         )
+        self.async_write_ha_state()

@@ -38,6 +38,6 @@ class DopplerEntity(
         self.device_data = coordinator.data[self.device.dsn]
 
         self._attr_unique_id = slugify(
-            f"{self.config_entry.unique_id}_{self.device.dsn}_{self.name}"
+            f"{self.config_entry.unique_id}_{self.device.dsn}_{self.ed.key}"
         )
         self._attr_device_info = DeviceInfo(identifiers={(DOMAIN, self.device.dsn)})
