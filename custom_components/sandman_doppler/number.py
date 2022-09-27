@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from collections.abc import Callable, Coroutine
 from dataclasses import dataclass
+from datetime import timedelta
 import logging
 from typing import Any
 
@@ -67,7 +68,7 @@ NUMBER_ENTITY_DESCRIPTIONS = [
         entity_category=EntityCategory.CONFIG,
         state_key=ATTR_TIME_OFFSET,
         state_func=lambda x: x.total_seconds() // 60,
-        set_value_func=lambda dev, val: dev.set_offset(int(val)),
+        set_value_func=lambda dev, val: dev.set_offset(timedelta(minutes=val)),
     ),
     DopplerNumberEntityDescription(
         "Day to Night Transition",
