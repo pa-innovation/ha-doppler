@@ -56,7 +56,7 @@ setalarm:
               value: Su
     color:
       name: Alarm Color
-      desciption: Color of the Alarm on the clock
+      description: Color of the Alarm on the clock
       required: true
       advanced: false
       selector:
