@@ -113,7 +113,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
         return dopplers
 
-    async def handle_set_alarm_service(call: ServiceCall) -> None:
+    async def handle_add_or_update_alarm_svc(call: ServiceCall) -> None:
         if "repeat" in call.data:
             r = call.data["repeat"]
         else:
@@ -135,25 +135,25 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             sound=call.data["sound"],
         )
         for device in get_dopplers_from_svc_targets(call):
-            result = await device.add_alarm(Alarm.from_dict(alarmdict))
+            result = await device.add_or_update_alarm(Alarm.from_dict(alarmdict))
             _LOGGER.warning(f"alarm result was {result}")
 
-    async def handle_delete_alarm_service(call: ServiceCall) -> None:
+    async def handle_delete_alarm_svc(call: ServiceCall) -> None:
         for device in get_dopplers_from_svc_targets(call):
             await device.delete_alarm(int(call.data["alarm_id"]))
 
-    async def handle_set_main_display_service(call: ServiceCall) -> None:
+    async def handle_set_main_display_svc(call: ServiceCall) -> None:
 
         _LOGGER.warning(f"Called handle_set_main_display service")
         mdt_dict = MainDisplayTextDict(
             {
-                "text": str(call.data["display_text"]),
-                "duration": int(call.data["display_duration"]),
-                "speed": int(call.data["display_speed"]),
+                "text": str(call.data["text"]),
+                "duration": int(call.data["duration"]),
+                "speed": int(call.data["speed"]),
                 "color": [
-                    int(call.data["display_color"][0]),
-                    int(call.data["display_color"][1]),
-                    int(call.data["display_color"][2]),
+                    int(call.data["color"][0]),
+                    int(call.data["color"][1]),
+                    int(call.data["color"][2]),
                 ],
             }
         )
@@ -161,16 +161,16 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         for device in get_dopplers_from_svc_targets(call):
             await device.set_main_display_text(MainDisplayText.from_dict(mdt_dict))
 
-    async def handle_set_mini_display_service(call: ServiceCall) -> None:
+    async def handle_set_mini_display_svc(call: ServiceCall) -> None:
         _LOGGER.warning(f"Called handle_display_num_mini service")
         mdn_dict = MiniDisplayNumberDict(
             {
-                "num": int(call.data["display_number"]),
-                "duration": int(call.data["display_duration"]),
+                "num": int(call.data["number"]),
+                "duration": int(call.data["duration"]),
                 "color": [
-                    int(call.data["display_color"][0]),
-                    int(call.data["display_color"][1]),
-                    int(call.data["display_color"][2]),
+                    int(call.data["color"][0]),
+                    int(call.data["color"][1]),
+                    int(call.data["color"][2]),
                 ],
             }
         )
@@ -178,28 +178,16 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         for device in get_dopplers_from_svc_targets(call):
             await device.set_mini_display_number(MiniDisplayNumber.from_dict(mdn_dict))
 
-    async def handle_set_lightbar_color_service(call: ServiceCall) -> None:
+    async def handle_set_light_bar_color_svc(call: ServiceCall) -> None:
         _LOGGER.warning(f"data was {call.data}")
-        _LOGGER.warning(f"Called handle_set_lightbar_color service")
-        color_list = []
-        for c in [
-            call.data.get("lightbar_color1"),
-            call.data.get("lightbar_color2"),
-            call.data.get("lightbar_color3"),
-            call.data.get("lightbar_color4"),
-            call.data.get("lightbar_color5"),
-            call.data.get("lightbar_color6"),
-            call.data.get("lightbar_color7"),
-            call.data.get("lightbar_color8"),
-            call.data.get("lightbar_color9"),
-            call.data.get("lightbar_color10"),
-            call.data.get("lightbar_color11"),
-            call.data.get("lightbar_color12"),
-        ]:
-            if c is not None:
-                color_list.append([c[0], c[1], c[2]])
-        s = call.data.get("lightbar_sparkle")
-        r = call.data.get("lightbar_rainbow")
+        _LOGGER.warning(f"Called handle_set_light_bar_color service")
+        color_list = [
+            [color[0], color[1], color[2]]
+            for i in range(12)
+            if (color := call.data.get(f"color_{i + 1}")) is not None
+        ]
+        s = call.data.get("sparkle")
+        r = call.data.get("rainbow")
 
         attributes_dict = {}
         attributes_dict["display"] = "set"
@@ -214,8 +202,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         lbde_dict = LightbarDisplayDict(
             {
                 "colors": color_list,
-                "duration": int(call.data["lightbar_duration"]),
-                "speed": int(call.data["lightbar_speed"]),
+                "duration": int(call.data["duration"]),
+                "speed": int(call.data["speed"]),
                 "attributes": attributes_dict,
             }
         )
@@ -226,45 +214,16 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             )
         _LOGGER.warning(f"retval={retval.to_dict()}")
 
-    async def handle_set_each_lightbar_color_service(call: ServiceCall) -> None:
+    async def handle_set_each_light_bar_color_svc(call: ServiceCall) -> None:
         _LOGGER.warning(f"data was {call.data}")
-        _LOGGER.warning(f"Called handle_set_lightbar_color service")
-        color_list = []
-        for c in [
-            call.data.get("lightbar_color1"),
-            call.data.get("lightbar_color2"),
-            call.data.get("lightbar_color3"),
-            call.data.get("lightbar_color4"),
-            call.data.get("lightbar_color5"),
-            call.data.get("lightbar_color6"),
-            call.data.get("lightbar_color7"),
-            call.data.get("lightbar_color8"),
-            call.data.get("lightbar_color9"),
-            call.data.get("lightbar_color10"),
-            call.data.get("lightbar_color11"),
-            call.data.get("lightbar_color12"),
-            call.data.get("lightbar_color13"),
-            call.data.get("lightbar_color14"),
-            call.data.get("lightbar_color15"),
-            call.data.get("lightbar_color16"),
-            call.data.get("lightbar_color17"),
-            call.data.get("lightbar_color18"),
-            call.data.get("lightbar_color19"),
-            call.data.get("lightbar_color20"),
-            call.data.get("lightbar_color21"),
-            call.data.get("lightbar_color22"),
-            call.data.get("lightbar_color23"),
-            call.data.get("lightbar_color24"),
-            call.data.get("lightbar_color25"),
-            call.data.get("lightbar_color26"),
-            call.data.get("lightbar_color27"),
-            call.data.get("lightbar_color28"),
-            call.data.get("lightbar_color29"),
-        ]:
-            if c is not None:
-                color_list.append([c[0], c[1], c[2]])
-        s = call.data.get("lightbar_sparkle")
-        r = call.data.get("lightbar_rainbow")
+        _LOGGER.warning(f"Called handle_set_light_bar_color service")
+        color_list = [
+            [color[0], color[1], color[2]]
+            for i in range(29)
+            if (color := call.data.get(f"color_{i + 1}")) is not None
+        ]
+        s = call.data.get("sparkle")
+        r = call.data.get("rainbow")
 
         attributes_dict = {}
         attributes_dict["display"] = "set-each"
@@ -279,7 +238,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         lbde_dict = LightbarDisplayDict(
             {
                 "colors": color_list,
-                "duration": int(call.data["lightbar_duration"]),
+                "duration": int(call.data["duration"]),
                 "speed": 0,
                 "attributes": attributes_dict,
             }
@@ -291,29 +250,17 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             )
         _LOGGER.warning(f"retval={retval.to_dict()}")
 
-    async def handle_set_lightbar_blink_service(call: ServiceCall) -> None:
+    async def handle_set_light_bar_blink_svc(call: ServiceCall) -> None:
         _LOGGER.warning(f"data was {call.data}")
-        _LOGGER.warning(f"Called handle_set_lightbar_color service")
-        color_list = []
-        for c in [
-            call.data.get("lightbar_color1"),
-            call.data.get("lightbar_color2"),
-            call.data.get("lightbar_color3"),
-            call.data.get("lightbar_color4"),
-            call.data.get("lightbar_color5"),
-            call.data.get("lightbar_color6"),
-            call.data.get("lightbar_color7"),
-            call.data.get("lightbar_color8"),
-            call.data.get("lightbar_color9"),
-            call.data.get("lightbar_color10"),
-            call.data.get("lightbar_color11"),
-            call.data.get("lightbar_color12"),
-        ]:
-            if c is not None:
-                color_list.append([c[0], c[1], c[2]])
-        s = call.data.get("lightbar_sparkle")
-        r = call.data.get("lightbar_rainbow")
-        sp = call.data.get("lightbar_speed")
+        _LOGGER.warning(f"Called handle_set_light_bar_color service")
+        color_list = [
+            [color[0], color[1], color[2]]
+            for i in range(12)
+            if (color := call.data.get(f"color_{i + 1}")) is not None
+        ]
+        s = call.data.get("sparkle")
+        r = call.data.get("rainbow")
+        sp = call.data.get("speed")
 
         attributes_dict = {}
         attributes_dict["display"] = "blink"
@@ -328,8 +275,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         lbde_dict = LightbarDisplayDict(
             {
                 "colors": color_list,
-                "duration": int(call.data["lightbar_duration"]),
-                "speed": int(call.data["lightbar_speed"]),
+                "duration": int(call.data["duration"]),
+                "speed": int(call.data["speed"]),
                 "attributes": attributes_dict,
             }
         )
@@ -341,30 +288,18 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             )
         _LOGGER.warning(f"retval={retval.to_dict()}")
 
-    async def handle_set_lightbar_pulse_service(call: ServiceCall) -> None:
+    async def handle_set_light_bar_pulse_svc(call: ServiceCall) -> None:
         _LOGGER.warning(f"data was {call.data}")
-        _LOGGER.warning(f"Called handle_set_lightbar_pulse service")
-        color_list = []
-        for c in [
-            call.data.get("lightbar_color1"),
-            call.data.get("lightbar_color2"),
-            call.data.get("lightbar_color3"),
-            call.data.get("lightbar_color4"),
-            call.data.get("lightbar_color5"),
-            call.data.get("lightbar_color6"),
-            call.data.get("lightbar_color7"),
-            call.data.get("lightbar_color8"),
-            call.data.get("lightbar_color9"),
-            call.data.get("lightbar_color10"),
-            call.data.get("lightbar_color11"),
-            call.data.get("lightbar_color12"),
-        ]:
-            if c is not None:
-                color_list.append([c[0], c[1], c[2]])
-        s = call.data.get("lightbar_sparkle")
-        r = call.data.get("lightbar_rainbow")
-        sp = call.data.get("lightbar_speed")
-        gp = call.data.get("lightbar_gap")
+        _LOGGER.warning(f"Called handle_set_light_bar_pulse service")
+        color_list = [
+            [color[0], color[1], color[2]]
+            for i in range(12)
+            if (color := call.data.get(f"color_{i + 1}")) is not None
+        ]
+        s = call.data.get("sparkle")
+        r = call.data.get("rainbow")
+        sp = call.data.get("speed")
+        gp = call.data.get("gap")
 
         attributes_dict = {}
         attributes_dict["display"] = "pulse"
@@ -381,8 +316,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         lbde_dict = LightbarDisplayDict(
             {
                 "colors": color_list,
-                "duration": int(call.data["lightbar_duration"]),
-                "speed": int(call.data["lightbar_speed"]),
+                "duration": int(call.data["duration"]),
+                "speed": int(call.data["speed"]),
                 "attributes": attributes_dict,
             }
         )
@@ -394,30 +329,18 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             )
         _LOGGER.warning(f"retval={retval.to_dict()}")
 
-    async def handle_set_lightbar_comet_service(call: ServiceCall) -> None:
+    async def handle_set_light_bar_comet_svc(call: ServiceCall) -> None:
         _LOGGER.warning(f"data was {call.data}")
-        _LOGGER.warning(f"Called handle_set_lightbar_pulse service")
-        color_list = []
-        for c in [
-            call.data.get("lightbar_color1"),
-            call.data.get("lightbar_color2"),
-            call.data.get("lightbar_color3"),
-            call.data.get("lightbar_color4"),
-            call.data.get("lightbar_color5"),
-            call.data.get("lightbar_color6"),
-            call.data.get("lightbar_color7"),
-            call.data.get("lightbar_color8"),
-            call.data.get("lightbar_color9"),
-            call.data.get("lightbar_color10"),
-            call.data.get("lightbar_color11"),
-            call.data.get("lightbar_color12"),
-        ]:
-            if c is not None:
-                color_list.append([c[0], c[1], c[2]])
-        s = call.data.get("lightbar_sparkle")
-        r = call.data.get("lightbar_rainbow")
-        sz = call.data.get("lightbar_size")
-        direct = call.data.get("lightbar_direction")
+        _LOGGER.warning(f"Called handle_set_light_bar_pulse service")
+        color_list = [
+            [color[0], color[1], color[2]]
+            for i in range(12)
+            if (color := call.data.get(f"color_{i + 1}")) is not None
+        ]
+        s = call.data.get("sparkle")
+        r = call.data.get("rainbow")
+        sz = call.data.get("size")
+        direct = call.data.get("direction")
 
         attributes_dict = {}
         attributes_dict["display"] = "comet"
@@ -440,8 +363,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         lbde_dict = LightbarDisplayDict(
             {
                 "colors": color_list,
-                "duration": int(call.data["lightbar_duration"]),
-                "speed": int(call.data["lightbar_speed"]),
+                "duration": int(call.data["duration"]),
+                "speed": int(call.data["speed"]),
                 "attributes": attributes_dict,
             }
         )
@@ -453,32 +376,20 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             )
         _LOGGER.warning(f"retval={retval.to_dict()}")
 
-    async def handle_set_lightbar_sweep_service(call: ServiceCall) -> None:
+    async def handle_set_light_bar_sweep_svc(call: ServiceCall) -> None:
         _LOGGER.warning(f"data was {call.data}")
-        _LOGGER.warning(f"Called handle_set_lightbar_sweep service")
-        color_list = []
-        for c in [
-            call.data.get("lightbar_color1"),
-            call.data.get("lightbar_color2"),
-            call.data.get("lightbar_color3"),
-            call.data.get("lightbar_color4"),
-            call.data.get("lightbar_color5"),
-            call.data.get("lightbar_color6"),
-            call.data.get("lightbar_color7"),
-            call.data.get("lightbar_color8"),
-            call.data.get("lightbar_color9"),
-            call.data.get("lightbar_color10"),
-            call.data.get("lightbar_color11"),
-            call.data.get("lightbar_color12"),
-        ]:
-            if c is not None:
-                color_list.append([c[0], c[1], c[2]])
-        s = call.data.get("lightbar_sparkle")
-        r = call.data.get("lightbar_rainbow")
-        sp = call.data.get("lightbar_speed")
-        gp = call.data.get("lightbar_gap")
-        sz = call.data.get("lightbar_size")
-        direct = call.data.get("lightbar_direction")
+        _LOGGER.warning(f"Called handle_set_light_bar_sweep service")
+        color_list = [
+            [color[0], color[1], color[2]]
+            for i in range(12)
+            if (color := call.data.get(f"color_{i + 1}")) is not None
+        ]
+        s = call.data.get("sparkle")
+        r = call.data.get("rainbow")
+        sp = call.data.get("speed")
+        gp = call.data.get("gap")
+        sz = call.data.get("size")
+        direct = call.data.get("direction")
 
         attributes_dict = {}
         attributes_dict["display"] = "sweep"
@@ -503,8 +414,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         lbde_dict = LightbarDisplayDict(
             {
                 "colors": color_list,
-                "duration": int(call.data["lightbar_duration"]),
-                "speed": int(call.data["lightbar_speed"]),
+                "duration": int(call.data["duration"]),
+                "speed": int(call.data["speed"]),
                 "attributes": attributes_dict,
             }
         )
@@ -516,33 +427,33 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             )
         _LOGGER.warning(f"retval={retval.to_dict()}")
 
-    hass.services.async_register(DOMAIN, "setalarm", handle_set_alarm_service)
     hass.services.async_register(
-        DOMAIN, "deletealarm", handle_delete_alarm_service
+        DOMAIN, "add_or_update_alarm", handle_add_or_update_alarm_svc
+    )
+    hass.services.async_register(DOMAIN, "delete_alarm", handle_delete_alarm_svc)
+    hass.services.async_register(
+        DOMAIN, "set_main_display_text", handle_set_main_display_svc
     )
     hass.services.async_register(
-        DOMAIN, "displaytextmain", handle_set_main_display_service
+        DOMAIN, "set_mini_display_number", handle_set_mini_display_svc
     )
     hass.services.async_register(
-        DOMAIN, "displaynummini", handle_set_mini_display_service
+        DOMAIN, "set_light_bar_color", handle_set_light_bar_color_svc
     )
     hass.services.async_register(
-        DOMAIN, "setlightbarcolor", handle_set_lightbar_color_service
+        DOMAIN, "set_each_light_bar_color", handle_set_each_light_bar_color_svc
     )
     hass.services.async_register(
-        DOMAIN, "seteachlightbarcolor", handle_set_each_lightbar_color_service
+        DOMAIN, "set_light_bar_blink", handle_set_light_bar_blink_svc
     )
     hass.services.async_register(
-        DOMAIN, "setlightbarblink", handle_set_lightbar_blink_service
+        DOMAIN, "set_light_bar_pulse", handle_set_light_bar_pulse_svc
     )
     hass.services.async_register(
-        DOMAIN, "setlightbarpulse", handle_set_lightbar_pulse_service
+        DOMAIN, "set_light_bar_comet", handle_set_light_bar_comet_svc
     )
     hass.services.async_register(
-        DOMAIN, "setlightbarcomet", handle_set_lightbar_comet_service
-    )
-    hass.services.async_register(
-        DOMAIN, "setlightbarsweep", handle_set_lightbar_sweep_service
+        DOMAIN, "set_light_bar_sweep", handle_set_light_bar_sweep_svc
     )
 
     return True

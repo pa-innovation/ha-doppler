@@ -1,6 +1,6 @@
-setalarm:
-  name: Set Alarm
-  description: Sets an Alarm on the Doppler
+add_or_update_alarm:
+  name: Add new or update existing alarm
+  description: Sets an Alarm on the Doppler. If the ID is unused, the alarm will be created as new. If the ID is in use, the existing alarm will be replaced.
   target:
     device:
       integration: sandman_doppler
@@ -40,6 +40,8 @@ setalarm:
         select:
           multiple: true
           options:
+            - label: Sunday
+              value: Su
             - label: Monday
               value: Mo
             - label: Tuesday
@@ -52,8 +54,6 @@ setalarm:
               value: Fr
             - label: Saturday
               value: Sa
-            - label: Sunday
-              value: Su
     color:
       name: Alarm Color
       description: Color of the Alarm on the clock
@@ -73,7 +73,7 @@ setalarm:
           mode: slider
     status:
       name: Alarm Status
-      description: Whether alarm is set or unset
+      description: Whether alarm is enabled or disabled
       required: true
       advanced: false
       selector:
@@ -107,7 +107,7 @@ setalarm:
             - 'Violin.mp3'
             - 'Waves.mp3'
 
-deletealarm:
+delete_alarm:
   name: Delete Alarm
   description: Deletes the selected Alarm
   target:
@@ -127,37 +127,34 @@ deletealarm:
           max: 255
           mode: box
 
-displaytextmain:
-  name: Main Display Text
-  description: Display Text on Main Display
+set_main_display_text:
+  name: Set main display text
+  description: Display text on main display
   target:
     device:
       integration: sandman_doppler
     entity:
       integration: sandman_doppler
   fields:
-    display_text:
-      name: Text to Display
-      description: Text to Display
+    text:
+      name: Text
+      description: Text to display
       required: true
       advanced: false
       selector:
         text:
           type: text
-    display_duration:
-      name: Display Duration
-      description: Length of time text is displayed
+    duration:
+      name: Duration
+      description: Length of time text is displayed in seconds
       required: true
       advanced: false
       selector:
-        number:
-          min: 0
-          max: 8675309
-          unit_of_measurement: seconds
-          mode: box
-    display_speed:
-      name: Display Speed
-      description: How fast the text scrolls
+        duration:
+          enable_days: false
+    speed:
+      name: Speed
+      description: Number of characters to display over duration
       required: true
       advanced: false
       selector:
@@ -165,26 +162,26 @@ displaytextmain:
           min: 0
           max: 10000
           mode: box
-    display_color:
-      name: Display Color
-      description: Color of Displayed Text
+    color:
+      name: Color
+      description: Color of displayed text
       required: true
       advanced: false
       selector:
         color_rgb:
 
-displaynummini:
-  name: Mini Display Number
-  description: Display Number on Mini Display
+set_mini_display_number:
+  name: Set mini display number
+  description: Display a number on the mini display
   target:
     device:
       integration: sandman_doppler
     entity:
       integration: sandman_doppler
   fields:
-    display_number:
-      name: Number to Display
-      description: Number to Display on Mini Display
+    number:
+      name: Number
+      description: Number to display on Mini Display
       required: true
       advanced: false
       selector:
@@ -192,120 +189,118 @@ displaynummini:
           min: -199
           max: 199
           mode: box
-    display_duration:
+    duration:
       name: Display Duration
-      description: Length of time number is displayed on mini dispaly
+      description: Length of time in seconds the number is displayed on mini display
       required: true
       advanced: false
       selector:
-        number:
-          min: 0
-          max: 8675309
-          unit_of_measurement: seconds
-          mode: box          
-    display_color:
+        duration:
+          enable_days: false
+    color:
       name: Display Color
       description: Color of Displayed Number
       required: true
       advanced: false
       selector:
         color_rgb:
-setlightbarcolor:
-  name: Lightbar color
-  description: Sets lightbar to a single color and cycles colors if multiple colors are selected
+
+set_light_bar_color:
+  name: Set light bar color
+  description: Sets light bar to a single color and cycles colors if multiple colors are selected
   target:
     device:
       integration: sandman_doppler
     entity:
       integration: sandman_doppler
   fields:
-    lightbar_color1:
+    color_1:
       name: Color 1
-      description: First color of lightbar
+      description: First color of light bar
       required: true
       advanced: false
       selector:
         color_rgb:
-    lightbar_color2:
+    color_2:
       name: Color 2
-      description: Second color of lightbar
+      description: Second color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color3:
+    color_3:
       name: Color 3
-      description: Third color of lightbar
+      description: Third color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color4:
+    color_4:
       name: Color 4
-      description: Fourth color of lightbar
+      description: Fourth color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color5:
+    color_5:
       name: Color 5
-      description: Fifth color of lightbar
+      description: Fifth color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color6:
+    color_6:
       name: Color 6
-      description: Sixth color of lightbar
+      description: Sixth color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color7:
+    color_7:
       name: Color 7
-      description: Seventh color of lightbar
+      description: Seventh color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color8:
+    color_8:
       name: Color 8
-      description: Eighth color of lightbar
+      description: Eighth color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color9:
+    color_9:
       name: Color 9
-      description: Ninth color of lightbar
+      description: Ninth color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color10:
+    color_10:
       name: Color 10
-      description: Tenth color of lightbar
+      description: Tenth color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color11:
+    color_11:
       name: Color 11
-      description: Eleventh color of lightbar
+      description: Eleventh color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color12:
+    color_12:
       name: Color 12
-      description: Twelveth color of lightbar
+      description: Twelveth color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_duration:
+    duration:
       name: Duration
-      description: Duration of lightbar effect
+      description: Duration of light bar effect
       required: true
       advanced: false
       selector:
@@ -313,9 +308,9 @@ setlightbarcolor:
           min: 0
           max: 8675309
           mode: box
-    lightbar_speed:
+    speed:
       name: Speed
-      description: Speed of lightbar effect
+      description: Speed of light bar effect
       required: true
       advanced: false
       selector:
@@ -323,7 +318,7 @@ setlightbarcolor:
           min: 0
           max: 255
           mode: box
-    lightbar_sparkle:
+    sparkle:
       name: Sparkle
       description: Makes sparkles in the effect
       required: false
@@ -334,7 +329,7 @@ setlightbarcolor:
             - low
             - medium
             - high
-    lightbar_rainbow:
+    rainbow:
       name: Rainbow
       description: Replaces specified palette with rainbow effect
       required: false
@@ -342,221 +337,221 @@ setlightbarcolor:
       selector:
         boolean:
 
-seteachlightbarcolor:
-  name: Lightbar color Set Each
-  description: Sets each dot on the lightbar individually for duration
+set_each_light_bar_color:
+  name: Light bar color Set Each
+  description: Sets each dot on the light bar individually for duration
   target:
     device:
       integration: sandman_doppler
     entity:
       integration: sandman_doppler
   fields:
-    lightbar_color1:
+    color_1:
       name: Color 1
-      description: First color of lightbar
+      description: First color of light bar
       required: true
       advanced: false
       selector:
         color_rgb:
-    lightbar_color2:
+    color_2:
       name: Color 2
-      description: Second color of lightbar
+      description: Second color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color3:
+    color_3:
       name: Color 3
-      description: Third color of lightbar
+      description: Third color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color4:
+    color_4:
       name: Color 4
-      description: Fourth color of lightbar
+      description: Fourth color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color5:
+    color_5:
       name: Color 5
-      description: Fifth color of lightbar
+      description: Fifth color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color6:
+    color_6:
       name: Color 6
-      description: Sixth color of lightbar
+      description: Sixth color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color7:
+    color_7:
       name: Color 7
-      description: Seventh color of lightbar
+      description: Seventh color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color8:
+    color_8:
       name: Color 8
-      description: Eighth color of lightbar
+      description: Eighth color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color9:
+    color_9:
       name: Color 9
-      description: Ninth color of lightbar
+      description: Ninth color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color10:
+    color_10:
       name: Color 10
-      description: Tenth color of lightbar
+      description: Tenth color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color11:
+    color_11:
       name: Color 11
-      description: Eleventh color of lightbar
+      description: Eleventh color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color12:
+    color_12:
       name: Color 12
-      description: Twelveth color of lightbar
+      description: Twelveth color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color13:
+    color_13:
       name: Color 13
-      description: Thirteenth color of lightbar
+      description: Thirteenth color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color14:
+    color_14:
       name: Color 14
-      description: Fourteenth color of lightbar
+      description: Fourteenth color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color15:
+    color_15:
       name: Color 15
-      description: Fifteenth color of lightbar
+      description: Fifteenth color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color16:
+    color_16:
       name: Color 16
-      description: Sixteenth color of lightbar
+      description: Sixteenth color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color17:
+    color_17:
       name: Color 17
-      description: Seventeenth color of lightbar
+      description: Seventeenth color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color18:
+    color_18:
       name: Color 18
-      description: Eighteenth color of lightbar
+      description: Eighteenth color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color19:
+    color_19:
       name: Color 19
-      description: Nineteenth color of lightbar
+      description: Nineteenth color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color20:
+    color_20:
       name: Color 20
-      description: Twentieth color of lightbar
+      description: Twentieth color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color21:
+    color_21:
       name: Color 21
-      description: Twentyfirst color of lightbar
+      description: Twentyfirst color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color22:
+    color_22:
       name: Color 22
-      description: Twentysecond color of lightbar
+      description: Twentysecond color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color23:
+    color_23:
       name: Color 23
-      description: Twentythird color of lightbar
+      description: Twentythird color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color24:
+    color_24:
       name: Color 24
-      description: Twentyfourth color of lightbar
+      description: Twentyfourth color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color25:
+    color_25:
       name: Color 25
-      description: Twentyfifth color of lightbar
+      description: Twentyfifth color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color26:
+    color_26:
       name: Color 26
-      description: Twentysixth color of lightbar
+      description: Twentysixth color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color27:
+    color_27:
       name: Color 27
-      description: Twentyseventh color of lightbar
+      description: Twentyseventh color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color28:
+    color_28:
       name: Color 28
-      description: Twentyeighth color of lightbar
+      description: Twentyeighth color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color29:
+    color_29:
       name: Color 29
-      description: Twentyninth color of lightbar
+      description: Twentyninth color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:          
-    lightbar_duration:
+    duration:
       name: Duration
-      description: Duration of lightbar effect
+      description: Duration of light bar effect
       required: true
       advanced: false
       selector:
@@ -564,7 +559,7 @@ seteachlightbarcolor:
           min: 0
           max: 8675309
           mode: box
-    lightbar_sparkle:
+    sparkle:
       name: Sparkle
       description: Makes sparkles in the effect
       required: false
@@ -575,7 +570,7 @@ seteachlightbarcolor:
             - low
             - medium
             - high
-    lightbar_rainbow:
+    rainbow:
       name: Rainbow
       description: Replaces specified palette with rainbow effect
       required: false
@@ -583,102 +578,102 @@ seteachlightbarcolor:
       selector:
         boolean:
 
-setlightbarblink:
-  name: Lightbar Blink
-  description: Sets lightbar to blink between one or more colors and black
+set_light_bar_blink:
+  name: Light bar Blink
+  description: Sets light bar to blink between one or more colors and black
   target:
     device:
       integration: sandman_doppler
     entity:
       integration: sandman_doppler
   fields:
-    lightbar_color1:
+    color_1:
       name: Color 1
-      description: First color of lightbar
+      description: First color of light bar
       required: true
       advanced: false
       selector:
         color_rgb:
-    lightbar_color2:
+    color_2:
       name: Color 2
-      description: Second color of lightbar
+      description: Second color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color3:
+    color_3:
       name: Color 3
-      description: Third color of lightbar
+      description: Third color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color4:
+    color_4:
       name: Color 4
-      description: Fourth color of lightbar
+      description: Fourth color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color5:
+    color_5:
       name: Color 5
-      description: Fifth color of lightbar
+      description: Fifth color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color6:
+    color_6:
       name: Color 6
-      description: Sixth color of lightbar
+      description: Sixth color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color7:
+    color_7:
       name: Color 7
-      description: Seventh color of lightbar
+      description: Seventh color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color8:
+    color_8:
       name: Color 8
-      description: Eighth color of lightbar
+      description: Eighth color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color9:
+    color_9:
       name: Color 9
-      description: Ninth color of lightbar
+      description: Ninth color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color10:
+    color_10:
       name: Color 10
-      description: Tenth color of lightbar
+      description: Tenth color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color11:
+    color_11:
       name: Color 11
-      description: Eleventh color of lightbar
+      description: Eleventh color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color12:
+    color_12:
       name: Color 12
-      description: Twelveth color of lightbar
+      description: Twelveth color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_duration:
+    duration:
       name: Duration
-      description: Duration of lightbar effect
+      description: Duration of light bar effect
       required: true
       advanced: false
       selector:
@@ -686,9 +681,9 @@ setlightbarblink:
           min: 0
           max: 8675309
           mode: box
-    lightbar_speed:
+    speed:
       name: Speed
-      description: Speed of lightbar effect
+      description: Speed of light bar effect
       required: true
       advanced: false
       selector:
@@ -696,7 +691,7 @@ setlightbarblink:
           min: 0
           max: 255
           mode: box
-    lightbar_sparkle:
+    sparkle:
       name: Sparkle
       description: Makes sparkles in the effect
       required: false
@@ -707,7 +702,7 @@ setlightbarblink:
             - low
             - medium
             - high
-    lightbar_rainbow:
+    rainbow:
       name: Rainbow
       description: Replaces specified palette with rainbow effect
       required: false
@@ -715,102 +710,102 @@ setlightbarblink:
       selector:
         boolean:
 
-setlightbarpulse:
-  name: Lightbar Pulse
-  description: Sets lightbar to pulse between one or more colors and black
+set_light_bar_pulse:
+  name: Light bar Pulse
+  description: Sets light bar to pulse between one or more colors and black
   target:
     device:
       integration: sandman_doppler
     entity:
       integration: sandman_doppler
   fields:
-    lightbar_color1:
+    color_1:
       name: Color 1
-      description: First color of lightbar
+      description: First color of light bar
       required: true
       advanced: false
       selector:
         color_rgb:
-    lightbar_color2:
+    color_2:
       name: Color 2
-      description: Second color of lightbar
+      description: Second color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color3:
+    color_3:
       name: Color 3
-      description: Third color of lightbar
+      description: Third color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color4:
+    color_4:
       name: Color 4
-      description: Fourth color of lightbar
+      description: Fourth color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color5:
+    color_5:
       name: Color 5
-      description: Fifth color of lightbar
+      description: Fifth color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color6:
+    color_6:
       name: Color 6
-      description: Sixth color of lightbar
+      description: Sixth color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color7:
+    color_7:
       name: Color 7
-      description: Seventh color of lightbar
+      description: Seventh color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color8:
+    color_8:
       name: Color 8
-      description: Eighth color of lightbar
+      description: Eighth color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color9:
+    color_9:
       name: Color 9
-      description: Ninth color of lightbar
+      description: Ninth color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color10:
+    color_10:
       name: Color 10
-      description: Tenth color of lightbar
+      description: Tenth color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color11:
+    color_11:
       name: Color 11
-      description: Eleventh color of lightbar
+      description: Eleventh color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color12:
+    color_12:
       name: Color 12
-      description: Twelveth color of lightbar
+      description: Twelveth color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_duration:
+    duration:
       name: Duration
-      description: Duration of lightbar effect
+      description: Duration of light bar effect
       required: true
       advanced: false
       selector:
@@ -818,9 +813,9 @@ setlightbarpulse:
           min: 0
           max: 8675309
           mode: box
-    lightbar_speed:
+    speed:
       name: Speed
-      description: Speed of lightbar effect
+      description: Speed of light bar effect
       required: true
       advanced: false
       selector:
@@ -828,7 +823,7 @@ setlightbarpulse:
           min: 0
           max: 255
           mode: box
-    lightbar_gap:
+    gap:
       name: Gap
       description: Number of color slices between colors
       required: false
@@ -838,7 +833,7 @@ setlightbarpulse:
           min: 0
           max: 255
           mode: box
-    lightbar_sparkle:
+    sparkle:
       name: Sparkle
       description: Makes sparkles in the effect
       required: false
@@ -849,7 +844,7 @@ setlightbarpulse:
             - low
             - medium
             - high
-    lightbar_rainbow:
+    rainbow:
       name: Rainbow
       description: Replaces specified palette with rainbow effect
       required: false
@@ -857,102 +852,102 @@ setlightbarpulse:
       selector:
         boolean:
 
-setlightbarcomet:
-  name: Lightbar Comet
-  description: Sets lightbar to display a comet
+set_light_bar_comet:
+  name: Light bar Comet
+  description: Sets light bar to display a comet
   target:
     device:
       integration: sandman_doppler
     entity:
       integration: sandman_doppler
   fields:
-    lightbar_color1:
+    color_1:
       name: Color 1
-      description: First color of lightbar
+      description: First color of light bar
       required: true
       advanced: false
       selector:
         color_rgb:
-    lightbar_color2:
+    color_2:
       name: Color 2
-      description: Second color of lightbar
+      description: Second color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color3:
+    color_3:
       name: Color 3
-      description: Third color of lightbar
+      description: Third color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color4:
+    color_4:
       name: Color 4
-      description: Fourth color of lightbar
+      description: Fourth color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color5:
+    color_5:
       name: Color 5
-      description: Fifth color of lightbar
+      description: Fifth color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color6:
+    color_6:
       name: Color 6
-      description: Sixth color of lightbar
+      description: Sixth color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color7:
+    color_7:
       name: Color 7
-      description: Seventh color of lightbar
+      description: Seventh color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color8:
+    color_8:
       name: Color 8
-      description: Eighth color of lightbar
+      description: Eighth color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color9:
+    color_9:
       name: Color 9
-      description: Ninth color of lightbar
+      description: Ninth color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color10:
+    color_10:
       name: Color 10
-      description: Tenth color of lightbar
+      description: Tenth color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color11:
+    color_11:
       name: Color 11
-      description: Eleventh color of lightbar
+      description: Eleventh color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color12:
+    color_12:
       name: Color 12
-      description: Twelveth color of lightbar
+      description: Twelveth color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_duration:
+    duration:
       name: Duration
-      description: Duration of lightbar effect
+      description: Duration of light bar effect
       required: true
       advanced: false
       selector:
@@ -960,9 +955,9 @@ setlightbarcomet:
           min: 0
           max: 8675309
           mode: box
-    lightbar_speed:
+    speed:
       name: Speed
-      description: Speed of lightbar effect
+      description: Speed of light bar effect
       required: true
       advanced: false
       selector:
@@ -970,7 +965,7 @@ setlightbarcomet:
           min: 0
           max: 255
           mode: box
-    lightbar_size:
+    size:
       name: Size
       description: Size of Comet
       required: false
@@ -980,7 +975,7 @@ setlightbarcomet:
           min: 0
           max: 255
           mode: box
-    lightbar_direction:
+    direction:
       name: Direction
       description: Direction of comet
       required: false
@@ -991,7 +986,7 @@ setlightbarcomet:
             - right
             - left
             - bounce
-    lightbar_sparkle:
+    sparkle:
       name: Sparkle
       description: Makes sparkles in the effect
       required: false
@@ -1002,7 +997,7 @@ setlightbarcomet:
             - low
             - medium
             - high
-    lightbar_rainbow:
+    rainbow:
       name: Rainbow
       description: Replaces specified palette with rainbow effect
       required: false
@@ -1010,102 +1005,102 @@ setlightbarcomet:
       selector:
         boolean:
 
-setlightbarsweep:
-  name: Lightbar Sweep
-  description: Sets lightbar to display a sweep
+set_light_bar_sweep:
+  name: Light bar Sweep
+  description: Sets light bar to display a sweep
   target:
     device:
       integration: sandman_doppler
     entity:
       integration: sandman_doppler
   fields:
-    lightbar_color1:
+    color_1:
       name: Color 1
-      description: First color of lightbar
+      description: First color of light bar
       required: true
       advanced: false
       selector:
         color_rgb:
-    lightbar_color2:
+    color_2:
       name: Color 2
-      description: Second color of lightbar
+      description: Second color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color3:
+    color_3:
       name: Color 3
-      description: Third color of lightbar
+      description: Third color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color4:
+    color_4:
       name: Color 4
-      description: Fourth color of lightbar
+      description: Fourth color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color5:
+    color_5:
       name: Color 5
-      description: Fifth color of lightbar
+      description: Fifth color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color6:
+    color_6:
       name: Color 6
-      description: Sixth color of lightbar
+      description: Sixth color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color7:
+    color_7:
       name: Color 7
-      description: Seventh color of lightbar
+      description: Seventh color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color8:
+    color_8:
       name: Color 8
-      description: Eighth color of lightbar
+      description: Eighth color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color9:
+    color_9:
       name: Color 9
-      description: Ninth color of lightbar
+      description: Ninth color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color10:
+    color_10:
       name: Color 10
-      description: Tenth color of lightbar
+      description: Tenth color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color11:
+    color_11:
       name: Color 11
-      description: Eleventh color of lightbar
+      description: Eleventh color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_color12:
+    color_12:
       name: Color 12
-      description: Twelveth color of lightbar
+      description: Twelveth color of light bar
       required: false
       advanced: false
       selector:
         color_rgb:
-    lightbar_duration:
+    duration:
       name: Duration
-      description: Duration of lightbar effect
+      description: Duration of light bar effect
       required: true
       advanced: false
       selector:
@@ -1113,9 +1108,9 @@ setlightbarsweep:
           min: 0
           max: 8675309
           mode: box
-    lightbar_speed:
+    speed:
       name: Speed
-      description: Speed of lightbar effect
+      description: Speed of light bar effect
       required: true
       advanced: false
       selector:
@@ -1123,7 +1118,7 @@ setlightbarsweep:
           min: 0
           max: 255
           mode: box
-    lightbar_gap:
+    gap:
       name: Gap
       description: Number of color slices between colors
       required: false
@@ -1133,7 +1128,7 @@ setlightbarsweep:
           min: 0
           max: 255
           mode: box
-    lightbar_size:
+    size:
       name: Size
       description: Size of Sweep
       required: false
@@ -1143,7 +1138,7 @@ setlightbarsweep:
           min: 0
           max: 255
           mode: box
-    lightbar_direction:
+    direction:
       name: Direction
       description: Direction of Sweep
       required: false
@@ -1153,7 +1148,7 @@ setlightbarsweep:
           options:
             - right
             - left
-    lightbar_sparkle:
+    sparkle:
       name: Sparkle
       description: Makes sparkles in the effect
       required: false
@@ -1164,7 +1159,7 @@ setlightbarsweep:
             - low
             - medium
             - high
-    lightbar_rainbow:
+    rainbow:
       name: Rainbow
       description: Replaces specified palette with rainbow effect
       required: false
