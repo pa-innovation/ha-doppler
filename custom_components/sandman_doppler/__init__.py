@@ -150,6 +150,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     async def handle_set_main_display_svc(call: ServiceCall) -> None:
 
+        # regex for accepted characters: (?![kmwv])[a-z0-9 \_\-]+
         _LOGGER.warning(f"Called handle_set_main_display service")
         mdt_dict = MainDisplayTextDict(
             {
