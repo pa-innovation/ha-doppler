@@ -9,7 +9,7 @@ from typing import Any
 from aiohttp.client import DEFAULT_TIMEOUT, ClientTimeout
 from doppyler.client import DopplerClient
 from doppyler.exceptions import DopplerException
-from doppyler.model.alarm import Alarm, AlarmDict, AlarmSource, AlarmStatus
+from doppyler.model.alarm import Alarm, AlarmDict, AlarmSource
 from doppyler.model.color import Color
 from doppyler.model.doppler import Doppler
 from doppyler.model.light_bar import LightbarDisplayDict, LightbarDisplayEffect
@@ -24,6 +24,7 @@ from homeassistant.const import (
     CONF_PASSWORD,
 )
 from homeassistant.core import HomeAssistant, callback
+from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import device_registry as dr, entity_registry as er
 from homeassistant.helpers.aiohttp_client import async_create_clientsession
 from homeassistant.helpers.dispatcher import async_dispatcher_send
@@ -118,29 +119,34 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             r = call.data["repeat"]
         else:
             r = ""
+
+        hr, min, *_ = call.data["time"].split(":")
         alarmdict = AlarmDict(
-            id=int(call.data["alarm_id"]),
-            name=call.data["alarm_name"],
-            time_hr=int(call.data["alarm_time"].split(":")[0]),
-            time_min=int(call.data["alarm_time"].split(":")[1]),
+            id=int(call.data["id"]),
+            name=call.data["name"],
+            time_hr=int(hr),
+            time_min=int(min),
             repeat=r,
-            color=Color(
-                red=int(call.data["color"][0]),
-                green=int(call.data["color"][1]),
-                blue=int(call.data["color"][2]),
-            ),
+            color={
+                "red": int(call.data["color"][0]),
+                "green": int(call.data["color"][1]),
+                "blue": int(call.data["color"][2]),
+            },
             volume=int(call.data["volume"]),
-            status=AlarmStatus.SET,
+            status=call.data["status"],
             src=AlarmSource.APP,
             sound=call.data["sound"],
         )
         for device in get_dopplers_from_svc_targets(call):
-            result = await device.add_or_update_alarm(Alarm.from_dict(alarmdict))
+            try:
+                result = await device.add_or_update_alarm(Alarm.from_dict(alarmdict))
+            except Exception as err:
+                raise HomeAssistantError from err
             _LOGGER.warning(f"alarm result was {result}")
 
     async def handle_delete_alarm_svc(call: ServiceCall) -> None:
         for device in get_dopplers_from_svc_targets(call):
-            await device.delete_alarm(int(call.data["alarm_id"]))
+            await device.delete_alarm(int(call.data["id"]))
 
     async def handle_set_main_display_svc(call: ServiceCall) -> None:
 
@@ -148,7 +154,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         mdt_dict = MainDisplayTextDict(
             {
                 "text": str(call.data["text"]),
-                "duration": int(call.data["duration"]),
+                "duration": int(timedelta(**call.data["duration"]).total_seconds()),
                 "speed": int(call.data["speed"]),
                 "color": [
                     int(call.data["color"][0]),
@@ -166,7 +172,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         mdn_dict = MiniDisplayNumberDict(
             {
                 "num": int(call.data["number"]),
-                "duration": int(call.data["duration"]),
+                "duration": int(timedelta(**call.data["duration"]).total_seconds()),
                 "color": [
                     int(call.data["color"][0]),
                     int(call.data["color"][1]),
@@ -202,7 +208,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         lbde_dict = LightbarDisplayDict(
             {
                 "colors": color_list,
-                "duration": int(call.data["duration"]),
+                "duration": int(timedelta(**call.data["duration"]).total_seconds()),
                 "speed": int(call.data["speed"]),
                 "attributes": attributes_dict,
             }
@@ -238,7 +244,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         lbde_dict = LightbarDisplayDict(
             {
                 "colors": color_list,
-                "duration": int(call.data["duration"]),
+                "duration": int(timedelta(**call.data["duration"]).total_seconds()),
                 "speed": 0,
                 "attributes": attributes_dict,
             }
@@ -275,7 +281,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         lbde_dict = LightbarDisplayDict(
             {
                 "colors": color_list,
-                "duration": int(call.data["duration"]),
+                "duration": int(timedelta(**call.data["duration"]).total_seconds()),
                 "speed": int(call.data["speed"]),
                 "attributes": attributes_dict,
             }
@@ -316,7 +322,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         lbde_dict = LightbarDisplayDict(
             {
                 "colors": color_list,
-                "duration": int(call.data["duration"]),
+                "duration": int(timedelta(**call.data["duration"]).total_seconds()),
                 "speed": int(call.data["speed"]),
                 "attributes": attributes_dict,
             }
@@ -363,7 +369,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         lbde_dict = LightbarDisplayDict(
             {
                 "colors": color_list,
-                "duration": int(call.data["duration"]),
+                "duration": int(timedelta(**call.data["duration"]).total_seconds()),
                 "speed": int(call.data["speed"]),
                 "attributes": attributes_dict,
             }
@@ -414,7 +420,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         lbde_dict = LightbarDisplayDict(
             {
                 "colors": color_list,
-                "duration": int(call.data["duration"]),
+                "duration": int(timedelta(**call.data["duration"]).total_seconds()),
                 "speed": int(call.data["speed"]),
                 "attributes": attributes_dict,
             }

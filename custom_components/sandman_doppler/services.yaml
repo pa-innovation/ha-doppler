@@ -7,7 +7,7 @@ add_or_update_alarm:
     entity:
       integration: sandman_doppler
   fields:
-    alarm_id:
+    id:
       name: Alarm ID
       description: ID of the alarm to be set
       required: true
@@ -17,14 +17,14 @@ add_or_update_alarm:
           min: 1
           max: 255
           mode: box
-    alarm_name:
+    name:
       name: Alarm Name
       description: Name of the Alarm
       required: true
       advanced: false
       selector:
         text:          
-    alarm_time:
+    time:
       name: Alarm Time
       description: The time of the alarm to set
       required: true
@@ -116,7 +116,7 @@ delete_alarm:
     entity:
       integration: sandman_doppler
   fields:
-    alarm_id:
+    id:
       name: Alarm ID
       description: ID of the alarm to be set
       required: true
@@ -304,10 +304,8 @@ set_light_bar_color:
       required: true
       advanced: false
       selector:
-        number:
-          min: 0
-          max: 8675309
-          mode: box
+        duration:
+          enable_days: false
     speed:
       name: Speed
       description: Speed of light bar effect
@@ -555,10 +553,8 @@ set_each_light_bar_color:
       required: true
       advanced: false
       selector:
-        number:
-          min: 0
-          max: 8675309
-          mode: box
+        duration:
+          enable_days: false
     sparkle:
       name: Sparkle
       description: Makes sparkles in the effect
@@ -677,10 +673,8 @@ set_light_bar_blink:
       required: true
       advanced: false
       selector:
-        number:
-          min: 0
-          max: 8675309
-          mode: box
+        duration:
+          enable_days: false
     speed:
       name: Speed
       description: Speed of light bar effect
@@ -809,10 +803,8 @@ set_light_bar_pulse:
       required: true
       advanced: false
       selector:
-        number:
-          min: 0
-          max: 8675309
-          mode: box
+        duration:
+          enable_days: false
     speed:
       name: Speed
       description: Speed of light bar effect
@@ -951,10 +943,8 @@ set_light_bar_comet:
       required: true
       advanced: false
       selector:
-        number:
-          min: 0
-          max: 8675309
-          mode: box
+        duration:
+          enable_days: false
     speed:
       name: Speed
       description: Speed of light bar effect
@@ -1104,10 +1094,8 @@ set_light_bar_sweep:
       required: true
       advanced: false
       selector:
-        number:
-          min: 0
-          max: 8675309
-          mode: box
+        duration:
+          enable_days: false
     speed:
       name: Speed
       description: Speed of light bar effect
