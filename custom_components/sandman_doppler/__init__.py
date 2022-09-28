@@ -54,7 +54,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
     hass.data[DOMAIN][entry.entry_id] = coordinator = DopplerDataUpdateCoordinator(
-        hass, entry, client, dev_reg
+        hass, entry, client
     )
     await coordinator.async_config_entry_first_refresh()
 
@@ -62,6 +62,15 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     def async_on_device_added(device: Doppler) -> None:
         """Handle device added."""
         _LOGGER.debug("Device added: %s", device)
+        dev_reg.async_get_or_create(
+            config_entry_id=entry.entry_id,
+            identifiers={(DOMAIN, device.dsn)},
+            manufacturer=device.device_info.manufacturer,
+            model=device.device_info.model_number,
+            sw_version=device.device_info.software_version,
+            hw_version=device.device_info.firmware_version,
+            name=device.name,
+        )
         async_dispatcher_send(hass, f"{DOMAIN}_{entry.entry_id}_device_added", device)
 
     @callback
@@ -496,13 +505,11 @@ class DopplerDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         hass: HomeAssistant,
         entry: ConfigEntry,
         client: DopplerClient,
-        dev_reg: dr.DeviceRegistry,
     ) -> None:
         """Initialize."""
         self.data: dict[str, dict[str, Any]] = {}
         self.api = client
         self.platforms = []
-        self._dev_reg = dev_reg
         self._entry = entry
 
         super().__init__(hass, _LOGGER, name=DOMAIN, update_interval=SCAN_INTERVAL)
@@ -516,15 +523,6 @@ class DopplerDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             for device in self.api.devices.values():
                 _LOGGER.debug(
                     "Getting update for device %s (%s)", device.name, device.dsn
-                )
-                self._dev_reg.async_get_or_create(
-                    config_entry_id=self._entry.entry_id,
-                    identifiers={(DOMAIN, device.dsn)},
-                    manufacturer=device.device_info.manufacturer,
-                    model=device.device_info.model_number,
-                    sw_version=device.device_info.software_version,
-                    hw_version=device.device_info.firmware_version,
-                    name=device.name,
                 )
                 data[device.dsn] = await device.get_all_data()
                 _LOGGER.debug(
