@@ -1,5 +1,5 @@
-add_or_update_alarm:
-  name: Add new or update existing alarm
+add_alarm:
+  name: Add new alarm
   description: Sets an Alarm on the Doppler. If the ID is unused, the alarm will be created as new. If the ID is in use, the existing alarm will be replaced.
   target:
     device:

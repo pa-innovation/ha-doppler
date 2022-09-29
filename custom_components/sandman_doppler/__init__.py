@@ -127,7 +127,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
         return dopplers
 
-    async def handle_add_or_update_alarm_svc(call: ServiceCall) -> None:
+    async def handle_add_alarm_svc(call: ServiceCall) -> None:
         if "repeat" in call.data:
             r = call.data["repeat"]
         else:
@@ -152,7 +152,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         )
         for device in get_dopplers_from_svc_targets(call):
             try:
-                result = await device.add_or_update_alarm(Alarm.from_dict(alarmdict))
+                result = await device.add_alarm(Alarm.from_dict(alarmdict))
             except Exception as err:
                 raise HomeAssistantError from err
             _LOGGER.warning(f"alarm result was {result}")
@@ -448,7 +448,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         _LOGGER.warning(f"retval={retval.to_dict()}")
 
     hass.services.async_register(
-        DOMAIN, "add_or_update_alarm", handle_add_or_update_alarm_svc
+        DOMAIN, "add_alarm", handle_add_alarm_svc
     )
     hass.services.async_register(DOMAIN, "delete_alarm", handle_delete_alarm_svc)
     hass.services.async_register(
