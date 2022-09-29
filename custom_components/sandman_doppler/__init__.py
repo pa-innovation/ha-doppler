@@ -529,9 +529,6 @@ class DopplerDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
 
     async def _async_update_data(self) -> dict[str, Any]:
         """Update data via library."""
-        data: dict[str, Any] = {}
-        await self.api.get_devices()
-
         _LOGGER.debug(
             "Getting update for device %s (%s)", self.device.name, self.device.dsn
         )
