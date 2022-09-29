@@ -1,9 +1,9 @@
 """Sensor platform for Doppler Sandman."""
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
 import logging
-from collections.abc import Callable
 
 from doppyler.const import ATTR_CONNECTED_TO_ALEXA, ATTR_IS_IN_DAY_MODE
 from doppyler.model.doppler import Doppler
