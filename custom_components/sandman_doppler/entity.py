@@ -1,7 +1,7 @@
 """Doppler light platform."""
 from __future__ import annotations
 
-from typing import Generic, TypeVar
+from typing import Any, Generic, TypeVar
 
 from doppyler.model.doppler import Doppler
 from homeassistant.config_entries import ConfigEntry
@@ -35,9 +35,12 @@ class DopplerEntity(
         self.config_entry = config_entry
         self.device = device
 
-        self.device_data = coordinator.data[self.device.dsn]
-
         self._attr_unique_id = slugify(
             f"{self.config_entry.unique_id}_{self.device.dsn}_{self.ed.key}"
         )
         self._attr_device_info = DeviceInfo(identifiers={(DOMAIN, self.device.dsn)})
+
+    @property
+    def device_data(self) -> dict[str, Any]:
+        """Return device data."""
+        return self.coordinator.data

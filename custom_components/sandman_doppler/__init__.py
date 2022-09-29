@@ -6,16 +6,14 @@ from datetime import timedelta
 import logging
 from typing import Any
 
-from aiohttp.client import DEFAULT_TIMEOUT, ClientTimeout
 from doppyler.client import DopplerClient
 from doppyler.exceptions import DopplerException
 from doppyler.model.alarm import Alarm, AlarmDict, AlarmSource
-from doppyler.model.color import Color
 from doppyler.model.doppler import Doppler
 from doppyler.model.light_bar import LightbarDisplayDict, LightbarDisplayEffect
 from doppyler.model.main_display_text import MainDisplayText, MainDisplayTextDict
 from doppyler.model.mini_display_number import MiniDisplayNumber, MiniDisplayNumberDict
-from homeassistant.config_entries import ConfigEntry
+from homeassistant.config_entries import ConfigEntry, ConfigEntryNotReady
 from homeassistant.const import (
     ATTR_AREA_ID,
     ATTR_DEVICE_ID,
@@ -26,8 +24,9 @@ from homeassistant.const import (
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import device_registry as dr, entity_registry as er
-from homeassistant.helpers.aiohttp_client import async_create_clientsession
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.dispatcher import async_dispatcher_send
+from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.service import ServiceCall
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
@@ -40,28 +39,26 @@ _LOGGER = logging.getLogger(__name__)
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up config entry."""
-    hass.data.setdefault(DOMAIN, {})
+    hass.data.setdefault(DOMAIN, {}).setdefault(entry.entry_id, {})
 
     email = entry.data[CONF_EMAIL]
     password = entry.data[CONF_PASSWORD]
 
-    session = async_create_clientsession(hass, timeout=ClientTimeout(DEFAULT_TIMEOUT))
-    client = DopplerClient(email, password, client_session=session, local_control=True)
+    session = async_get_clientsession(hass)
+    client = DopplerClient(email, password, client_session=session, local_control=False)
 
     dev_reg = dr.async_get(hass)
     ent_reg = er.async_get(hass)
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
-    hass.data[DOMAIN][entry.entry_id] = coordinator = DopplerDataUpdateCoordinator(
-        hass, entry, client
-    )
-    await coordinator.async_config_entry_first_refresh()
-
     @callback
     def async_on_device_added(device: Doppler) -> None:
         """Handle device added."""
         _LOGGER.debug("Device added: %s", device)
+        hass.data[DOMAIN][entry.entry_id][
+            device.dsn
+        ] = coordinator = DopplerDataUpdateCoordinator(hass, entry, client, device)
         dev_reg.async_get_or_create(
             config_entry_id=entry.entry_id,
             identifiers={(DOMAIN, device.dsn)},
@@ -71,7 +68,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             hw_version=device.device_info.firmware_version,
             name=device.name,
         )
-        async_dispatcher_send(hass, f"{DOMAIN}_{entry.entry_id}_device_added", device)
+        hass.async_create_task(coordinator.async_refresh())
 
     @callback
     def async_on_device_removed(device: Doppler) -> None:
@@ -80,13 +77,20 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         dev_entry = dev_reg.async_get_device({(DOMAIN, device.dsn)})
         assert dev_entry
         dev_reg.async_remove_device(dev_entry.id)
+        hass.data[DOMAIN][entry.entry_id].pop(device.dsn)
 
     entry.async_on_unload(client.on_device_added(async_on_device_added))
     entry.async_on_unload(client.on_device_removed(async_on_device_removed))
 
-    # Load initial devices after the first refresh
-    for device in client.devices.values():
-        async_on_device_added(device)
+    try:
+        await client.get_devices()
+    except DopplerException as err:
+        raise ConfigEntryNotReady from err
+    entry.async_on_unload(
+        async_track_time_interval(
+            hass, lambda _: client.get_devices(), timedelta(minutes=5)
+        )
+    )
 
     def get_dopplers_from_svc_targets(call: ServiceCall) -> set[Doppler]:
         """Get dopplers from service targets."""
@@ -505,38 +509,54 @@ class DopplerDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
         hass: HomeAssistant,
         entry: ConfigEntry,
         client: DopplerClient,
+        device: Doppler,
     ) -> None:
         """Initialize."""
-        self.data: dict[str, dict[str, Any]] = {}
+        super().__init__(
+            hass, _LOGGER, name=f"{DOMAIN}_{device.dsn}", update_interval=SCAN_INTERVAL
+        )
+        self.data: dict[str, Any] = {}
         self.api = client
-        self.platforms = []
+        self.device = device
         self._entry = entry
+        self._entities_created = False
 
-        super().__init__(hass, _LOGGER, name=DOMAIN, update_interval=SCAN_INTERVAL)
+    async def _reschedule_refresh(self) -> None:
+        """Reschedule refresh due to failure."""
+        _LOGGER.debug("Update failed, scheduling a new one in 15 seconds")
+        await asyncio.sleep(15)
+        await self.async_refresh()
 
     async def _async_update_data(self) -> dict[str, Any]:
         """Update data via library."""
-        data: dict[dict[str, Any]] = {}
+        data: dict[str, Any] = {}
         await self.api.get_devices()
 
+        _LOGGER.debug(
+            "Getting update for device %s (%s)", self.device.name, self.device.dsn
+        )
         try:
-            for device in self.api.devices.values():
-                _LOGGER.debug(
-                    "Getting update for device %s (%s)", device.name, device.dsn
-                )
-                data[device.dsn] = await device.get_all_data()
-                _LOGGER.debug(
-                    "Finished getting update for device %s (%s)",
-                    device.name,
-                    device.dsn,
-                )
+            data = await self.device.get_all_data()
         except DopplerException as exc:
             _LOGGER.debug(
                 "Exception received during update for device %s (%s): %s: %s",
-                device.name,
-                device.dsn,
+                self.device.name,
+                self.device.dsn,
                 type(exc).__name__,
                 exc,
             )
+            if not self._entities_created:
+                self.hass.async_create_task(self._reschedule_refresh())
             raise UpdateFailed() from exc
+        else:
+            _LOGGER.debug(
+                "Finished getting update for device %s (%s)",
+                self.device.name,
+                self.device.dsn,
+            )
+        if not self.data:
+            self._entities_created = True
+            async_dispatcher_send(
+                self.hass, f"{DOMAIN}_{self._entry.entry_id}_device_added", self.device
+            )
         return data

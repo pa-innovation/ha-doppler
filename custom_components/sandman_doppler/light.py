@@ -145,7 +145,7 @@ async def async_setup_entry(
     @callback
     def async_add_device(device: Doppler) -> None:
         """Add Doppler binary sensor entities."""
-        coordinator: DopplerDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]
+        coordinator: DopplerDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id][device.dsn]
         entities = [
             DopplerLight(coordinator, entry, device, description)
             for description in LIGHT_ENTITY_DESCRIPTIONS
@@ -277,42 +277,6 @@ class DopplerLight(DopplerEntity[DopplerLightEntityDescription], LightEntity):
         )
         self.device_data[getattr(self.ed, f"{light_property}_key")] = val
         self.async_write_ha_state()
-
-    # @callback
-    # def async_sync_from_day_night_color(self, src_entity_id: str, color: Color) -> None:
-    #     """Sync this entity from the day/night color."""
-    #     _LOGGER.error("%s called sync_from_day_night_color", self.entity_id)
-    #     self.async_sync_from_other_entity("day_night", "color", src_entity_id, color)
-
-    # @callback
-    # def async_sync_from_button_display_color(
-    #     self, src_entity_id: str, color: Color
-    # ) -> None:
-    #     """Sync this entity from the button/display color."""
-    #     _LOGGER.error("%s called sync_from_button_display_color for", self.entity_id)
-    #     self.async_sync_from_other_entity(
-    #         "button_display", "color", src_entity_id, color
-    #     )
-
-    # @callback
-    # def async_sync_from_day_night_brightness(
-    #     self, src_entity_id: str, brightness: int
-    # ) -> None:
-    #     """Sync this entity from the day/night brightness."""
-    #     _LOGGER.error("%s called sync_from_day_night_brightness", self.entity_id)
-    #     self.async_sync_from_other_entity(
-    #         "day_night", "brightness", src_entity_id, brightness
-    #     )
-
-    # @callback
-    # def async_sync_from_button_display_brightness(
-    #     self, src_entity_id: str, brightness: int
-    # ) -> None:
-    #     """Sync this entity from the button/display brightness."""
-    #     _LOGGER.error("%s called sync_from_button_display_brightness", self.entity_id)
-    #     self.async_sync_from_other_entity(
-    #         "button_display", "brightness", src_entity_id, brightness
-    #     )
 
     async def async_added_to_hass(self) -> None:
         """When entity is added to hass."""

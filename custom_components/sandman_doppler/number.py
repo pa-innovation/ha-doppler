@@ -105,7 +105,7 @@ async def async_setup_entry(
     @callback
     def async_add_device(device: Doppler) -> None:
         """Add Doppler binary sensor entities."""
-        coordinator: DopplerDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]
+        coordinator: DopplerDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id][device.dsn]
         entities = [
             DopplerNumber(coordinator, entry, device, description)
             for description in NUMBER_ENTITY_DESCRIPTIONS
