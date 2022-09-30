@@ -5,7 +5,7 @@ from collections.abc import Callable
 from datetime import timedelta
 from functools import wraps
 import logging
-from typing import Any, Literal
+from typing import Any
 
 from doppyler.client import DopplerClient
 from doppyler.exceptions import DopplerException
@@ -23,8 +23,8 @@ from homeassistant.const import (
     CONF_ENABLED,
     CONF_ID,
     CONF_LOCATION,
-    CONF_REPEAT,
     CONF_NAME,
+    CONF_REPEAT,
 )
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import HomeAssistantError
