@@ -1,6 +1,7 @@
 """The Sandman Doppler services module."""
 from __future__ import annotations
 
+import asyncio
 from collections.abc import Callable
 from datetime import timedelta
 from functools import wraps
@@ -42,14 +43,24 @@ SCAN_INTERVAL = timedelta(seconds=60)
 
 _LOGGER = logging.getLogger(__name__)
 
-CONF_COLOR = "color"
-CONF_VOLUME = "volume"
-CONF_SOUND = "sound"
+ATTR_COLOR = "color"
 ATTR_DEVICES = "devices"
+ATTR_DIRECTION = "direction"
+ATTR_DURATION = "duration"
+ATTR_ENABLED = CONF_ENABLED
+ATTR_GAP = "gap"
+ATTR_ID = CONF_ID
+ATTR_LOCATION = CONF_LOCATION
+ATTR_NAME = CONF_NAME
+ATTR_NUMBER = "number"
+ATTR_RAINBOW = "rainbow"
+ATTR_REPEAT = CONF_REPEAT
+ATTR_SIZE = "size"
+ATTR_SOUND = "sound"
+ATTR_SPARKLE = "sparkle"
 ATTR_SPEED = "speed"
 ATTR_TEXT = "text"
-ATTR_DURATION = "duration"
-ATTR_NUMBER = "number"
+ATTR_VOLUME = "volume"
 
 COLOR_SCHEMA = vol.All(
     [vol.All(vol.Coerce(int), vol.Range(0, 255))],
@@ -77,6 +88,27 @@ def async_service_wrapper(orig_func: Callable) -> Callable:
             raise HomeAssistantError from err
 
     return async_service_wrapper_func
+
+
+async def call_doppyler_api_across_devices(
+    devices: set[Doppler], func_name: str, *args, **kwargs
+) -> None:
+    """Call Doppyler API across all devices."""
+    results = await asyncio.gather(
+        *(getattr(device, func_name)(*args, **kwargs) for device in devices),
+        return_exceptions=True,
+    )
+    if errors := (
+        tup for tup in zip(devices, results) if isinstance(tup[1], Exception)
+    ):
+        lines = (
+            f"{len(errors)} error(s):",
+            *(
+                f"{device} - {type(error).__name__}: {error}"
+                for device, error in errors
+            ),
+        )
+        raise HomeAssistantError("\n".join(lines))
 
 
 class DopplerServices:
@@ -154,7 +186,7 @@ class DopplerServices:
             DOMAIN,
             "set_weather_location",
             self.handle_set_weather_location,
-            schema=self._expand_schema({vol.Required(CONF_LOCATION): cv.string}),
+            schema=self._expand_schema({vol.Required(ATTR_LOCATION): cv.string}),
         )
 
         self.hass.services.async_register(
@@ -163,18 +195,18 @@ class DopplerServices:
             self.handle_add_alarm,
             schema=self._expand_schema(
                 {
-                    vol.Required(CONF_ID): vol.Coerce(int),
-                    vol.Required(CONF_NAME): cv.string,
+                    vol.Required(ATTR_ID): vol.Coerce(int),
+                    vol.Required(ATTR_NAME): cv.string,
                     vol.Required(ATTR_TIME): cv.time,
-                    vol.Required(CONF_REPEAT, default=[]): vol.All(
+                    vol.Required(ATTR_REPEAT, default=[]): vol.All(
                         cv.ensure_list, [vol.Coerce(RepeatDayOfWeek)]
                     ),
-                    vol.Required(CONF_COLOR): COLOR_SCHEMA,
-                    vol.Required(CONF_VOLUME): vol.All(
+                    vol.Required(ATTR_COLOR): COLOR_SCHEMA,
+                    vol.Required(ATTR_VOLUME): vol.All(
                         vol.Coerce(int), vol.Range(1, 100)
                     ),
-                    vol.Required(CONF_ENABLED): cv.boolean,
-                    vol.Required(CONF_SOUND): cv.string,
+                    vol.Required(ATTR_ENABLED): cv.boolean,
+                    vol.Required(ATTR_SOUND): cv.string,
                 }
             ),
         )
@@ -183,7 +215,7 @@ class DopplerServices:
             DOMAIN,
             "delete_alarm",
             self.handle_delete_alarm,
-            schema=self._expand_schema({vol.Required(CONF_ID): vol.Coerce(int)}),
+            schema=self._expand_schema({vol.Required(ATTR_ID): vol.Coerce(int)}),
         )
 
         self.hass.services.async_register(
@@ -197,7 +229,7 @@ class DopplerServices:
                     ),
                     vol.Required(ATTR_SPEED): vol.Coerce(int),
                     vol.Required(ATTR_DURATION): cv.time_period,
-                    vol.Required(CONF_COLOR): COLOR_SCHEMA,
+                    vol.Required(ATTR_COLOR): COLOR_SCHEMA,
                 }
             ),
         )
@@ -210,7 +242,7 @@ class DopplerServices:
                 {
                     vol.Optional(ATTR_NUMBER): vol.Coerce(int),
                     vol.Optional(ATTR_DURATION): cv.time_period,
-                    vol.Optional(CONF_COLOR): COLOR_SCHEMA,
+                    vol.Optional(ATTR_COLOR): COLOR_SCHEMA,
                 }
             ),
         )
@@ -262,36 +294,32 @@ class DopplerServices:
         self, call: ServiceCall, devices: set[Doppler]
     ) -> None:
         _LOGGER.warning(f"Called set_weather_location service")
-        for device in devices:
-            await device.set_weather_configuration(location=call.data[CONF_LOCATION])
+        call_doppyler_api_across_devices(
+            devices, "set_weather_configuration", location=call.data[ATTR_LOCATION]
+        )
 
     @async_service_wrapper
     async def handle_add_alarm(self, call: ServiceCall, devices: set[Doppler]) -> None:
         _LOGGER.warning(f"Called add_alarm service")
         alarm = Alarm(
-            id=call.data[CONF_ID],
-            name=call.data[CONF_NAME],
+            id=call.data[ATTR_ID],
+            name=call.data[ATTR_NAME],
             alarm_time=call.data[ATTR_TIME],
-            repeat=call.data[CONF_REPEAT],
-            color=call.data[CONF_COLOR],
-            volume=call.data[CONF_VOLUME],
-            status=call.data[CONF_ENABLED],
+            repeat=call.data[ATTR_REPEAT],
+            color=call.data[ATTR_COLOR],
+            volume=call.data[ATTR_VOLUME],
+            status=call.data[ATTR_ENABLED],
             src=AlarmSource.APP,
-            sound=call.data[CONF_SOUND],
+            sound=call.data[ATTR_SOUND],
         )
-        for device in devices:
-            try:
-                await device.add_alarm(alarm)
-            except DopplerException as err:
-                raise HomeAssistantError from err
+        call_doppyler_api_across_devices(devices, "add_alarm", alarm)
 
     @async_service_wrapper
     async def handle_delete_alarm(
         self, call: ServiceCall, devices: set[Doppler]
     ) -> None:
         _LOGGER.warning(f"Called delete_alarm service")
-        for device in devices:
-            await device.delete_alarm(call.data[CONF_ID])
+        call_doppyler_api_across_devices(devices, "delete_alarm", call.data[ATTR_ID])
 
     @async_service_wrapper
     async def handle_set_main_display(
@@ -302,10 +330,9 @@ class DopplerServices:
             text=call.data[ATTR_TEXT],
             duration=call.data[ATTR_DURATION],
             speed=call.data[ATTR_SPEED],
-            color=call.data[CONF_COLOR],
+            color=call.data[ATTR_COLOR],
         )
-        for device in devices:
-            await device.set_main_display_text(mdt)
+        call_doppyler_api_across_devices(devices, "set_main_display_text", mdt)
 
     @async_service_wrapper
     async def handle_set_mini_display(
@@ -315,10 +342,9 @@ class DopplerServices:
         mdn = MiniDisplayNumber(
             number=call.data[ATTR_NUMBER],
             duration=call.data[ATTR_DURATION],
-            color=call.data[CONF_COLOR],
+            color=call.data[ATTR_COLOR],
         )
-        for device in devices:
-            await device.set_mini_display_number(mdn)
+        call_doppyler_api_across_devices(devices, "set_mini_display_number", mdn)
 
     @async_service_wrapper
     async def handle_set_light_bar_color(
@@ -353,11 +379,9 @@ class DopplerServices:
             }
         )
         _LOGGER.warning(f"lbde_dict={lbde_dict}")
-        for device in devices:
-            retval = await device.set_light_bar_effect(
-                LightbarDisplayEffect.from_dict(lbde_dict)
-            )
-        _LOGGER.warning(f"retval={retval.to_dict()}")
+        call_doppyler_api_across_devices(
+            devices, "set_light_bar_effect", LightbarDisplayEffect.from_dict(lbde_dict)
+        )
 
     @async_service_wrapper
     async def handle_set_each_light_bar_color(
@@ -392,11 +416,9 @@ class DopplerServices:
             }
         )
         _LOGGER.warning(f"lbde_dict={lbde_dict}")
-        for device in devices:
-            retval = await device.set_light_bar_effect(
-                LightbarDisplayEffect.from_dict(lbde_dict)
-            )
-        _LOGGER.warning(f"retval={retval.to_dict()}")
+        call_doppyler_api_across_devices(
+            devices, "set_light_bar_effect", LightbarDisplayEffect.from_dict(lbde_dict)
+        )
 
     @async_service_wrapper
     async def handle_set_light_bar_blink(
@@ -433,11 +455,9 @@ class DopplerServices:
         )
 
         _LOGGER.warning(f"lbde_dict={lbde_dict}")
-        for device in devices:
-            retval = await device.set_light_bar_effect(
-                LightbarDisplayEffect.from_dict(lbde_dict)
-            )
-        _LOGGER.warning(f"retval={retval.to_dict()}")
+        call_doppyler_api_across_devices(
+            devices, "set_light_bar_effect", LightbarDisplayEffect.from_dict(lbde_dict)
+        )
 
     @async_service_wrapper
     async def handle_set_light_bar_pulse(
@@ -477,11 +497,9 @@ class DopplerServices:
         )
 
         _LOGGER.warning(f"lbde_dict={lbde_dict}")
-        for device in devices:
-            retval = await device.set_light_bar_effect(
-                LightbarDisplayEffect.from_dict(lbde_dict)
-            )
-        _LOGGER.warning(f"retval={retval.to_dict()}")
+        call_doppyler_api_across_devices(
+            devices, "set_light_bar_effect", LightbarDisplayEffect.from_dict(lbde_dict)
+        )
 
     @async_service_wrapper
     async def handle_set_light_bar_comet(
@@ -527,11 +545,9 @@ class DopplerServices:
         )
 
         _LOGGER.warning(f"lbde_dict={lbde_dict}")
-        for device in devices:
-            retval = await device.set_light_bar_effect(
-                LightbarDisplayEffect.from_dict(lbde_dict)
-            )
-        _LOGGER.warning(f"retval={retval.to_dict()}")
+        call_doppyler_api_across_devices(
+            devices, "set_light_bar_effect", LightbarDisplayEffect.from_dict(lbde_dict)
+        )
 
     @async_service_wrapper
     async def handle_set_light_bar_sweep(
@@ -581,8 +597,6 @@ class DopplerServices:
         )
 
         _LOGGER.warning(f"lbde_dict={lbde_dict}")
-        for device in devices:
-            retval = await device.set_light_bar_effect(
-                LightbarDisplayEffect.from_dict(lbde_dict)
-            )
-        _LOGGER.warning(f"retval={retval.to_dict()}")
+        call_doppyler_api_across_devices(
+            devices, "set_light_bar_effect", LightbarDisplayEffect.from_dict(lbde_dict)
+        )

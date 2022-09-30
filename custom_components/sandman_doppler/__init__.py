@@ -35,7 +35,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     password = entry.data[CONF_PASSWORD]
 
     session = async_get_clientsession(hass)
-    client = DopplerClient(email, password, client_session=session, local_control=False)
+    client = DopplerClient(email, password, client_session=session)
 
     dev_reg = dr.async_get(hass)
     ent_reg = er.async_get(hass)
@@ -78,6 +78,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         await client.get_devices()
     except DopplerException as err:
         raise ConfigEntryNotReady from err
+
     entry.async_on_unload(
         async_track_time_interval(
             hass, lambda _: client.get_devices(), timedelta(minutes=5)
