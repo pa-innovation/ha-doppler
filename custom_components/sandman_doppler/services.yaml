@@ -36,7 +36,7 @@ add_alarm:
           mode: box
     name:
       name: Alarm Name
-      description: Name of the Alarm
+      description: Name of the alarm
       required: true
       advanced: false
       selector:
@@ -50,7 +50,7 @@ add_alarm:
         time:
     repeat:
       name: Repeat Days
-      description: Alarm Repeats on these days
+      description: Alarm repeats on these days
       required: false
       advanced: false
       selector:
@@ -73,7 +73,7 @@ add_alarm:
               value: Sa
     color:
       name: Alarm Color
-      description: Color of the Alarm on the clock
+      description: Color of the alarm on the clock
       required: true
       advanced: false
       selector:
@@ -88,8 +88,8 @@ add_alarm:
           min: 0
           max: 100
           mode: slider
-    status:
-      name: Alarm Status
+    enabled:
+      name: Alarm Enabled?
       description: Whether alarm is enabled or disabled
       required: true
       advanced: false
@@ -97,7 +97,7 @@ add_alarm:
         boolean:
     sound:
       name: Alarm Sound
-      description: mp3 file to play for alarm
+      description: MP3 file to play for alarm
       required: true
       advanced: false
       selector:

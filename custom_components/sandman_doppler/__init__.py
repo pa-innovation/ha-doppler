@@ -84,7 +84,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         )
     )
 
-    DopplerServices(hass, client, ent_reg, dev_reg).async_register()
+    DopplerServices(hass, ent_reg, dev_reg, client).async_register()
 
     return True
 
