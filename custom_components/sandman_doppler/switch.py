@@ -106,8 +106,8 @@ ENTITY_DESCRIPTIONS = [
         set_value_func_name="set_sound_preset_mode",
     ),
     DopplerSwitchEntityDescription(
-        "Weather Service",
-        name="Weather Service",
+        "Weather: Displayed",
+        name="Weather: Displayed",
         state_key=ATTR_WEATHER,
         state_func=lambda x: x.enabled,
         set_value_func=lambda dev, val: dev.set_weather_configuration(enabled=val),

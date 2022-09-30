@@ -1,3 +1,20 @@
+set_weather_location:
+  name: Set weather location
+  description: Sets the location that weather is retrieved for. To control other weather settings, use the available weather entities.
+  target:
+    device:
+      integration: sandman_doppler
+    entity:
+      integration: sandman_doppler
+  fields:
+    location:
+      name: Location
+      description: The location to query weather for.
+      required: true
+      advanced: false
+      selector:
+        text:
+
 add_alarm:
   name: Add new alarm
   description: Sets an Alarm on the Doppler. If the ID is unused, the alarm will be created as new. If the ID is in use, the existing alarm will be replaced.

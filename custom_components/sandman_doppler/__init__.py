@@ -18,6 +18,7 @@ from homeassistant.const import (
     ATTR_AREA_ID,
     ATTR_DEVICE_ID,
     ATTR_ENTITY_ID,
+    ATTR_LOCATION,
     CONF_EMAIL,
     CONF_PASSWORD,
 )
@@ -50,7 +51,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     dev_reg = dr.async_get(hass)
     ent_reg = er.async_get(hass)
 
-    await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
+    if not hass.data[DOMAIN][entry.entry_id].get("platform_setup_complete"):
+        hass.data[DOMAIN][entry.entry_id]["platform_setup_complete"] = True
+        await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
     @callback
     def async_on_device_added(device: Doppler) -> None:
@@ -127,6 +130,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
         return dopplers
 
+    async def handle_set_weather_location_svc(call: ServiceCall) -> None:
+        for device in get_dopplers_from_svc_targets(call):
+            await device.set_weather_configuration(location=call.data[ATTR_LOCATION])
+
     async def handle_add_alarm_svc(call: ServiceCall) -> None:
         if "repeat" in call.data:
             r = call.data["repeat"]
@@ -162,7 +169,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             await device.delete_alarm(int(call.data["id"]))
 
     async def handle_set_main_display_svc(call: ServiceCall) -> None:
-
         # regex for accepted characters: (?![kmwv])[a-z0-9 \_\-]+
         _LOGGER.warning(f"Called handle_set_main_display service")
         mdt_dict = MainDisplayTextDict(
@@ -448,8 +454,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         _LOGGER.warning(f"retval={retval.to_dict()}")
 
     hass.services.async_register(
-        DOMAIN, "add_alarm", handle_add_alarm_svc
+        DOMAIN, "set_weather_location", handle_set_weather_location_svc
     )
+    hass.services.async_register(DOMAIN, "add_alarm", handle_add_alarm_svc)
     hass.services.async_register(DOMAIN, "delete_alarm", handle_delete_alarm_svc)
     hass.services.async_register(
         DOMAIN, "set_main_display_text", handle_set_main_display_svc

@@ -6,7 +6,7 @@ from dataclasses import dataclass
 import logging
 from typing import Any
 
-from doppyler.const import ATTR_ALARMS, ATTR_LIGHT_SENSOR_VALUE, ATTR_WIFI
+from doppyler.const import ATTR_ALARMS, ATTR_LIGHT_SENSOR_VALUE, ATTR_WEATHER, ATTR_WIFI
 from doppyler.model.doppler import Doppler
 from homeassistant.components.sensor import (
     SensorDeviceClass,
@@ -72,6 +72,14 @@ SENSOR_ENTITY_DESCRIPTIONS = [
         native_unit_of_measurement=PERCENTAGE,
         state_key=ATTR_WIFI,
         state_func=lambda x: int(x.signal_strength),
+    ),
+    DopplerSensorEntityDescription(
+        "Weather: Location",
+        name="Weather: Location",
+        icon="mdi:earth",
+        entity_category=EntityCategory.CONFIG,
+        state_key=ATTR_WEATHER,
+        state_func=lambda x: x.location,
     ),
 ]
 

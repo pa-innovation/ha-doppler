@@ -60,8 +60,8 @@ ENUM_SELECT_ENTITY_DESCRIPTIONS = [
         set_value_func=lambda dev, val: dev.set_sound_preset(val),
     ),
     DopplerEnumSelectEntityDescription(
-        "Weather Mode",
-        name="Weather Mode",
+        "Weather: Mode",
+        name="Weather: Mode",
         icon="mdi:weather-partly-snowy-rainy",
         entity_category=EntityCategory.CONFIG,
         enum_cls=WeatherMode,
