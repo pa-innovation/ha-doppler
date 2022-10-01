@@ -57,7 +57,7 @@ class DopplerFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
         session = async_get_clientsession(self.hass)
         client = DopplerClient(email, password, client_session=session)
         try:
-            await client.get_devices()
+            await client.get_token()
         except DopplerException:
             return False
         return True

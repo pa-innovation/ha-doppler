@@ -75,9 +75,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     entry.async_on_unload(client.on_device_removed(async_on_device_removed))
 
     try:
-        await client.get_devices()
+        await client.get_token()
     except DopplerException as err:
         raise ConfigEntryNotReady from err
+
+    hass.async_create_task(client.get_devices())
 
     entry.async_on_unload(
         async_track_time_interval(

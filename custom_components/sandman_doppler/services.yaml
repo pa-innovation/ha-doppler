@@ -11,7 +11,6 @@ set_weather_location:
       name: Location
       description: The location to query weather for.
       required: true
-      advanced: false
       selector:
         text:
 
@@ -28,7 +27,6 @@ add_alarm:
       name: Alarm ID
       description: ID of the alarm to be set
       required: true
-      advanced: false
       selector:
         number:
           min: 1
@@ -38,21 +36,18 @@ add_alarm:
       name: Alarm Name
       description: Name of the alarm
       required: true
-      advanced: false
       selector:
         text:          
     time:
       name: Alarm Time
       description: The time of the alarm to set
       required: true
-      advanced: false
       selector:
         time:
     repeat:
       name: Repeat Days
       description: Alarm repeats on these days
       required: false
-      advanced: false
       selector:
         select:
           multiple: true
@@ -75,7 +70,6 @@ add_alarm:
       name: Alarm Color
       description: Color of the alarm on the clock
       required: true
-      advanced: false
       selector:
         color_rgb:
     volume:
@@ -92,14 +86,12 @@ add_alarm:
       name: Alarm Enabled?
       description: Whether alarm is enabled or disabled
       required: true
-      advanced: false
       selector:
         boolean:
     sound:
       name: Alarm Sound
       description: MP3 file to play for alarm
       required: true
-      advanced: false
       selector:
         select:
           options:
@@ -137,7 +129,6 @@ delete_alarm:
       name: Alarm ID
       description: ID of the alarm to be set
       required: true
-      advanced: false
       selector:
         number:
           min: 1
@@ -157,7 +148,6 @@ set_main_display_text:
       name: Text
       description: Text to display
       required: true
-      advanced: false
       selector:
         text:
           type: text
@@ -165,7 +155,6 @@ set_main_display_text:
       name: Duration
       description: Length of time text is displayed in seconds
       required: true
-      advanced: false
       selector:
         duration:
           enable_days: false
@@ -173,7 +162,6 @@ set_main_display_text:
       name: Speed
       description: Number of characters to display over duration
       required: true
-      advanced: false
       selector:
         number:
           min: 0
@@ -183,7 +171,6 @@ set_main_display_text:
       name: Color
       description: Color of displayed text
       required: true
-      advanced: false
       selector:
         color_rgb:
 
@@ -200,7 +187,6 @@ set_mini_display_number:
       name: Number
       description: Number to display on Mini Display
       required: true
-      advanced: false
       selector:
         number:
           min: -199
@@ -210,7 +196,6 @@ set_mini_display_number:
       name: Display Duration
       description: Length of time in seconds the number is displayed on mini display
       required: true
-      advanced: false
       selector:
         duration:
           enable_days: false
@@ -218,116 +203,47 @@ set_mini_display_number:
       name: Display Color
       description: Color of Displayed Number
       required: true
-      advanced: false
       selector:
         color_rgb:
 
-set_light_bar_color:
-  name: Set light bar color
-  description: Sets light bar to a single color and cycles colors if multiple colors are selected
+activate_light_bar_set:
+  name: Activate the light bar (`set`)
+  description: Activates the light bar in `set` mode.
   target:
     device:
       integration: sandman_doppler
     entity:
       integration: sandman_doppler
   fields:
-    color_1:
-      name: Color 1
-      description: First color of light bar
-      required: true
-      advanced: false
-      selector:
-        color_rgb:
-    color_2:
-      name: Color 2
-      description: Second color of light bar
+    color:
+      name: Single Color
+      description: Use this option to select a single color. If this is enabled, don't set rainbow to `true`. If color list is enabled, this will be ignored.
       required: false
-      advanced: false
       selector:
         color_rgb:
-    color_3:
-      name: Color 3
-      description: Third color of light bar
+    colors:
+      name: Color List
+      description: List of colors where each color is in the form [red_val, green_val, blue_val]. You can use the Single Color color picker to pick a color visually and then switch to YAML mode and copy the result into this box. Repeat for each color you want to add to the list. If this is enabled, don't set rainbow to `true`.
       required: false
-      advanced: false
       selector:
-        color_rgb:
-    color_4:
-      name: Color 4
-      description: Fourth color of light bar
+        object:
+    rainbow:
+      name: Rainbow
+      description: Uses rainbow effect for color. If this is `true` don't specify color list.
       required: false
-      advanced: false
       selector:
-        color_rgb:
-    color_5:
-      name: Color 5
-      description: Fifth color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_6:
-      name: Color 6
-      description: Sixth color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_7:
-      name: Color 7
-      description: Seventh color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_8:
-      name: Color 8
-      description: Eighth color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_9:
-      name: Color 9
-      description: Ninth color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_10:
-      name: Color 10
-      description: Tenth color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_11:
-      name: Color 11
-      description: Eleventh color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_12:
-      name: Color 12
-      description: Twelveth color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
+        boolean:
     duration:
       name: Duration
       description: Duration of light bar effect
       required: true
-      advanced: false
       selector:
         duration:
           enable_days: false
     speed:
       name: Speed
       description: Speed of light bar effect
-      required: true
-      advanced: false
+      required: false
       selector:
         number:
           min: 0
@@ -337,238 +253,44 @@ set_light_bar_color:
       name: Sparkle
       description: Makes sparkles in the effect
       required: false
-      advanced: false
       selector:
         select:
           options:
             - low
             - medium
             - high
-    rainbow:
-      name: Rainbow
-      description: Replaces specified palette with rainbow effect
-      required: false
-      advanced: false
-      selector:
-        boolean:
 
-set_each_light_bar_color:
-  name: Light bar color Set Each
-  description: Sets each dot on the light bar individually for duration
+activate_light_bar_set_each:
+  name: Activate the light bar (`set-each`)
+  description: Activates the light bar in `set-each` mode.
   target:
     device:
       integration: sandman_doppler
     entity:
       integration: sandman_doppler
   fields:
-    color_1:
-      name: Color 1
-      description: First color of light bar
-      required: true
-      advanced: false
+    color:
+      name: Single Color
+      description: Use this option to select a single color. If this is enabled, don't set rainbow to `true`. If color list is enabled, this will be ignored.
+      required: false
       selector:
         color_rgb:
-    color_2:
-      name: Color 2
-      description: Second color of light bar
+    colors:
+      name: Color List
+      description: List of colors where each color is in the form [red_val, green_val, blue_val]. You can use the Single Color color picker to pick a color visually and then switch to YAML mode and copy the result into this box. Repeat for each color you want to add to the list. If this is enabled, don't set rainbow to `true`.
       required: false
-      advanced: false
       selector:
-        color_rgb:
-    color_3:
-      name: Color 3
-      description: Third color of light bar
+        object:
+    rainbow:
+      name: Rainbow
+      description: Uses rainbow effect for color. If this is `true` don't specify color list.
       required: false
-      advanced: false
       selector:
-        color_rgb:
-    color_4:
-      name: Color 4
-      description: Fourth color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_5:
-      name: Color 5
-      description: Fifth color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_6:
-      name: Color 6
-      description: Sixth color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_7:
-      name: Color 7
-      description: Seventh color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_8:
-      name: Color 8
-      description: Eighth color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_9:
-      name: Color 9
-      description: Ninth color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_10:
-      name: Color 10
-      description: Tenth color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_11:
-      name: Color 11
-      description: Eleventh color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_12:
-      name: Color 12
-      description: Twelveth color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_13:
-      name: Color 13
-      description: Thirteenth color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_14:
-      name: Color 14
-      description: Fourteenth color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_15:
-      name: Color 15
-      description: Fifteenth color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_16:
-      name: Color 16
-      description: Sixteenth color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_17:
-      name: Color 17
-      description: Seventeenth color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_18:
-      name: Color 18
-      description: Eighteenth color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_19:
-      name: Color 19
-      description: Nineteenth color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_20:
-      name: Color 20
-      description: Twentieth color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_21:
-      name: Color 21
-      description: Twentyfirst color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_22:
-      name: Color 22
-      description: Twentysecond color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_23:
-      name: Color 23
-      description: Twentythird color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_24:
-      name: Color 24
-      description: Twentyfourth color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_25:
-      name: Color 25
-      description: Twentyfifth color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_26:
-      name: Color 26
-      description: Twentysixth color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_27:
-      name: Color 27
-      description: Twentyseventh color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_28:
-      name: Color 28
-      description: Twentyeighth color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_29:
-      name: Color 29
-      description: Twentyninth color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:          
+        boolean:
     duration:
       name: Duration
       description: Duration of light bar effect
       required: true
-      advanced: false
       selector:
         duration:
           enable_days: false
@@ -576,127 +298,51 @@ set_each_light_bar_color:
       name: Sparkle
       description: Makes sparkles in the effect
       required: false
-      advanced: false
       selector:
         select:
           options:
             - low
             - medium
             - high
-    rainbow:
-      name: Rainbow
-      description: Replaces specified palette with rainbow effect
-      required: false
-      advanced: false
-      selector:
-        boolean:
 
-set_light_bar_blink:
-  name: Light bar Blink
-  description: Sets light bar to blink between one or more colors and black
+activate_light_bar_blink:
+  name: Activate the light bar (`blink`)
+  description: Activates the light bar in `blink` mode.
   target:
     device:
       integration: sandman_doppler
     entity:
       integration: sandman_doppler
   fields:
-    color_1:
-      name: Color 1
-      description: First color of light bar
-      required: true
-      advanced: false
-      selector:
-        color_rgb:
-    color_2:
-      name: Color 2
-      description: Second color of light bar
+    color:
+      name: Single Color
+      description: Use this option to select a single color. If this is enabled, don't set rainbow to `true`. If color list is enabled, this will be ignored.
       required: false
-      advanced: false
       selector:
         color_rgb:
-    color_3:
-      name: Color 3
-      description: Third color of light bar
+    colors:
+      name: Color List
+      description: List of colors where each color is in the form [red_val, green_val, blue_val]. You can use the Single Color color picker to pick a color visually and then switch to YAML mode and copy the result into this box. Repeat for each color you want to add to the list. If this is enabled, don't set rainbow to `true`.
       required: false
-      advanced: false
       selector:
-        color_rgb:
-    color_4:
-      name: Color 4
-      description: Fourth color of light bar
+        object:
+    rainbow:
+      name: Rainbow
+      description: Uses rainbow effect for color. If this is `true` don't specify color list.
       required: false
-      advanced: false
       selector:
-        color_rgb:
-    color_5:
-      name: Color 5
-      description: Fifth color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_6:
-      name: Color 6
-      description: Sixth color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_7:
-      name: Color 7
-      description: Seventh color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_8:
-      name: Color 8
-      description: Eighth color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_9:
-      name: Color 9
-      description: Ninth color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_10:
-      name: Color 10
-      description: Tenth color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_11:
-      name: Color 11
-      description: Eleventh color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_12:
-      name: Color 12
-      description: Twelveth color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
+        boolean:
     duration:
       name: Duration
       description: Duration of light bar effect
       required: true
-      advanced: false
       selector:
         duration:
           enable_days: false
     speed:
       name: Speed
       description: Speed of light bar effect
-      required: true
-      advanced: false
+      required: false
       selector:
         number:
           min: 0
@@ -706,137 +352,114 @@ set_light_bar_blink:
       name: Sparkle
       description: Makes sparkles in the effect
       required: false
-      advanced: false
       selector:
         select:
           options:
             - low
             - medium
             - high
-    rainbow:
-      name: Rainbow
-      description: Replaces specified palette with rainbow effect
-      required: false
-      advanced: false
-      selector:
-        boolean:
 
-set_light_bar_pulse:
-  name: Light bar Pulse
-  description: Sets light bar to pulse between one or more colors and black
+activate_light_bar_pulse:
+  name: Activate the light bar (`pulse`)
+  description: Activates the light bar in `pulse` mode.
   target:
     device:
       integration: sandman_doppler
     entity:
       integration: sandman_doppler
   fields:
-    color_1:
-      name: Color 1
-      description: First color of light bar
-      required: true
-      advanced: false
-      selector:
-        color_rgb:
-    color_2:
-      name: Color 2
-      description: Second color of light bar
+    color:
+      name: Single Color
+      description: Use this option to select a single color. If this is enabled, don't set rainbow to `true`. If color list is enabled, this will be ignored.
       required: false
-      advanced: false
       selector:
         color_rgb:
-    color_3:
-      name: Color 3
-      description: Third color of light bar
+    colors:
+      name: Color List
+      description: List of colors where each color is in the form [red_val, green_val, blue_val]. You can use the Single Color color picker to pick a color visually and then switch to YAML mode and copy the result into this box. Repeat for each color you want to add to the list. If this is enabled, don't set rainbow to `true`.
       required: false
-      advanced: false
       selector:
-        color_rgb:
-    color_4:
-      name: Color 4
-      description: Fourth color of light bar
+        object:
+    rainbow:
+      name: Rainbow
+      description: Uses rainbow effect for color. If this is `true` don't specify color list.
       required: false
-      advanced: false
       selector:
-        color_rgb:
-    color_5:
-      name: Color 5
-      description: Fifth color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_6:
-      name: Color 6
-      description: Sixth color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_7:
-      name: Color 7
-      description: Seventh color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_8:
-      name: Color 8
-      description: Eighth color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_9:
-      name: Color 9
-      description: Ninth color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_10:
-      name: Color 10
-      description: Tenth color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_11:
-      name: Color 11
-      description: Eleventh color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_12:
-      name: Color 12
-      description: Twelveth color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
+        boolean:
     duration:
       name: Duration
       description: Duration of light bar effect
       required: true
-      advanced: false
       selector:
         duration:
           enable_days: false
     speed:
       name: Speed
       description: Speed of light bar effect
-      required: true
-      advanced: false
+      required: false
       selector:
         number:
           min: 0
           max: 255
           mode: box
+    sparkle:
+      name: Sparkle
+      description: Makes sparkles in the effect
+      required: false
+      selector:
+        select:
+          options:
+            - low
+            - medium
+            - high
     gap:
       name: Gap
       description: Number of color slices between colors
       required: false
-      advanced: false
+      selector:
+        number:
+          min: 2
+          max: 255
+          mode: box
+
+activate_light_bar_comet:
+  name: Activate the light bar (`comet`)
+  description: Activates the light bar in `comet` mode.
+  target:
+    device:
+      integration: sandman_doppler
+    entity:
+      integration: sandman_doppler
+  fields:
+    color:
+      name: Single Color
+      description: Use this option to select a single color. If this is enabled, don't set rainbow to `true`. If color list is enabled, this will be ignored.
+      required: false
+      selector:
+        color_rgb:
+    colors:
+      name: Color List
+      description: List of colors where each color is in the form [red_val, green_val, blue_val]. You can use the Single Color color picker to pick a color visually and then switch to YAML mode and copy the result into this box. Repeat for each color you want to add to the list. If this is enabled, don't set rainbow to `true`.
+      required: false
+      selector:
+        object:
+    rainbow:
+      name: Rainbow
+      description: Uses rainbow effect for color. If this is `true` don't specify color list.
+      required: false
+      selector:
+        boolean:
+    duration:
+      name: Duration
+      description: Duration of light bar effect
+      required: true
+      selector:
+        duration:
+          enable_days: false
+    speed:
+      name: Speed
+      description: Speed of light bar effect
+      required: false
       selector:
         number:
           min: 0
@@ -846,137 +469,16 @@ set_light_bar_pulse:
       name: Sparkle
       description: Makes sparkles in the effect
       required: false
-      advanced: false
       selector:
         select:
           options:
             - low
             - medium
             - high
-    rainbow:
-      name: Rainbow
-      description: Replaces specified palette with rainbow effect
-      required: false
-      advanced: false
-      selector:
-        boolean:
-
-set_light_bar_comet:
-  name: Light bar Comet
-  description: Sets light bar to display a comet
-  target:
-    device:
-      integration: sandman_doppler
-    entity:
-      integration: sandman_doppler
-  fields:
-    color_1:
-      name: Color 1
-      description: First color of light bar
-      required: true
-      advanced: false
-      selector:
-        color_rgb:
-    color_2:
-      name: Color 2
-      description: Second color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_3:
-      name: Color 3
-      description: Third color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_4:
-      name: Color 4
-      description: Fourth color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_5:
-      name: Color 5
-      description: Fifth color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_6:
-      name: Color 6
-      description: Sixth color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_7:
-      name: Color 7
-      description: Seventh color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_8:
-      name: Color 8
-      description: Eighth color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_9:
-      name: Color 9
-      description: Ninth color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_10:
-      name: Color 10
-      description: Tenth color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_11:
-      name: Color 11
-      description: Eleventh color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_12:
-      name: Color 12
-      description: Twelveth color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    duration:
-      name: Duration
-      description: Duration of light bar effect
-      required: true
-      advanced: false
-      selector:
-        duration:
-          enable_days: false
-    speed:
-      name: Speed
-      description: Speed of light bar effect
-      required: true
-      advanced: false
-      selector:
-        number:
-          min: 0
-          max: 255
-          mode: box
     size:
       name: Size
-      description: Size of Comet
+      description: Size of comet
       required: false
-      advanced: false
       selector:
         number:
           min: 0
@@ -986,148 +488,70 @@ set_light_bar_comet:
       name: Direction
       description: Direction of comet
       required: false
-      advanced: false
       selector:
         select:
           options:
             - right
             - left
             - bounce
-    sparkle:
-      name: Sparkle
-      description: Makes sparkles in the effect
-      required: false
-      advanced: false
-      selector:
-        select:
-          options:
-            - low
-            - medium
-            - high
-    rainbow:
-      name: Rainbow
-      description: Replaces specified palette with rainbow effect
-      required: false
-      advanced: false
-      selector:
-        boolean:
 
-set_light_bar_sweep:
-  name: Light bar Sweep
-  description: Sets light bar to display a sweep
+activate_light_bar_sweep:
+  name: Activate the light bar (`sweep`)
+  description: Activates the light bar in `sweep` mode.
   target:
     device:
       integration: sandman_doppler
     entity:
       integration: sandman_doppler
   fields:
-    color_1:
-      name: Color 1
-      description: First color of light bar
-      required: true
-      advanced: false
-      selector:
-        color_rgb:
-    color_2:
-      name: Color 2
-      description: Second color of light bar
+    color:
+      name: Single Color
+      description: Use this option to select a single color. If this is enabled, don't set rainbow to `true`. If color list is enabled, this will be ignored.
       required: false
-      advanced: false
       selector:
         color_rgb:
-    color_3:
-      name: Color 3
-      description: Third color of light bar
+    colors:
+      name: Color List
+      description: List of colors where each color is in the form [red_val, green_val, blue_val]. You can use the Single Color color picker to pick a color visually and then switch to YAML mode and copy the result into this box. Repeat for each color you want to add to the list. If this is enabled, don't set rainbow to `true`.
       required: false
-      advanced: false
       selector:
-        color_rgb:
-    color_4:
-      name: Color 4
-      description: Fourth color of light bar
+        object:
+    rainbow:
+      name: Rainbow
+      description: Uses rainbow effect for color. If this is `true` don't specify color list.
       required: false
-      advanced: false
       selector:
-        color_rgb:
-    color_5:
-      name: Color 5
-      description: Fifth color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_6:
-      name: Color 6
-      description: Sixth color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_7:
-      name: Color 7
-      description: Seventh color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_8:
-      name: Color 8
-      description: Eighth color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_9:
-      name: Color 9
-      description: Ninth color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_10:
-      name: Color 10
-      description: Tenth color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_11:
-      name: Color 11
-      description: Eleventh color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
-    color_12:
-      name: Color 12
-      description: Twelveth color of light bar
-      required: false
-      advanced: false
-      selector:
-        color_rgb:
+        boolean:
     duration:
       name: Duration
       description: Duration of light bar effect
       required: true
-      advanced: false
       selector:
         duration:
           enable_days: false
     speed:
       name: Speed
       description: Speed of light bar effect
-      required: true
-      advanced: false
+      required: false
       selector:
         number:
           min: 0
           max: 255
           mode: box
+    sparkle:
+      name: Sparkle
+      description: Makes sparkles in the effect
+      required: false
+      selector:
+        select:
+          options:
+            - low
+            - medium
+            - high
     gap:
       name: Gap
-      description: Number of color slices between colors
+      description: Number of dots per block that are black
       required: false
-      advanced: false
       selector:
         number:
           min: 0
@@ -1135,9 +559,8 @@ set_light_bar_sweep:
           mode: box
     size:
       name: Size
-      description: Size of Sweep
+      description: Number of dots per block that are colored
       required: false
-      advanced: false
       selector:
         number:
           min: 0
@@ -1145,29 +568,11 @@ set_light_bar_sweep:
           mode: box
     direction:
       name: Direction
-      description: Direction of Sweep
+      description: Direction of sweep
       required: false
-      advanced: false
       selector:
         select:
           options:
             - right
             - left
-    sparkle:
-      name: Sparkle
-      description: Makes sparkles in the effect
-      required: false
-      advanced: false
-      selector:
-        select:
-          options:
-            - low
-            - medium
-            - high
-    rainbow:
-      name: Rainbow
-      description: Replaces specified palette with rainbow effect
-      required: false
-      advanced: false
-      selector:
-        boolean:
+            - bounce
