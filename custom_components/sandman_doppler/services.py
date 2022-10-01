@@ -140,11 +140,11 @@ class DopplerServices:
         """Get dopplers from service targets."""
         devices: set[Doppler] = set()
         device_ids: set[str] = set()
-        device_ids.update(data.get(ATTR_DEVICE_ID, []))
+        device_ids.update(data.pop(ATTR_DEVICE_ID, []))
         device_ids.update(
             {
                 entity_entry.device_id
-                for entity_id in data.get(ATTR_ENTITY_ID, [])
+                for entity_id in data.pop(ATTR_ENTITY_ID, [])
                 if (entity_entry := self.ent_reg.async_get(entity_id))
                 and entity_entry.device_id
             }
@@ -152,7 +152,7 @@ class DopplerServices:
         device_ids.update(
             {
                 dev.id
-                for area_id in data.get(ATTR_AREA_ID, [])
+                for area_id in data.pop(ATTR_AREA_ID, [])
                 for dev in dr.async_entries_for_area(self.dev_reg, area_id)
             }
         )
@@ -188,8 +188,8 @@ class DopplerServices:
         return vol.All(
             schema,
             cv.has_at_least_one_key(ATTR_DEVICE_ID, ATTR_ENTITY_ID, ATTR_AREA_ID),
-            _validate_colors,
             self.get_dopplers_from_targets,
+            _validate_colors,
         )
 
     @callback
@@ -342,70 +342,67 @@ class DopplerServices:
 
     async def handle_set_weather_location(self, call: ServiceCall) -> None:
         """Handle set_weather_location service."""
-        _LOGGER.warning(f"Called set_weather_location service")
-        devices: set[Doppler] = call.data[ATTR_DEVICES]
-        call_doppyler_api_across_devices(
-            devices, "set_weather_configuration", location=call.data[ATTR_LOCATION]
-        )
+        data = call.data.copy()
+        devices: set[Doppler] = data.pop(ATTR_DEVICES)
+        _LOGGER.debug("Called set_weather_location service, sending %s", data)
+        call_doppyler_api_across_devices(devices, "set_weather_configuration", **data)
 
     async def handle_add_alarm(self, call: ServiceCall) -> None:
         """Handle add_alarm service."""
-        _LOGGER.warning(f"Called add_alarm service")
+        data = call.data.copy()
+        devices: set[Doppler] = data.pop(ATTR_DEVICES)
         alarm = Alarm(
-            id=call.data[ATTR_ID],
-            name=call.data[ATTR_NAME],
-            alarm_time=call.data[ATTR_TIME],
-            repeat=call.data[ATTR_REPEAT],
-            color=call.data[ATTR_COLOR],
-            volume=call.data[ATTR_VOLUME],
-            status=call.data[ATTR_ENABLED],
+            id=data[ATTR_ID],
+            name=data[ATTR_NAME],
+            alarm_time=data[ATTR_TIME],
+            repeat=data[ATTR_REPEAT],
+            color=data[ATTR_COLOR],
+            volume=data[ATTR_VOLUME],
+            status=data[ATTR_ENABLED],
             src=AlarmSource.APP,
-            sound=call.data[ATTR_SOUND],
+            sound=data[ATTR_SOUND],
         )
-        devices: set[Doppler] = call.data[ATTR_DEVICES]
+        _LOGGER.debug(f"Called add_alarm service, sending %s", alarm)
         await call_doppyler_api_across_devices(devices, "add_alarm", alarm)
 
     async def handle_delete_alarm(self, call: ServiceCall) -> None:
         """Handle delete_alarm service."""
-        _LOGGER.warning(f"Called delete_alarm service")
-        devices: set[Doppler] = call.data[ATTR_DEVICES]
-        await call_doppyler_api_across_devices(
-            devices, "delete_alarm", call.data[ATTR_ID]
-        )
+        data = call.data.copy()
+        devices: set[Doppler] = data.pop(ATTR_DEVICES)
+        _LOGGER.debug(f"Called delete_alarm service for id %s", data[ATTR_ID])
+        await call_doppyler_api_across_devices(devices, "delete_alarm", data[ATTR_ID])
 
     async def handle_set_main_display(self, call: ServiceCall) -> None:
         """Handle set_main_display service."""
-        _LOGGER.warning(f"Called set_main_display service")
+        data = call.data.copy()
+        devices: set[Doppler] = data.pop(ATTR_DEVICES)
         mdt = MainDisplayText(
-            text=call.data[ATTR_TEXT],
-            duration=call.data[ATTR_DURATION],
-            speed=call.data[ATTR_SPEED],
-            color=call.data[ATTR_COLOR],
+            text=data[ATTR_TEXT],
+            duration=data[ATTR_DURATION],
+            speed=data[ATTR_SPEED],
+            color=data[ATTR_COLOR],
         )
-        devices: set[Doppler] = call.data[ATTR_DEVICES]
+        _LOGGER.debug(f"Called set_main_display service, sending %s", mdt)
         await call_doppyler_api_across_devices(devices, "set_main_display_text", mdt)
 
     async def handle_set_mini_display(self, call: ServiceCall) -> None:
         """Handle set_mini_display service."""
-        _LOGGER.warning(f"Called display_num_mini service")
+        data = call.data.copy()
+        devices: set[Doppler] = data.pop(ATTR_DEVICES)
         mdn = MiniDisplayNumber(
-            number=call.data[ATTR_NUMBER],
-            duration=call.data[ATTR_DURATION],
-            color=call.data[ATTR_COLOR],
+            number=data[ATTR_NUMBER],
+            duration=data[ATTR_DURATION],
+            color=data[ATTR_COLOR],
         )
-        devices: set[Doppler] = call.data[ATTR_DEVICES]
+        _LOGGER.debug(f"Called display_num_mini service, sending %s", mdn)
         await call_doppyler_api_across_devices(devices, "set_mini_display_number", mdn)
 
     async def handle_activate_light_bar(self, mode: Mode, call: ServiceCall) -> None:
         """Handle activate_light_bar_* services."""
-        _LOGGER.warning(f"Called activate_light_bar_%s service", mode.value)
-        lbde = LightBarDisplayEffect(
-            mode,
-            **{
-                k: v
-                for k, v in call.data.items()
-                if k not in (ATTR_AREA_ID, ATTR_DEVICE_ID, ATTR_ENTITY_ID, ATTR_DEVICES)
-            },
+        data = call.data.copy()
+        devices: set[Doppler] = data.pop(ATTR_DEVICES)
+        lbde = LightBarDisplayEffect(mode, **data)
+        _LOGGER.debug(
+            f"Called activate_light_bar_%s service, sending %s", mode.value, lbde
         )
-        devices: set[Doppler] = call.data[ATTR_DEVICES]
         await call_doppyler_api_across_devices(devices, "set_light_bar_effect", lbde)
