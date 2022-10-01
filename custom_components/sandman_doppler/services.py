@@ -351,50 +351,31 @@ class DopplerServices:
         """Handle add_alarm service."""
         data = call.data.copy()
         devices: set[Doppler] = data.pop(ATTR_DEVICES)
-        alarm = Alarm(
-            id=data[ATTR_ID],
-            name=data[ATTR_NAME],
-            alarm_time=data[ATTR_TIME],
-            repeat=data[ATTR_REPEAT],
-            color=data[ATTR_COLOR],
-            volume=data[ATTR_VOLUME],
-            status=data[ATTR_ENABLED],
-            src=AlarmSource.APP,
-            sound=data[ATTR_SOUND],
-        )
-        _LOGGER.debug(f"Called add_alarm service, sending %s", alarm)
+        alarm = Alarm(**data, src=AlarmSource.APP)
+        _LOGGER.debug("Called add_alarm service, sending %s", alarm)
         await call_doppyler_api_across_devices(devices, "add_alarm", alarm)
 
     async def handle_delete_alarm(self, call: ServiceCall) -> None:
         """Handle delete_alarm service."""
         data = call.data.copy()
         devices: set[Doppler] = data.pop(ATTR_DEVICES)
-        _LOGGER.debug(f"Called delete_alarm service for id %s", data[ATTR_ID])
+        _LOGGER.debug("Called delete_alarm service for id %s", data[ATTR_ID])
         await call_doppyler_api_across_devices(devices, "delete_alarm", data[ATTR_ID])
 
     async def handle_set_main_display(self, call: ServiceCall) -> None:
         """Handle set_main_display service."""
         data = call.data.copy()
         devices: set[Doppler] = data.pop(ATTR_DEVICES)
-        mdt = MainDisplayText(
-            text=data[ATTR_TEXT],
-            duration=data[ATTR_DURATION],
-            speed=data[ATTR_SPEED],
-            color=data[ATTR_COLOR],
-        )
-        _LOGGER.debug(f"Called set_main_display service, sending %s", mdt)
+        mdt = MainDisplayText(**data)
+        _LOGGER.debug("Called set_main_display service, sending %s", mdt)
         await call_doppyler_api_across_devices(devices, "set_main_display_text", mdt)
 
     async def handle_set_mini_display(self, call: ServiceCall) -> None:
         """Handle set_mini_display service."""
         data = call.data.copy()
         devices: set[Doppler] = data.pop(ATTR_DEVICES)
-        mdn = MiniDisplayNumber(
-            number=data[ATTR_NUMBER],
-            duration=data[ATTR_DURATION],
-            color=data[ATTR_COLOR],
-        )
-        _LOGGER.debug(f"Called display_num_mini service, sending %s", mdn)
+        mdn = MiniDisplayNumber(**data)
+        _LOGGER.debug("Called display_num_mini service, sending %s", mdn)
         await call_doppyler_api_across_devices(devices, "set_mini_display_number", mdn)
 
     async def handle_activate_light_bar(self, mode: Mode, call: ServiceCall) -> None:
@@ -403,6 +384,6 @@ class DopplerServices:
         devices: set[Doppler] = data.pop(ATTR_DEVICES)
         lbde = LightBarDisplayEffect(mode, **data)
         _LOGGER.debug(
-            f"Called activate_light_bar_%s service, sending %s", mode.value, lbde
+            "Called activate_light_bar_%s service, sending %s", mode.value, lbde
         )
         await call_doppyler_api_across_devices(devices, "set_light_bar_effect", lbde)
