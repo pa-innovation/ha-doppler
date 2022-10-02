@@ -95,10 +95,10 @@ async def call_doppyler_api_across_devices(
         tup for tup in zip(devices, results) if isinstance(tup[1], Exception)
     ]:
         lines = [
-                *(
-                    f"{device} - {type(error).__name__}: {error}"
-                    for device, error in errors
-                ),
+            *(
+                f"{device} - {type(error).__name__}: {error}"
+                for device, error in errors
+            ),
         ]
         if len(lines) > 1:
             lines.insert(0, f"{len(errors)} error(s):")
