@@ -94,13 +94,14 @@ async def call_doppyler_api_across_devices(
     if errors := [
         tup for tup in zip(devices, results) if isinstance(tup[1], Exception)
     ]:
-        lines = (
-            f"{len(errors)} error(s):",
-            *(
-                f"{device} - {type(error).__name__}: {error}"
-                for device, error in errors
-            ),
-        )
+        lines = [
+                *(
+                    f"{device} - {type(error).__name__}: {error}"
+                    for device, error in errors
+                ),
+        ]
+        if len(lines) > 1:
+            lines.insert(0, f"{len(errors)} error(s):")
         raise HomeAssistantError("\n".join(lines))
 
 
