@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import asyncio
 from datetime import timedelta
+import functools
 import logging
 from typing import Any
 
@@ -10,8 +11,8 @@ from doppyler.client import DopplerClient
 from doppyler.exceptions import DopplerException
 from doppyler.model.doppler import Doppler
 from homeassistant.config_entries import ConfigEntry, ConfigEntryNotReady
-from homeassistant.const import CONF_EMAIL, CONF_PASSWORD
-from homeassistant.core import HomeAssistant, callback
+from homeassistant.const import CONF_EMAIL, CONF_PASSWORD, EVENT_HOMEASSISTANT_STARTED
+from homeassistant.core import CoreState, HomeAssistant, callback
 from homeassistant.helpers import device_registry as dr, entity_registry as er
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.dispatcher import async_dispatcher_send
@@ -47,6 +48,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     @callback
     def async_on_device_added(device: Doppler) -> None:
         """Handle device added."""
+        # Create a new coordinator and device registry entry for every new device and
+        # trigger an initial refresh to get information
         _LOGGER.debug("Device added: %s", device)
         hass.data[DOMAIN][entry.entry_id][
             device.dsn
@@ -79,8 +82,18 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     except DopplerException as err:
         raise ConfigEntryNotReady from err
 
-    hass.async_create_task(client.get_devices())
+    # Since getting devies can take some time, we delay querying until after startup
+    # so we don't hold everything up.
+    if hass.state == CoreState.running:
+        hass.async_create_task(client.get_devices())
+    else:
+        hass.bus.async_listen_once(
+            EVENT_HOMEASSISTANT_STARTED,
+            lambda _: hass.async_create_task(client.get_devices()),
+        )
 
+    # Every five minutes we will query for new devices - this will activate our add
+    # and remove device listeners if the list changes
     entry.async_on_unload(
         async_track_time_interval(
             hass, lambda _: client.get_devices(), timedelta(minutes=5)
