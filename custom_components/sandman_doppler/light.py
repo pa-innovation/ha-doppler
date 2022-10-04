@@ -206,7 +206,8 @@ class DopplerLight(DopplerEntity[DopplerLightEntityDescription], LightEntity):
         brightness = kwargs.get(ATTR_BRIGHTNESS)
         rgb_color = kwargs.get(ATTR_RGB_COLOR)
         if brightness is not None:
-            brightness *= 100 // 255
+            brightness *= 100
+            brightness //= 255
             self.device_data[
                 self.ed.brightness_key
             ] = await self.ed.set_brightness_func(self.device, brightness)

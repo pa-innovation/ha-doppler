@@ -96,7 +96,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # and remove device listeners if the list changes
     entry.async_on_unload(
         async_track_time_interval(
-            hass, lambda _: client.get_devices(), timedelta(minutes=5)
+            hass,
+            lambda _: hass.async_create_task(client.get_devices()),
+            timedelta(minutes=5),
         )
     )
 
