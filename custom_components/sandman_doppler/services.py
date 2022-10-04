@@ -105,13 +105,9 @@ async def call_doppyler_api_across_devices(
 def _validate_colors(data: dict[str, Any]) -> dict[str, Any]:
     """Validate colors in service call dict."""
     cv.has_at_least_one_key(ATTR_RAINBOW, ATTR_COLOR, ATTR_COLORS)(data)
-    single_color = data.pop(ATTR_COLOR, None)
+    single_color = data.pop(ATTR_COLOR, [255, 255, 255])
 
-    if data.get(ATTR_RAINBOW) and (single_color or data.get(ATTR_COLORS)):
-        _LOGGER.warning("'rainbow' supercedes color choices, removing")
-        data.pop(ATTR_COLORS, None)
-
-    if single_color and not data.get(ATTR_COLORS):
+    if not data.get(ATTR_COLORS):
         data[ATTR_COLORS] = [single_color]
 
     return data
