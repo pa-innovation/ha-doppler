@@ -231,7 +231,7 @@ class DopplerDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             await asyncio.gather(
                 *[
                     self.doppler.set_smart_button_configuration(
-                        button_num, url=self._webhook_url
+                        button_num, url=self._webhook_url, command="HA"
                     )
                     for button_num in range(1, 3)
                 ]

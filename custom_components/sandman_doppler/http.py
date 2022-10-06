@@ -32,7 +32,7 @@ class DopplerWebhookView(HomeAssistantView):
     async def post(self, request: Request, device_id: str) -> Response:
         """Respond to requests from the device."""
         hass: HomeAssistant = request.app["hass"]
-        request.query_string
+        _LOGGER.error(request.query_string)
         if not self._dev_reg:
             self._dev_reg = dr.async_get(hass)
         if not self._ent_reg:
@@ -55,7 +55,7 @@ class DopplerWebhookView(HomeAssistantView):
             _LOGGER.error("Device not a Sandman Doppler device: %s", device_id)
             return Response(status=HTTPStatus.OK)
 
-        data = await request.post()
+        data = await request.json()
         if not (dsn := data.get(ATTR_DSN)):
             _LOGGER.error("Invalid request: %s", data)
             return Response(status=HTTPStatus.OK)
@@ -74,9 +74,12 @@ class DopplerWebhookView(HomeAssistantView):
                 **data,
                 ATTR_NAME: device.name_by_user or device.name,
                 ATTR_DEVICE_ID: device_id,
-                ATTR_ENTITY_ID: er.async_entries_for_device(
-                    self._ent_reg, device_id, include_disabled_entities=True
-                ),
+                ATTR_ENTITY_ID: [
+                    ent_reg.entity_id
+                    for ent_reg in er.async_entries_for_device(
+                        self._ent_reg, device_id, include_disabled_entities=True
+                    )
+                ],
             },
         )
         return Response(status=HTTPStatus.OK)
