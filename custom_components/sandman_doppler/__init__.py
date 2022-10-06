@@ -228,10 +228,14 @@ class DopplerDataUpdateCoordinator(DataUpdateCoordinator[dict[str, Any]]):
             )
         if not self.data:
             self._entities_created = True
-            for button_num in range(1, 3):
-                self.doppler.set_smart_button_configuration(
-                    button_num, url=self._webhook_url
-                )
+            await asyncio.gather(
+                *[
+                    self.doppler.set_smart_button_configuration(
+                        button_num, url=self._webhook_url
+                    )
+                    for button_num in range(1, 3)
+                ]
+            )
             async_dispatcher_send(
                 self.hass, f"{DOMAIN}_{self._entry.entry_id}_device_added", self.doppler
             )
