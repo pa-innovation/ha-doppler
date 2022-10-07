@@ -32,7 +32,6 @@ class DopplerWebhookView(HomeAssistantView):
     async def post(self, request: Request, device_id: str) -> Response:
         """Respond to requests from the device."""
         hass: HomeAssistant = request.app["hass"]
-        _LOGGER.error(request.query_string)
         if not self._dev_reg:
             self._dev_reg = dr.async_get(hass)
         if not self._ent_reg:
