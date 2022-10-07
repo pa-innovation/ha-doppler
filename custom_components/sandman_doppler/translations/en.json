@@ -1,35 +1,23 @@
 {
-    "config": {
-      "step": {
-        "user": {
-          "data": {
-            "email": "Email",
-            "password": "Password"
-          }
-        }
-      },
-      "error": {
-        "auth": "Email/Password is wrong."
-      },
-      "abort": {
-        "already_configured": "Account is already configured"
-      }
-    },
-    "options": {
-      "step": {
-        "user": {
-          "data": {
-            "binary_sensor": "Binary sensor enabled",
-            "sensor": "Sensor enabled",
-            "switch": "Switch enabled"
-          }
+  "config": {
+    "step": {
+      "user": {
+        "data": {
+          "email": "Email",
+          "password": "Password"
         }
       }
     },
-    "device_automation": {
-      "trigger_type": {
-        "sandman_doppler_button": "Button #{subtype} pushed"
-      }
+    "error": {
+      "auth": "Email/Password is wrong."
+    },
+    "abort": {
+      "already_configured": "Account is already configured"
+    }
+  },
+  "device_automation": {
+    "trigger_type": {
+      "sandman_doppler_button_pressed": "Button {subtype} pushed"
     }
   }
-  
+}

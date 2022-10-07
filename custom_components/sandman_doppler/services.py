@@ -46,7 +46,7 @@ from homeassistant.helpers import (
 from homeassistant.helpers.service import ServiceCall
 import voluptuous as vol
 
-from .const import DOMAIN
+from .const import DOMAIN, SERVICE_ACTIVATE_LIGHT_BAR_BLINK, SERVICE_ACTIVATE_LIGHT_BAR_COMET, SERVICE_ACTIVATE_LIGHT_BAR_PULSE, SERVICE_ACTIVATE_LIGHT_BAR_SET, SERVICE_ACTIVATE_LIGHT_BAR_SET_EACH, SERVICE_ACTIVATE_LIGHT_BAR_SWEEP, SERVICE_ADD_ALARM, SERVICE_DELETE_ALARM, SERVICE_SET_MAIN_DISPLAY_TEXT, SERVICE_SET_MINI_DISPLAY_NUMBER, SERVICE_SET_WEATHER_LOCATION
 
 SCAN_INTERVAL = timedelta(seconds=60)
 
@@ -191,14 +191,14 @@ class DopplerServices:
         """Register services."""
         self.hass.services.async_register(
             DOMAIN,
-            "set_weather_location",
+            SERVICE_SET_WEATHER_LOCATION,
             self.handle_set_weather_location,
             schema=self._expand_schema({vol.Required(ATTR_LOCATION): cv.string}),
         )
 
         self.hass.services.async_register(
             DOMAIN,
-            "add_alarm",
+            SERVICE_ADD_ALARM,
             self.handle_add_alarm,
             schema=self._expand_schema(
                 {
@@ -220,14 +220,14 @@ class DopplerServices:
 
         self.hass.services.async_register(
             DOMAIN,
-            "delete_alarm",
+            SERVICE_DELETE_ALARM,
             self.handle_delete_alarm,
             schema=self._expand_schema({vol.Required(ATTR_ID): vol.Coerce(int)}),
         )
 
         self.hass.services.async_register(
             DOMAIN,
-            "set_main_display_text",
+            SERVICE_SET_MAIN_DISPLAY_TEXT,
             self.handle_set_main_display,
             schema=self._expand_schema(
                 {
@@ -243,7 +243,7 @@ class DopplerServices:
 
         self.hass.services.async_register(
             DOMAIN,
-            "set_mini_display_number",
+            SERVICE_SET_MINI_DISPLAY_NUMBER,
             self.handle_set_mini_display,
             schema=self._expand_schema(
                 {
@@ -256,14 +256,14 @@ class DopplerServices:
 
         self.hass.services.async_register(
             DOMAIN,
-            "activate_light_bar_blink",
+            SERVICE_ACTIVATE_LIGHT_BAR_BLINK,
             functools.partial(self.handle_activate_light_bar, Mode.BLINK),
             schema=self._get_light_bar_schema(LIGHT_BAR_BLINK_SCHEMA),
         )
 
         self.hass.services.async_register(
             DOMAIN,
-            "activate_light_bar_comet",
+            SERVICE_ACTIVATE_LIGHT_BAR_COMET,
             functools.partial(self.handle_activate_light_bar, Mode.COMET),
             schema=self._get_light_bar_schema(
                 LIGHT_BAR_BASE_SCHEMA.extend(
@@ -282,7 +282,7 @@ class DopplerServices:
 
         self.hass.services.async_register(
             DOMAIN,
-            "activate_light_bar_pulse",
+            SERVICE_ACTIVATE_LIGHT_BAR_PULSE,
             functools.partial(self.handle_activate_light_bar, Mode.PULSE),
             schema=self._get_light_bar_schema(
                 LIGHT_BAR_BASE_SCHEMA.extend(
@@ -300,21 +300,21 @@ class DopplerServices:
 
         self.hass.services.async_register(
             DOMAIN,
-            "activate_light_bar_set",
+            SERVICE_ACTIVATE_LIGHT_BAR_SET,
             functools.partial(self.handle_activate_light_bar, Mode.SET),
             schema=self._get_light_bar_schema(LIGHT_BAR_SET_SCHEMA),
         )
 
         self.hass.services.async_register(
             DOMAIN,
-            "activate_light_bar_set_each",
+            SERVICE_ACTIVATE_LIGHT_BAR_SET_EACH,
             functools.partial(self.handle_activate_light_bar, Mode.SET_EACH),
             schema=self._get_light_bar_schema(LIGHT_BAR_BASE_SCHEMA),
         )
 
         self.hass.services.async_register(
             DOMAIN,
-            "activate_light_bar_sweep",
+            SERVICE_ACTIVATE_LIGHT_BAR_SWEEP,
             functools.partial(self.handle_activate_light_bar, Mode.SWEEP),
             schema=self._get_light_bar_schema(
                 LIGHT_BAR_BASE_SCHEMA.extend(

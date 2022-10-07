@@ -1,10 +1,7 @@
 """Provides device triggers for sandman_doppler."""
 from __future__ import annotations
 
-import logging
 from typing import Any
-
-_LOGGER: logging.Logger = logging.getLogger(__package__)
 
 from homeassistant.components.automation import (
     AutomationActionType,
@@ -13,33 +10,28 @@ from homeassistant.components.automation import (
 from homeassistant.components.device_automation import DEVICE_TRIGGER_BASE_SCHEMA
 from homeassistant.components.homeassistant.triggers import event as event_trigger
 from homeassistant.const import (
+    ATTR_DEVICE_ID,
     CONF_DEVICE_ID,
     CONF_DOMAIN,
-    CONF_ENTITY_ID,
     CONF_PLATFORM,
     CONF_TYPE,
-    STATE_OFF,
-    STATE_ON,
 )
 from homeassistant.core import CALLBACK_TYPE, HomeAssistant
-from homeassistant.helpers import (
-    config_validation as cv,
-    device_registry as dr,
-    entity_registry,
-)
+from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.typing import ConfigType
 import voluptuous as vol
 
-from .const import ATTR_BUTTON, ATTR_DSN, CONF_SUBTYPE, DOMAIN
+from .const import ATTR_BUTTON, CONF_SUBTYPE, DOMAIN, EVENT_BUTTON_PRESSED
 
-TRIGGER_TYPES = {"sandman_doppler_button"}
+TRIGGER_TYPES = {EVENT_BUTTON_PRESSED}
 
 TRIGGER_SCHEMA = DEVICE_TRIGGER_BASE_SCHEMA.extend(
     {
         vol.Required(CONF_TYPE): vol.In(TRIGGER_TYPES),
-        vol.Required(ATTR_DSN): vol.Match(r"Doppler-[a-f0-9]{8}"),
-        vol.Required(ATTR_BUTTON): vol.In({1, 2}),
-        vol.Required(CONF_SUBTYPE): vol.In({1, 2}),
+        vol.Required(ATTR_BUTTON): vol.All(vol.Coerce(int), vol.Range(min=1, max=2)),
+        vol.Required(CONF_SUBTYPE): vol.All(
+            vol.Coerce(int), vol.Range(min=1, max=2), vol.Coerce(str)
+        ),
     }
 )
 
@@ -48,35 +40,30 @@ async def async_get_triggers(
     hass: HomeAssistant, device_id: str
 ) -> list[dict[str, Any]]:
     """List device triggers for sandman_doppler devices."""
-    registry = entity_registry.async_get(hass)
     device_registry = dr.async_get(hass)
     triggers = []
 
-    _LOGGER.warning(f"device_id={device_id}")
+    device_entry = device_registry.async_get(device_id)
+    if not device_entry:
+        raise ValueError(f"Device not found: {device_id}")
 
-    device_entry = device_registry.async_get(str(device_id))
-    assert device_entry
-    _LOGGER.warning(f"device_entry.identifiers={device_entry.identifiers}")
+    if not any(id[0] == DOMAIN for id in device_entry.identifiers):
+        raise ValueError(f"Device {device_id} is not a sandman_doppler device")
 
-    for id in device_entry.identifiers:
-        if id[1].startswith("Doppler"):
-            dsn = id[1]
-    assert dsn
-    _LOGGER.warning(f"dsn={dsn}")
-    for i in range(1, 3):
-        triggers.append(
+    triggers.extend(
+        [
             {
                 CONF_PLATFORM: "device",
-                CONF_DOMAIN: "sandman_doppler",
+                CONF_DOMAIN: DOMAIN,
                 CONF_DEVICE_ID: device_id,
-                ATTR_DSN: dsn,
                 ATTR_BUTTON: i,
-                CONF_TYPE: "sandman_doppler_button",
+                CONF_TYPE: EVENT_BUTTON_PRESSED,
                 CONF_SUBTYPE: i,
             }
-        )
+            for i in range(1, 3)
+        ]
+    )
 
-    _LOGGER.warning(f"triggers= {triggers}")
     return triggers
 
 
@@ -88,28 +75,20 @@ async def async_attach_trigger(
 ) -> CALLBACK_TYPE:
     """Attach a trigger."""
 
-    #    my_device_registry=dr.async_get(hass)
-    #    device=my_device_registry.async_get(config[CONF_DEVICE_ID])
+    if config[CONF_TYPE] in TRIGGER_TYPES:
+        event_config = event_trigger.TRIGGER_SCHEMA(
+            {
+                event_trigger.CONF_PLATFORM: "event",
+                event_trigger.CONF_EVENT_TYPE: EVENT_BUTTON_PRESSED,
+                event_trigger.CONF_EVENT_DATA: {
+                    ATTR_DEVICE_ID: config[CONF_DEVICE_ID],
+                    ATTR_BUTTON: config[ATTR_BUTTON],
+                },
+            }
+        )
 
-    #    for id in device.identifiers:
-    #        if id.startswith("Doppler"):
-    #            dsn=id
-    _LOGGER.warning(f"config= {config}")
-    event_config = event_trigger.TRIGGER_SCHEMA(
-        {
-            event_trigger.CONF_PLATFORM: "event",
-            event_trigger.CONF_EVENT_TYPE: "sandman_doppler_button",
-            event_trigger.CONF_EVENT_DATA: {
-                ATTR_DSN: config[ATTR_DSN],
-                ATTR_BUTTON: config[ATTR_BUTTON],
-                #                CONF_DEVICE_ID: config[CONF_DEVICE_ID],
-                #                CONF_TYPE: config[CONF_TYPE],
-            },
-        }
-    )
+        return await event_trigger.async_attach_trigger(
+            hass, event_config, action, automation_info, platform_type="device"
+        )
 
-    _LOGGER.warning(f"event_config={event_config}")
-
-    return await event_trigger.async_attach_trigger(
-        hass, event_config, action, automation_info, platform_type="device"
-    )
+    raise ValueError(f"Unsupported trigger type {config[CONF_TYPE]}")
