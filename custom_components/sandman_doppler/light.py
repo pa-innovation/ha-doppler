@@ -16,13 +16,14 @@ from doppyler.const import (
     ATTR_NIGHT_BUTTON_COLOR,
     ATTR_NIGHT_DISPLAY_BRIGHTNESS,
     ATTR_NIGHT_DISPLAY_COLOR,
+    ATTR_SMART_BUTTON_COLOR,
 )
 from doppyler.model.color import Color
 from doppyler.model.doppler import Doppler
 from homeassistant.components.light import (
     ATTR_BRIGHTNESS,
     ATTR_RGB_COLOR,
-    COLOR_MODE_RGB,
+    ColorMode,
     LightEntity,
     LightEntityDescription,
 )
@@ -50,10 +51,10 @@ class DopplerLightEntityDescription(LightEntityDescription):
     """Class to describe Doppler light entities."""
 
     color_key: str | None = None
-    set_color_func: Callable[[Doppler, Color], Coroutine[Any, Any, Color]] | None = None
+    set_color_func: Callable[[Doppler, Color], Coroutine[Any, Any, Any]] | None = None
     brightness_key: str | None = None
     set_brightness_func: Callable[
-        [Doppler, Color], Coroutine[Any, Any, int | float]
+        [Doppler, int], Coroutine[Any, Any, int]
     ] | None = None
 
 
@@ -104,6 +105,19 @@ LIGHT_ENTITY_DESCRIPTIONS = [
     ),
 ]
 
+SMART_BUTTON_LIGHT_ENTITY_DESCRIPTIONS = [
+    DopplerLightEntityDescription(
+        f"Smart Button {i}",
+        icon="mdi:gesture-tap-button",
+        name=f"Smart Button {i}",
+        color_key=f"{ATTR_SMART_BUTTON_COLOR}_{i}",
+        set_color_func=lambda dev, color: dev.set_smart_button_configuration(
+            i, color=color
+        ),
+    )
+    for i in range(1, 3)
+]
+
 
 def get_split_key(entity_description: DopplerLightEntityDescription) -> tuple[str, str]:
     """Split entity description keys into day/night and button/display."""
@@ -152,6 +166,12 @@ async def async_setup_entry(
             DopplerLight(coordinator, entry, device, description)
             for description in LIGHT_ENTITY_DESCRIPTIONS
         ]
+        entities.extend(
+            [
+                DopplerSmartButtonLight(coordinator, entry, device, description)
+                for description in SMART_BUTTON_LIGHT_ENTITY_DESCRIPTIONS
+            ]
+        )
         async_add_devices(entities)
 
     entry.async_on_unload(
@@ -161,12 +181,46 @@ async def async_setup_entry(
     )
 
 
-class DopplerLight(DopplerEntity[DopplerLightEntityDescription], LightEntity):
-    """Doppler Light class."""
+class BaseDopplerLight(DopplerEntity[DopplerLightEntityDescription], LightEntity):
+    """Base Doppler Light class."""
 
-    _attr_color_mode = COLOR_MODE_RGB
-    _attr_supported_color_modes = {COLOR_MODE_RGB}
+    _attr_color_mode = ColorMode.RGB
+    _attr_supported_color_modes = {ColorMode.RGB}
     _attr_is_on = True
+
+    @property
+    def rgb_color(self) -> tuple[int, int, int] | None:
+        """Return the rgb color value [int, int, int]."""
+        color: Color | None = self.device_data[self.ed.color_key]
+        if not color:
+            return None
+        return (color.red, color.green, color.blue)
+
+    async def _async_set_brightness(self, brightness: int) -> int:
+        """Set brightness on device."""
+        brightness *= 100
+        brightness //= 255
+        brightness = self.device_data[
+            self.ed.brightness_key
+        ] = await self.ed.set_brightness_func(self.device, brightness)
+        return brightness
+
+    async def _async_set_rgb_color(self, rgb_color: list[int]) -> Color:
+        """Set color on device."""
+        color = Color(rgb_color[0], rgb_color[1], rgb_color[2])
+        await self.ed.set_color_func(self.device, color)
+        self.device_data[self.ed.color_key] = color
+        return color
+
+    async def async_turn_off(self, **kwargs: Any) -> None:
+        """Turn the device off."""
+        _LOGGER.warning(
+            "Turning off the Doppler %s light is not supported.", self.ed.key
+        )
+
+
+class DopplerLight(BaseDopplerLight):
+    """Doppler Light class."""
 
     def __init__(
         self,
@@ -186,14 +240,6 @@ class DopplerLight(DopplerEntity[DopplerLightEntityDescription], LightEntity):
         )
 
     @property
-    def rgb_color(self) -> tuple[int, int, int] | None:
-        """Return the rgb color value [int, int, int]."""
-        color: Color | None = self.device_data[self.ed.color_key]
-        if not color:
-            return None
-        return (color.red, color.green, color.blue)
-
-    @property
     def brightness(self) -> int:
         """Return the brightness of this light between 0..255."""
         brightness = self.device_data[self.ed.brightness_key]
@@ -203,35 +249,20 @@ class DopplerLight(DopplerEntity[DopplerLightEntityDescription], LightEntity):
 
     async def async_turn_on(self, **kwargs: Any) -> None:
         """Turn the device on."""
-        brightness = kwargs.get(ATTR_BRIGHTNESS)
-        rgb_color = kwargs.get(ATTR_RGB_COLOR)
-        if brightness is not None:
-            brightness *= 100
-            brightness //= 255
-            self.device_data[
-                self.ed.brightness_key
-            ] = await self.ed.set_brightness_func(self.device, brightness)
+        if (brightness := kwargs.get(ATTR_BRIGHTNESS)) is not None:
+            brightness = await self._async_set_brightness(brightness)
             signal_name = (
                 f"{self._sync_signal_prefix}_{slugify(self.ed.key)}_brightness"
             )
-            _LOGGER.error("%s sending signal %s", self.entity_id, signal_name)
+            _LOGGER.debug("%s sending signal %s", self.entity_id, signal_name)
             async_dispatcher_send(self.hass, signal_name, self.entity_id, brightness)
-        if rgb_color is not None:
-            color = Color(rgb_color[0], rgb_color[1], rgb_color[2])
-            self.device_data[self.ed.color_key] = await self.ed.set_color_func(
-                self.device, color
-            )
+        if (rgb_color := kwargs.get(ATTR_RGB_COLOR)) is not None:
+            color = await self._async_set_rgb_color(rgb_color)
             signal_name = f"{self._sync_signal_prefix}_{slugify(self.ed.key)}_color"
-            _LOGGER.error("%s sending signal %s", self.entity_id, signal_name)
+            _LOGGER.debug("%s sending signal %s", self.entity_id, signal_name)
             async_dispatcher_send(self.hass, signal_name, self.entity_id, color)
-        self.async_write_ha_state()
-
-    async def async_turn_off(self, **kwargs: Any) -> None:
-        """Turn the device off."""
-        _LOGGER.warning(
-            "Turning off the Doppler %s light is not supported.",
-            self.ed.key.lower(),
-        )
+        if brightness is not None or rgb_color is not None:
+            self.async_write_ha_state()
 
     @callback
     def async_sync_from_other_entity(
@@ -252,10 +283,13 @@ class DopplerLight(DopplerEntity[DopplerLightEntityDescription], LightEntity):
         ):
             _LOGGER.debug(
                 (
-                    "No sync required for %s because sync entity with unique ID %s "
-                    "does not exist"
+                    "No sync required for %s %s from %s %s because sync entity with "
+                    "unique ID %s does not exist"
                 ),
                 self.entity_id,
+                light_property,
+                src_entity_id,
+                light_property,
                 unique_id,
             )
             return
@@ -264,17 +298,24 @@ class DopplerLight(DopplerEntity[DopplerLightEntityDescription], LightEntity):
             (state := self.hass.states.get(sync_entity_id)) and state.state == STATE_ON
         ):
             _LOGGER.debug(
-                "No sync required for %s because sync entity %s is not on",
+                (
+                    "No sync required for %s %s from %s %s because sync entity %s is "
+                    "not on"
+                ),
                 self.entity_id,
+                light_property,
+                src_entity_id,
+                light_property,
                 sync_entity_id,
             )
             return
 
         _LOGGER.debug(
-            "Syncing %s %s from %s (%s) because sync entity %s is on",
+            "Syncing %s %s from %s %s (%s) because sync entity %s is on",
             self.entity_id,
             light_property,
             src_entity_id,
+            light_property,
             val,
             sync_entity_id,
         )
@@ -293,14 +334,19 @@ class DopplerLight(DopplerEntity[DopplerLightEntityDescription], LightEntity):
                 signal_name = (
                     f"{self._sync_signal_prefix}_{light_type}_{light_property}"
                 )
-                _LOGGER.error("%s connected to signal %s", self.entity_id, signal_name)
                 listener_callback: Callable[[Color | int], None] = functools.partial(
                     self.async_sync_from_other_entity, switch_type, light_property
                 )
-                # getattr(
-                #     self,
-                #     f"async_sync_from_{switch_type}_{light_property}",
-                # )
                 self.async_on_remove(
                     async_dispatcher_connect(self.hass, signal_name, listener_callback)
                 )
+
+
+class DopplerSmartButtonLight(BaseDopplerLight):
+    """Doppler Smart Button Light class."""
+
+    async def async_turn_on(self, **kwargs: Any) -> None:
+        """Turn the device on."""
+        if (rgb_color := kwargs.get(ATTR_RGB_COLOR)) is not None:
+            await self._async_set_rgb_color(rgb_color)
+            self.async_write_ha_state()
