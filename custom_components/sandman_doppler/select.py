@@ -96,11 +96,11 @@ SELECT_ENTITY_DESCRIPTIONS = [
 async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_devices: AddEntitiesCallback
 ) -> None:
-    """Setup sensor platform."""
+    """Setup select platform."""
 
     @callback
     def async_add_device(device: Doppler) -> None:
-        """Add Doppler binary sensor entities."""
+        """Add Doppler select entities."""
         coordinator: DopplerDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id][
             device.dsn
         ]

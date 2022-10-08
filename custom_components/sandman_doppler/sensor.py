@@ -6,7 +6,7 @@ from dataclasses import dataclass
 import logging
 from typing import Any
 
-from doppyler.const import ATTR_ALARMS, ATTR_LIGHT_SENSOR_VALUE, ATTR_WEATHER, ATTR_WIFI
+from doppyler.const import ATTR_LIGHT_SENSOR_VALUE, ATTR_WEATHER, ATTR_WIFI
 from doppyler.model.doppler import Doppler
 from homeassistant.components.sensor import (
     SensorDeviceClass,
@@ -91,7 +91,7 @@ async def async_setup_entry(
 
     @callback
     def async_add_device(device: Doppler) -> None:
-        """Add Doppler binary sensor entities."""
+        """Add Doppler sensor entities."""
         coordinator: DopplerDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id][
             device.dsn
         ]

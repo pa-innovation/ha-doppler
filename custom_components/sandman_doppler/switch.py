@@ -1,8 +1,9 @@
 """Switch platform for Doppler Sandman."""
 from __future__ import annotations
 
-from collections.abc import Callable, Coroutine
-from dataclasses import dataclass
+from collections.abc import Callable, Coroutine, Mapping
+from dataclasses import asdict, dataclass
+import functools
 import logging
 from typing import Any
 
@@ -21,6 +22,7 @@ from doppyler.const import (
     ATTR_USE_LEADING_ZERO,
     ATTR_WEATHER,
 )
+from doppyler.model.alarm import Alarm
 from doppyler.model.doppler import Doppler
 from homeassistant.components.switch import (
     SwitchDeviceClass,
@@ -29,9 +31,14 @@ from homeassistant.components.switch import (
 )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers.dispatcher import async_dispatcher_connect
-from homeassistant.helpers.entity import EntityCategory
+from homeassistant.helpers.dispatcher import (
+    async_dispatcher_connect,
+    async_dispatcher_send,
+)
+from homeassistant.helpers.entity import DeviceInfo, EntityCategory
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.update_coordinator import CoordinatorEntity
+from homeassistant.util import slugify
 
 from . import DopplerDataUpdateCoordinator
 from .const import DOMAIN
@@ -136,11 +143,11 @@ ENTITY_DESCRIPTIONS = [
 async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_devices: AddEntitiesCallback
 ) -> None:
-    """Setup sensor platform."""
+    """Setup switch platform."""
 
     @callback
     def async_add_device(device: Doppler) -> None:
-        """Add Doppler binary sensor entities."""
+        """Add Doppler switch entities."""
         coordinator: DopplerDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id][
             device.dsn
         ]
@@ -148,7 +155,28 @@ async def async_setup_entry(
             DopplerSwitch(coordinator, entry, device, description)
             for description in ENTITY_DESCRIPTIONS
         ]
+        entities.extend(
+            [
+                DopplerAlarmSwitch(coordinator, entry, device, alarm)
+                for alarm in device.alarms.values()
+            ]
+        )
         async_add_devices(entities)
+
+        entry.async_on_unload(
+            device.on_alarm_added(
+                lambda alarm: async_add_devices(
+                    [DopplerAlarmSwitch(coordinator, entry, device, alarm)]
+                )
+            )
+        )
+        entry.async_on_unload(
+            device.on_alarm_removed(
+                lambda alarm: async_dispatcher_send(
+                    hass, f"{DOMAIN}_{device.dsn}_alarm_{alarm.id}_removed"
+                )
+            )
+        )
 
     entry.async_on_unload(
         async_dispatcher_connect(
@@ -187,3 +215,74 @@ class DopplerSwitch(DopplerEntity[DopplerSwitchEntityDescription], SwitchEntity)
 
         self.device_data[self.ed.state_key] = new_val
         self.async_write_ha_state()
+
+
+class DopplerAlarmSwitch(CoordinatorEntity[DopplerDataUpdateCoordinator], SwitchEntity):
+    """Doppler Alarm switch class."""
+
+    _attr_device_class: SwitchDeviceClass.SWITCH
+    _attr_has_entity_name = True
+    _attr_icon = "mdi:alarm"
+
+    def __init__(
+        self,
+        coordinator: DopplerDataUpdateCoordinator,
+        config_entry: ConfigEntry,
+        device: Doppler,
+        alarm: Alarm,
+    ):
+        super().__init__(coordinator)
+        self.config_entry = config_entry
+        self.device = device
+        self.alarm = alarm
+
+        self._attr_unique_id = slugify(
+            f"{self.config_entry.unique_id}_{self.device.dsn}_alarm_{alarm.id}"
+        )
+        self._attr_device_info = DeviceInfo(identifiers={(DOMAIN, self.device.dsn)})
+
+    @property
+    def name(self) -> str:
+        """Return the name of the alarm."""
+        return f"Alarm {self.alarm.id} ({self.alarm.name})"
+
+    @property
+    def is_on(self) -> bool | None:
+        return self.alarm.enabled
+
+    @property
+    def extra_state_attributes(self) -> Mapping[str, Any] | None:
+        """Return extra state attributes."""
+        return asdict(self.alarm)
+
+    async def _async_update_alarm_status(self, enabled: bool) -> None:
+        """Update the alarm status."""
+        self.alarm.enabled = enabled
+        await self.device.update_alarms([self.alarm])
+        self.async_write_ha_state()
+
+    async_turn_on = functools.partialmethod(_async_update_alarm_status, True)
+    async_turn_off = functools.partialmethod(_async_update_alarm_status, False)
+
+    # async def async_turn_on(self, **kwargs) -> None:
+    #     """Turn the switch on."""
+    #     self.alarm.enabled = True
+    #     await self.device.update_alarms([self.alarm])
+    #     self.async_write_ha_state()
+
+    # async def async_turn_off(self, **kwargs) -> None:
+    #     """Turn the switch off."""
+    #     self.alarm.enabled = False
+    #     await self.device.update_alarms([self.alarm])
+    #     self.async_write_ha_state()
+
+    async def async_added_to_hass(self) -> None:
+        """When entity is added to hass."""
+        await super().async_added_to_hass()
+        self.async_on_remove(
+            async_dispatcher_connect(
+                self.hass,
+                f"{DOMAIN}_{self.device.dsn}_alarm_{self.alarm.id}_removed",
+                functools.partial(self.async_remove, force_remove=True),
+            )
+        )

@@ -154,11 +154,11 @@ def get_opposite_button_or_display(
 async def async_setup_entry(
     hass: HomeAssistant, entry: ConfigEntry, async_add_devices: AddEntitiesCallback
 ) -> None:
-    """Setup sensor platform."""
+    """Setup light platform."""
 
     @callback
     def async_add_device(device: Doppler) -> None:
-        """Add Doppler binary sensor entities."""
+        """Add Doppler light entities."""
         coordinator: DopplerDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id][
             device.dsn
         ]
