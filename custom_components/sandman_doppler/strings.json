@@ -15,17 +15,6 @@
       "already_configured": "Account is already configured"
     }
   },
-  "options": {
-    "step": {
-      "user": {
-        "data": {
-          "binary_sensor": "Binary sensor enabled",
-          "sensor": "Sensor enabled",
-          "switch": "Switch enabled"
-        }
-      }
-    }
-  },
   "device_automation": {
     "trigger_type": {
       "sandman_doppler_button_pressed": "Button {subtype} pushed"
