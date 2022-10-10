@@ -48,41 +48,93 @@ These are polled every 60 seconds locally
 Entities
 Read/Write enties: 
 -Turn the Doppler System alarm on and off
+
+
 -Adjust colors of your Dopplers buttons and display in both day and night mode
+
+
 -Volume Level of your Doppler
+
+
 -Ascending alarms toggle on and off
--Alexa tap to talk tone toggle
+
+
+-Alexa tap to talk tone 
+
+
 -Alexa wake word tone toggle
+
+
 -Colon blink toggle
+
+
 -Colon toggle
+
+
 -Day to night threshold
+
+
 -Night to day threshold
+
+
 -Display seconds mode (show the current time down to the second on the mini display)
+
+
 -Fade time mode toggle (fade between each minute on the main display)
+
+
 -Sound presets
+
+
 -Volume dependent EQ toggle
+
+
 -Three color and brightness syncs toggle
+
+
 -12/24 time mode toggle
+
+
 -Time offset
+
+
 -Timezone
+
+
 -Use leading zero in 24 hour mode
+
+
 -Weather settings (currently you can only add location via service or the app)
 
 Read only:
 -Day or night mode indicator
+
+
 -Reading of the light sensor on top of the Doppler
+
+
 -Status of Alexa (logged in or not)
+
+
 -How long the Doppler has been connector to Wifi
+
+
 -Current Wifi SSD
+
+
 -Current Wifi Signal strength
 
 
-## Advanced services
-Home assistant supports the following services to use the advanced
-features of Doppler from either developer tools, or more importantly
-in automations:
 
-Activate Lightbar Blink:
+
+## Advanced services
+
+
+Home Assistant supports the following services to use the advanced
+features of Doppler from either developer tools, or more importantly
+in automations. To access these go to developer tool/services and then select the service you'd like to access. Or, go to Automations in Home Assistant and select the service you'd like to autoamte. 
+
+**Activate Lightbar Blink**
 This service makes the lightbar blink in one or more colors.
 
 -Targets
@@ -124,7 +176,7 @@ is optional.
 Sparkle turns on a cool sparkle effect when checked and low, medium,
 or high is selcted.
 
-Activate Lightbar Comet:
+**Activate Lightbar Comet**
 
 This service makes a comet appear on the lightbar of the Doppler.  It
 can make comets of any color or rainbow comets.
@@ -171,7 +223,7 @@ Direction adjusts whether the comet goes from left to right (right),
 right to left (left), or both directions (bounce).
 
 
-Activate Lightbar Pulse:
+**Activate Lightbar Pulse**
 
 This service makes the chosen colors slowly pulse on the lightbar
 fading in from black and out to black.
@@ -211,7 +263,7 @@ Sparkle activates a sparkle effect on the lightbar concurrently with the pulsing
 Gap changes the number of frames between colors.
 
 
-Activate Lightbar Set:
+**Activate Lightbar Set**
 
 This service sets the lightbar to one or more colors in sequence with
 no pulsing or blinking.
@@ -248,7 +300,7 @@ Sparkle turns on a sparkle effect.  The box on the left must be
 checked and low medium or high selected for sparkle to work.
 
 
-Activate Lightbar Set-Each:
+**Activate Lightbar Set-Each**
 
 This service allows the user to set the color of each individual dot
 on the lightbar.
@@ -280,7 +332,7 @@ must be selected in order for the service to be called.
 Sparkle makes a changing sparkle effect occur in conjunction with the
 dot pattern.
 
-Activate Lightbar Sweep:
+**Activate Lightbar Sweep**
 This service makes colors sweep across the lightbar.
 
 -Targets
@@ -333,7 +385,7 @@ Pick a duration for the effect, 10 seconds is a good start.  Hit run
 service and watch!
 
 
-Add New Alarm:
+**Add New Alarm**
 This service sets a new alarm on the Doppler.
 
 -Targets
@@ -376,7 +428,7 @@ Because alarms are numbered on a per clock basis, it is advisable to select only
 -Alarm ID
 Provide the Alarm ID to be deleted.
 
-Set Main Display Text:
+**Set Main Display Text**
 
 Creates a scrolling text message on the Doppler (Minus a few characters Doppler can't display.)
 
@@ -398,7 +450,7 @@ the text scroll faster.
 -Color
 The Color fields allows selection of the color with which the text is displayed.
 
-Set Mini Display Number:
+**Set Mini Display Number**
 
 This service displays a number on the mini-display where temperature
 would normally be displayed.
@@ -417,7 +469,7 @@ Duration is the number of seconds to to display the number.
 Display color in which the number will be displayed.
 
 
-Set Weather Location:
+**Set Weather Location**
 
 -Targets
 First pick a device.  It is recommended to set the weather location on
