@@ -107,15 +107,23 @@ LIGHT_ENTITY_DESCRIPTIONS = [
 
 SMART_BUTTON_LIGHT_ENTITY_DESCRIPTIONS = [
     DopplerLightEntityDescription(
-        f"Smart Button {i}",
+        f"Smart Button {1}",
         icon="mdi:gesture-tap-button",
-        name=f"Smart Button {i}",
-        color_key=f"{ATTR_SMART_BUTTON_COLOR}_{i}",
+        name=f"Smart Button {1}",
+        color_key=f"{ATTR_SMART_BUTTON_COLOR}_{1}",
         set_color_func=lambda dev, color: dev.set_smart_button_configuration(
-            i, color=color
+            1, color=color
+        ),
+    ),
+  DopplerLightEntityDescription(
+        f"Smart Button {2}",
+        icon="mdi:gesture-tap-button",
+        name=f"Smart Button {2}",
+        color_key=f"{ATTR_SMART_BUTTON_COLOR}_{2}",
+        set_color_func=lambda dev, color: dev.set_smart_button_configuration(
+            2, color=color
         ),
     )
-    for i in range(1, 3)
 ]
 
 
