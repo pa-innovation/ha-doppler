@@ -125,7 +125,7 @@ Read only:
 -Current Wifi Signal strength
 
 
-** Doppler Triggers and Automations **
+## Doppler Triggers and Automations
 
 Almost every entity changing on the Doppler can be used as a trigger in Home Assistants automation system.  The Smart buttons (1/2 buttons on the top of the Doppler) appear here as well as device triggers. To easily access these, we recommend going to the Doppler device screen and click "Create automations with device". 
 
