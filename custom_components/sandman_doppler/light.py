@@ -20,6 +20,7 @@ from doppyler.const import (
 )
 from doppyler.model.color import Color
 from doppyler.model.doppler import Doppler
+from doppyler.model.smart_button import SmartButtonConfiguration
 from homeassistant.components.light import (
     ATTR_BRIGHTNESS,
     ATTR_RGB_COLOR,
@@ -105,25 +106,23 @@ LIGHT_ENTITY_DESCRIPTIONS = [
     ),
 ]
 
+
+def set_smart_button_color_func(
+    i: int,
+) -> Callable[[Doppler, Color], Coroutine[Any, Any, SmartButtonConfiguration]]:
+    """Return a coroutine to set the smart button color."""
+    return lambda dev, color: dev.set_smart_button_configuration(i, color=color)
+
+
 SMART_BUTTON_LIGHT_ENTITY_DESCRIPTIONS = [
     DopplerLightEntityDescription(
-        f"Smart Button 1",
+        f"Smart Button {i}",
         icon="mdi:gesture-tap-button",
-        name=f"Smart Button 1",
-        color_key=f"{ATTR_SMART_BUTTON_COLOR}_1",
-        set_color_func=lambda dev, color: dev.set_smart_button_configuration(
-            1, color=color
-        ),
-    ),
-  DopplerLightEntityDescription(
-        f"Smart Button 2",
-        icon="mdi:gesture-tap-button",
-        name=f"Smart Button 2",
-        color_key=f"{ATTR_SMART_BUTTON_COLOR}_2",
-        set_color_func=lambda dev, color: dev.set_smart_button_configuration(
-            2, color=color
-        ),
+        name=f"Smart Button {i}",
+        color_key=f"{ATTR_SMART_BUTTON_COLOR}_{i}",
+        set_color_func=set_smart_button_color_func(i),
     )
+    for i in range(1, 3)
 ]
 
 

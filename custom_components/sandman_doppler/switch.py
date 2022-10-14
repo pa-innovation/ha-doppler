@@ -88,7 +88,7 @@ ENTITY_DESCRIPTIONS = [
         state_key=ATTR_DISPLAY_SECONDS,
         set_value_func_name="set_display_seconds_mode",
     ),
-    #Note that while this is under Alexa in the api it's really not an Alexa function
+    # Note that while this is under Alexa in the api it's really not an Alexa function
     DopplerSwitchEntityDescription(
         "Ascending Alarms",
         name="Ascending Alarms",
