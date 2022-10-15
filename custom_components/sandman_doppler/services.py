@@ -35,6 +35,8 @@ from doppyler.model.doppler import Doppler
 from doppyler.model.light_bar import Direction, LightBarDisplayEffect, Mode, Sparkle
 from doppyler.model.main_display_text import MainDisplayText
 from doppyler.model.mini_display_number import MiniDisplayNumber
+import voluptuous as vol
+
 from homeassistant.const import ATTR_AREA_ID, ATTR_DEVICE_ID, ATTR_ENTITY_ID, ATTR_TIME
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import HomeAssistantError
@@ -44,7 +46,6 @@ from homeassistant.helpers import (
     entity_registry as er,
 )
 from homeassistant.helpers.service import ServiceCall
-import voluptuous as vol
 
 from .const import (
     DOMAIN,

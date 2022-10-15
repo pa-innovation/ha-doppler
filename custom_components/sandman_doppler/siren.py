@@ -9,6 +9,7 @@ from typing import Any
 
 from doppyler.const import ATTR_ALARM_SOUNDS
 from doppyler.model.doppler import Doppler
+
 from homeassistant.components.siren import (
     ATTR_TONE,
     ATTR_VOLUME_LEVEL,

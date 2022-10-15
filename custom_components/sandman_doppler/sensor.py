@@ -8,6 +8,7 @@ from typing import Any
 
 from doppyler.const import ATTR_LIGHT_SENSOR_VALUE, ATTR_WEATHER, ATTR_WIFI
 from doppyler.model.doppler import Doppler
+
 from homeassistant.components.sensor import (
     SensorDeviceClass,
     SensorEntity,

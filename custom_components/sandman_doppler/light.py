@@ -21,6 +21,7 @@ from doppyler.const import (
 from doppyler.model.color import Color
 from doppyler.model.doppler import Doppler
 from doppyler.model.smart_button import SmartButtonConfiguration
+
 from homeassistant.components.light import (
     ATTR_BRIGHTNESS,
     ATTR_RGB_COLOR,

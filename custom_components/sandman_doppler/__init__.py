@@ -9,6 +9,7 @@ from typing import Any
 from doppyler.client import DopplerClient
 from doppyler.exceptions import DopplerException
 from doppyler.model.doppler import Doppler
+
 from homeassistant.config_entries import ConfigEntry, ConfigEntryNotReady
 from homeassistant.const import (
     CONF_EMAIL,

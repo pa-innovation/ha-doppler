@@ -3,6 +3,8 @@ from __future__ import annotations
 
 from typing import Any
 
+import voluptuous as vol
+
 from homeassistant.components.automation import (
     AutomationActionType,
     AutomationTriggerInfo,
@@ -19,7 +21,6 @@ from homeassistant.const import (
 from homeassistant.core import CALLBACK_TYPE, HomeAssistant
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.typing import ConfigType
-import voluptuous as vol
 
 from .const import ATTR_BUTTON, CONF_SUBTYPE, DOMAIN, EVENT_BUTTON_PRESSED
 

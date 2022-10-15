@@ -24,6 +24,7 @@ from doppyler.const import (
 )
 from doppyler.model.alarm import Alarm
 from doppyler.model.doppler import Doppler
+
 from homeassistant.components.switch import (
     SwitchDeviceClass,
     SwitchEntity,
