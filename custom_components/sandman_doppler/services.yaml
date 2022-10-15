@@ -157,7 +157,7 @@ set_main_display_text:
       required: true
       selector:
         duration:
-          enable_days: false
+          enable_day: false
     speed:
       name: Speed
       description: Number of characters to display over duration
@@ -198,7 +198,7 @@ set_mini_display_number:
       required: true
       selector:
         duration:
-          enable_days: false
+          enable_day: false
     color:
       name: Display Color
       description: Color of Displayed Number
@@ -239,7 +239,7 @@ activate_light_bar_set:
       required: true
       selector:
         duration:
-          enable_days: false
+          enable_day: false
     speed:
       name: Speed
       description: Speed of light bar effect
@@ -293,7 +293,7 @@ activate_light_bar_set_each:
       required: true
       selector:
         duration:
-          enable_days: false
+          enable_day: false
     sparkle:
       name: Sparkle
       description: Makes sparkles in the effect
@@ -338,7 +338,7 @@ activate_light_bar_blink:
       required: true
       selector:
         duration:
-          enable_days: false
+          enable_day: false
     speed:
       name: Speed
       description: Speed of light bar effect
@@ -392,7 +392,7 @@ activate_light_bar_pulse:
       required: true
       selector:
         duration:
-          enable_days: false
+          enable_day: false
     speed:
       name: Speed
       description: Speed of light bar effect
@@ -455,7 +455,7 @@ activate_light_bar_comet:
       required: true
       selector:
         duration:
-          enable_days: false
+          enable_day: false
     speed:
       name: Speed
       description: Speed of light bar effect
@@ -528,7 +528,7 @@ activate_light_bar_sweep:
       required: true
       selector:
         duration:
-          enable_days: false
+          enable_day: false
     speed:
       name: Speed
       description: Speed of light bar effect
