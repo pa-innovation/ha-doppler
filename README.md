@@ -124,14 +124,27 @@ Read only:
 
 -Current Wifi Signal strength
 
+## Creation automations from smart buttons (1 or 2 on the top of the clock)
 
-## Doppler Triggers and Automations
+When you integrate your Doppler(s) with Home Assistant, the integration will automatically register itself with your Doppler(s) so that when a smart button is pushed, Home Assistant is notified. There are two ways to create automations for these button presses:
 
-Almost every entity changing on the Doppler can be used as a trigger in Home Assistants automation system.  The Smart buttons (1/2 buttons on the top of the Doppler) appear here as well as device triggers. To easily access these, we recommend going to the Doppler device screen and click "Create automations with device". 
+1. Use Device Triggers: If you are using the Automations UI to create your automation, select the Device Trigger type and then look for your Doppler device. You will see two trigger options, one for each of the smart buttons, and selecting that will automatically trigger the automation you create when the button is pressed.
 
+2. Use Event Triggers: If you are writing your automations by hand, or if you'd prefer to use event triggers, you can trigger on the `sandman_doppler_button_pressed` event. The event data will look as follows:
+
+```yaml
+event_data:
+    device_id: 12345  # The ID of the device in Home Assistant
+    dsn: "Doppler-deadbeef"  # Doppler serial number. You should not have to use or remember this.
+    doppler_name: "Radar"  # The name of the doppler as configured in the Sandman Clocks app
+    name: "Radar"  # The name of the device in Home Assistant. If you've never changed the name of the device in Home Assistant, this will be the same as `doppler_name`
+    button: 1  # Smart button number that was pressed
+    action: "press"  # Push action of the smart button. Currently only `press` is supported
+```
+
+You can use this event data in triggers and conditions to decide what actions you want Home Assistant to take. To learn more about `event` triggers, refer to the [Home Assistant documentation](https://www.home-assistant.io/docs/automation/trigger/#event-trigger).
 
 ## Advanced services
-
 
 Home Assistant supports the following services to use the advanced
 features of Doppler from either developer tools, or more importantly

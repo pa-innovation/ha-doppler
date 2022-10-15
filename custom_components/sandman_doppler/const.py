@@ -7,6 +7,8 @@ ATTR_DSN = "dsn"
 ATTR_BUTTON = "button"
 CONF_SUBTYPE = "subtype"
 
+ATTR_DOPPLER_NAME = "doppler_name"
+
 EVENT_BUTTON_PRESSED = f"{DOMAIN}_button_pressed"
 
 SERVICE_SET_WEATHER_LOCATION = "set_weather_location"
