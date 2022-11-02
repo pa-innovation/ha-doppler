@@ -353,7 +353,7 @@ class DopplerServices:
         data = call.data.copy()
         devices: set[Doppler] = data.pop(ATTR_DEVICES)
         _LOGGER.debug("Called set_weather_location service, sending %s", data)
-        call_doppyler_api_across_devices(devices, "set_weather_configuration", **data)
+        await call_doppyler_api_across_devices(devices, "set_weather_configuration", **data)
 
     async def handle_add_alarm(self, call: ServiceCall) -> None:
         """Handle add_alarm service."""
