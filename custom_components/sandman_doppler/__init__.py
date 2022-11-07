@@ -67,7 +67,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     password = entry.data[CONF_PASSWORD]
 
     session = async_get_clientsession(hass)
-    client = DopplerClient(email, password, client_session=session)
+    client = DopplerClient(email, password, client_session=session, local_api_semaphore_limit=1)
 
     dev_reg = dr.async_get(hass)
     ent_reg = er.async_get(hass)
