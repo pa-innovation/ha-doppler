@@ -260,7 +260,7 @@ class DopplerAlarmSwitch(CoordinatorEntity[DopplerDataUpdateCoordinator], Switch
     async def _async_update_alarm_status(self, enabled: bool) -> None:
         """Update the alarm status."""
         self.alarm.enabled = enabled
-        await self.device.update_alarms([self.alarm])
+        await self.device.update_alarm(self.alarm.id, self.alarm)
         self.async_write_ha_state()
 
     async_turn_on = functools.partialmethod(_async_update_alarm_status, True)
