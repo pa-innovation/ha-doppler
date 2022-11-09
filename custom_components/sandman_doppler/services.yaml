@@ -576,3 +576,31 @@ activate_light_bar_sweep:
             - right
             - left
             - bounce
+set_rainbow_mode:
+  name: Put the clock in rainbow mode
+  description: Puts the clock in rainbow mode
+  target:
+    device:
+      integration: sandman_doppler
+    entity:
+      integration: sandman_doppler
+  fields:
+    speed:
+      name: "Speed"
+      description: "Speed of effect (lower number is faster) or 0 to turn off"
+      required: true
+      selector:
+        number:
+          min: 0
+          max: 255
+          mode: box
+    mode:
+      name: "Day/Night/Both"
+      description: "Whether the clock displays rainbow mode for day, night, or both"
+      required: true
+      selector:
+        select:
+          options:
+            - day 
+            - night
+            - both
