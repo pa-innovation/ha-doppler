@@ -434,7 +434,7 @@ If you want the alarm to go off be sure to slide the Alarm Enabled slider to the
 -Alarm Sound
 Finally, you must pick an alarm sound to be played from the list of available alarm sounds.
 
-Delete Alarm:
+### Delete Alarm:
 
 Deletes an alarm on the Doppler.
 
@@ -496,6 +496,25 @@ Location is the zipcode for Dopplers in the United States.  In non US
 countries, the postal code will often work if followed by a space and
 the country name.  If the postal code doesn't work try the city name
 followed by the country name.
+
+### Rainbow Display
+
+-Targets
+First, targets should be selected.  This can be a set of areas,
+devices, or entities associated with one or more dopplers.
+
+-Speed
+Adjusts the speed at which the rainbow traverses the screen.  0
+turns this mode off, 1 is the fastest and higher numbers make the
+rainbow move more slowly.
+
+-Day/Night/Both
+Determines whther the rainbow is active according to the lightsensor.
+Day makes the rainbow active when the lightsensor sees daylight. Night 
+makes the rainbow active when the lightsensor detects night.  Both makes
+the rainbow always active.  Note that the rainbow will be at the day or 
+night brightness selected by the Day and Night Display entities in the device
+settings.
 
 ## Things we would like to change/add
 
