@@ -26,6 +26,8 @@ Anything you'd like to do with the Sandman Doppler you can control and automate 
 
 ## Installation
 
+You will need our mobile app to get your Doppler setup and online. It is not recommended to actively use our App and Home Assistant at the same time. 
+
 To install this integration into your Home Assistant we are recommending your use the Home Assistant Community Store or HACS. 
 
 1. Use [HACS](https://hacs.xyz/docs/setup/download), in `HACS > Integrations > Explore & Add Repositories` search for "Sandman Doppler". After adding this `https://github.com/pa-innovation/ha-doppler/` as a custom repository. Skip to 7.
@@ -518,4 +520,8 @@ settings.
 
 ## Things we would like to change/add
 
+We want feedback, please join our Discord to give us feedback:https://discord.gg/sandman 
 
+-Ability to have app and Home Assistant running at the same time
+-Updated UI elements
+-A trigger activating after your alarm is dismissed. 
