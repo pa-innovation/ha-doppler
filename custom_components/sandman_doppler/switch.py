@@ -250,7 +250,7 @@ class DopplerAlarmSwitch(CoordinatorEntity[DopplerDataUpdateCoordinator], Switch
 
     @property
     def is_on(self) -> bool | None:
-        return True if self.alarm.status=="set" or self.alarm.status == "snoozed" else False
+        return True if self.alarm.status=="set" or self.alarm.status == "snoozed" or self.alarm.status=="active" else False
 
     @property
     def extra_state_attributes(self) -> Mapping[str, Any] | None:
