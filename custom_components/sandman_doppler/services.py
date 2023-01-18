@@ -413,21 +413,7 @@ class DopplerServices:
             alarms[device]=await getattr(device, "get_all_alarms")()
             alarm=alarms[device][data[ATTR_ID]]
             alarm.status=data[ATTR_STATUS]
-            _LOGGER.warning(f"alarm was {alarm}")
             await getattr(device,"update_alarm")(data[ATTR_ID],alarm) 
-       
-        
-
-        #alist[device]=await call_doppyler_api_across_devices(devices, "get_all_alarms")
-        #i=0
-        #for device in devices:
-        #    alist[i]
-        #_LOGGER.warning(f"alist was {alist}")
-        #_LOGGER.warning(f"alist[0] was {alist[0][0]}")
-        #alarm=alist[0][data[ATTR_ID]]
-        #alarm.status=data[ATTR_STATUS]
-        #_LOGGER.debug("Called update_alarm service for id %s", data[ATTR_ID])
-        #await call_doppyler_api_across_devices(devices, "update_alarm", data[ATTR_ID], alarm)
 
     async def handle_set_main_display(self, call: ServiceCall) -> None:
         """Handle set_main_display service."""
