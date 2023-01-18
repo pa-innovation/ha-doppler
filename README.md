@@ -52,7 +52,7 @@ Read/Write entities:
 -Turn the Doppler System alarm on and off
 
 
--Adjust colors of your Dopplers buttons and display in both day and night mode
+-Adjust colors of your Dopplers buttons and display in both day and night mode 
 
 
 -Volume Level of your Doppler
@@ -557,5 +557,7 @@ settings.
 
 We want feedback, please join our Discord to give us feedback:https://discord.gg/sandman 
 
--Ability to have app and Home Assistant running at the same time
+-Ability to have app and Home Assistant running at the same time (mutiple nonces)
 -Updated UI elements
+-Turning off all active alarms via HA
+-Snoozing all active alarms via HA
