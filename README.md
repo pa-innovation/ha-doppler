@@ -1,6 +1,6 @@
 # Sandman Doppler Integration
 
-This is an integration designed to all you to access and control your Sandman Doppler inside Home Assistant. 
+This is an integration designed to allow you to access and control your Sandman Doppler inside Home Assistant. 
 
 The integration uses local control to communicate with your Doppler using our local API: https://documenter.getpostman.com/view/14527424/VVQiv24k
 
@@ -48,7 +48,7 @@ This Sandman Doppler integration provides the following:
 These are polled every 60 seconds locally
 
 Entities
-Read/Write enties: 
+Read/Write entities: 
 -Turn the Doppler System alarm on and off
 
 
@@ -146,11 +146,33 @@ event_data:
 
 You can use this event data in triggers and conditions to decide what actions you want Home Assistant to take. To learn more about `event` triggers, refer to the [Home Assistant documentation](https://www.home-assistant.io/docs/automation/trigger/#event-trigger).
 
-## Advanced services
+## Creating automations for alarms
 
-Home Assistant supports the following services to use the advanced
-features of Doppler from either developer tools, or more importantly
-in automations. To access these go to developer tool/services and then select the service you'd like to access. Or, go to Automations in Home Assistant and select the service you'd like to autoamte. 
+Actions can be taken in automations based on the status of alarms by using a State Trigger if you know the AlarmID and the state change you want to trigger on.  For example, an alarm state change from "active" to "snoozed" allows you to trigger an action when a ringing alarm is snoozed.  Likewise, a state change from "active" to "unarmed" allows you to trigger an action when a ringing alarm is turned off.
+
+1. Get the Alarm ID.  Go to Settings, Devices and Services and select devices from the Sandman Doppler Integration.  Select the device whose alarms you wish to trigger on.  Look in the Controls section and find the desired alarm.  Alarm 0, the Doppler System Alarm will always be present.  Other alarms may be set by using the Add New Alarm service or the Doppler Phone App.
+
+2. Create the automation. Go to Settings, Automations and Scenes, and create a new automation.
+
+3. Select the trigger.  For the trigger, select a status trigger and choose the alarm entity whose Alarm ID matches the one you found in step 1.
+
+4. Select the Status attribute. Choose Status from the dropdown menu.
+
+5. Optionally set the From field.  This field allows you to set the state the alarm is transitioning from.  If you want to find all changes to a given status, ignore this step, otherwise choose a status from the list below.  Setting this field to "active" allows you to trigger when an alarm is turned off while ringing or snoozed given the proper value of the To field below.  Setting this field to "set" allows you to trigger when an alarm goes off given the proper value of the To field.  See the relevant status below.
+
+6. Set the To field.  This field allows to to specify the target state of the alarm.  If the to Field is set to "active" then the automation action will trigger when the alarm goes off.  If this field is set to "unarmed" then the automation action will trigger when the alarm is turned off (ringing or not).
+
+7. Summary.  To trigger on the alarm going off, set From field to "set" and set the To field to "active".  To trigger on stopping a ringing alarm set the From field to "active" and set To field to "unarmed". To trigger on alarm snoozed, set the From field to "active" and the To field to "snoozed".  To trigger on all instances of the alarm being turned off, set the To field to "unarmed" and ignore the From field.  To trigger on all instances of the alarm being set, set the To field to "set".
+
+Useful status are: "set", the alarm has been set; "active", the alarm is ringing; "snoozed", the alarm has been snoozed; and "unarmed", the alarm has been turned off. 
+
+Note: The Update Alarm Status service can be used in automations to turn on, snooze and turn off alarms.  See the section Update Alarm Status below.
+
+Caveat: Because the Doppler integration is of type local polling, it make take up to one minute for an alarm to change state.  For example, an automation with a state trigger on From "set" To "active" could require an alarm ring for up to a minute before the "active" state is registered in Home Assistant triggering the automation action.  As a result, if the alarm is turned off via a button in that one minute time period, the automation will NOT activate.
+
+## Advanced Services
+
+Home Assistant supports the following services to use the advanced features of Doppler from either developer tools, or more importantly in automations. To access these go to developer tool/services and then select the service you'd like to access. Or, go to Automations in Home Assistant and select the service you'd like to automate. 
 
 ### Activate Lightbar Blink
 This service makes the lightbar blink in one or more colors.
@@ -175,7 +197,7 @@ Doppler will alternate between the colors of the rainbow: red, orange
 yellow, green, blue, purple. It is important to both check the checkbox
 on the left and turn on the slider at the right if rainbow mode is
 desired.  If the slider is forgotten, rainbow mode won't be selected
-which may result in an error being returned by Home Asisstant.
+which may result in an error being returned by Home Assistant.
 
 Single Color, Color List, and Rainbow are designed to be mutually
 exclusive in this service although if single color or color list is
@@ -192,7 +214,7 @@ is optional.
 
 -Sparkle
 Sparkle turns on a cool sparkle effect when checked and low, medium,
-or high is selcted.
+or high is selected.
 
 ### Activate Lightbar Comet
 
@@ -216,7 +238,7 @@ If rainbow is enabled then the comet will be rainbow colored.  It is
 important to both check the checkbox on the right and turn on the
 slider at the left.  If the slider is forgotten, rainbow mode won't be
 selected which may result in an error being returned by Home
-Asisstant.
+Assistant.
 
 Single Color, Color List, and Rainbow are designed to be mutually
 exclusive in this service but if single color or color list is
@@ -446,6 +468,19 @@ Because alarms are numbered on a per clock basis, it is advisable to select only
 -Alarm ID
 Provide the Alarm ID to be deleted.
 
+### Update Alarm Status
+
+Changes the state of an existing alarm on the Doppler.  This can be used in automations to set an alarm, stop a ringing alarm, or to snooze a ringing alarm.
+
+-Targets
+Because alarms are numbered on a per clock basis, it is advisable to select only one device when updating alarm status.
+
+-Alarm ID
+Provide the Alarm ID for changing the status.  
+
+-Alarm Status
+Alarm statuses are "set", "unarmed", and "snoozed". "set" means that the alarm will go off.  "unarmed" means that the alarm won't go off.  "unarmed" is also used to stop a ringing alarm. "snoozed" allows snoozing a ringing alarm. 
+
 ### Set Main Display Text
 
 Creates a scrolling text message on the Doppler (Minus a few characters Doppler can't display.)
@@ -511,7 +546,7 @@ turns this mode off, 1 is the fastest and higher numbers make the
 rainbow move more slowly.
 
 -Day/Night/Both
-Determines whther the rainbow is active according to the lightsensor.
+Determines whether the rainbow is active according to the lightsensor.
 Day makes the rainbow active when the lightsensor sees daylight. Night 
 makes the rainbow active when the lightsensor detects night.  Both makes
 the rainbow always active.  Note that the rainbow will be at the day or 
@@ -524,4 +559,3 @@ We want feedback, please join our Discord to give us feedback:https://discord.gg
 
 -Ability to have app and Home Assistant running at the same time
 -Updated UI elements
--A trigger activating after your alarm is dismissed. 
