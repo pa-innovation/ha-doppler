@@ -453,7 +453,7 @@ off.
 The alarm volume is how loud you would like the alarm to be when it goes off.
 
 -Alarm Enabled
-If you want the alarm to go off be sure to slide the Alarm Enabled slider to the right.
+If you want the alarm to go off, select "set".  If you don't want the alarm to go off, select "unarmed".
 
 -Alarm Sound
 Finally, you must pick an alarm sound to be played from the list of available alarm sounds.
