@@ -13,6 +13,7 @@ EVENT_BUTTON_PRESSED = f"{DOMAIN}_button_pressed"
 
 SERVICE_SET_WEATHER_LOCATION = "set_weather_location"
 SERVICE_ADD_ALARM = "add_alarm"
+SERVICE_UPDATE_ALARM = "update_alarm"
 SERVICE_DELETE_ALARM = "delete_alarm"
 SERVICE_UPDATE_ALARM = "update_alarm"
 SERVICE_SET_MAIN_DISPLAY_TEXT = "set_main_display_text"

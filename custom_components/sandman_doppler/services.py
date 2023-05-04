@@ -14,7 +14,6 @@ from doppyler.const import (
     ATTR_DEVICES,
     ATTR_DIRECTION,
     ATTR_DURATION,
-    ATTR_ENABLED,
     ATTR_GAP,
     ATTR_ID,
     ATTR_LOCATION,
@@ -27,9 +26,9 @@ from doppyler.const import (
     ATTR_SOUND,
     ATTR_SPARKLE,
     ATTR_SPEED,
+    ATTR_STATUS,
     ATTR_TEXT,
     ATTR_VOLUME,
-    ATTR_STATUS,
 )
 from doppyler.model.alarm import Alarm, AlarmSource, RepeatDayOfWeek
 from doppyler.model.color import Color
@@ -65,6 +64,7 @@ from .const import (
     SERVICE_SET_MINI_DISPLAY_NUMBER,
     SERVICE_SET_WEATHER_LOCATION,
     SERVICE_SET_RAINBOW_MODE,
+    SERVICE_UPDATE_ALARM,
 )
 
 SCAN_INTERVAL = timedelta(seconds=60)
@@ -74,7 +74,7 @@ _LOGGER = logging.getLogger(__name__)
 COLOR_SCHEMA = vol.All(
     [vol.All(vol.Coerce(int), vol.Range(0, 255))],
     vol.Length(3, 3),
-    lambda x: Color.from_list(x),
+    Color.from_list,
 )
 BASE_SCHEMA = vol.Schema(
     {
@@ -114,7 +114,7 @@ async def call_doppyler_api_across_devices(
         tup for tup in zip(devices, results) if isinstance(tup[1], Exception)
     ]:
         lines = [
-            *(f"{device} - {type(error).__name__}: {error}" for device, error in errors)
+            f"{device} - {type(error).__name__}: {error}" for device, error in errors
         ]
         if len(lines) > 1:
             lines.insert(0, f"{len(errors)} error(s):")
@@ -232,9 +232,48 @@ class DopplerServices:
                     vol.Required(ATTR_VOLUME): vol.All(
                         vol.Coerce(int), vol.Range(1, 100)
                     ),
-                    vol.Required(ATTR_STATUS): cv.string,
+                    vol.Required(ATTR_STATUS): vol.All(
+                        cv.boolean, lambda x: "set" if x else "unarmed"
+                    ),
                     vol.Required(ATTR_SOUND): cv.string,
                 }
+            ),
+        )
+
+        self.hass.services.async_register(
+            DOMAIN,
+            SERVICE_UPDATE_ALARM,
+            self.handle_update_alarm,
+            schema=vol.All(
+                BASE_SCHEMA.extend(
+                    {
+                        vol.Required(ATTR_ID): vol.Coerce(int),
+                        vol.Optional(ATTR_NAME): cv.string,
+                        vol.Optional(ATTR_TIME): cv.time,
+                        vol.Optional(ATTR_REPEAT, default=[]): vol.All(
+                            cv.ensure_list, [vol.Coerce(RepeatDayOfWeek)]
+                        ),
+                        vol.Optional(ATTR_COLOR): COLOR_SCHEMA,
+                        vol.Optional(ATTR_VOLUME): vol.All(
+                            vol.Coerce(int), vol.Range(1, 100)
+                        ),
+                        vol.Optional(ATTR_STATUS): vol.All(
+                            cv.boolean, lambda x: "set" if x else "unarmed"
+                        ),
+                        vol.Optional(ATTR_SOUND): cv.string,
+                    }
+                ),
+                cv.has_at_least_one_key(ATTR_DEVICE_ID, ATTR_ENTITY_ID, ATTR_AREA_ID),
+                cv.has_at_least_one_key(
+                    ATTR_NAME,
+                    ATTR_TIME,
+                    ATTR_REPEAT,
+                    ATTR_COLOR,
+                    ATTR_VOLUME,
+                    ATTR_STATUS,
+                    ATTR_SOUND,
+                ),
+                self.get_dopplers_from_targets,
             ),
         )
 
@@ -243,18 +282,6 @@ class DopplerServices:
             SERVICE_DELETE_ALARM,
             self.handle_delete_alarm,
             schema=self._expand_schema({vol.Required(ATTR_ID): vol.Coerce(int)}),
-        )
-
-        self.hass.services.async_register(
-            DOMAIN,
-            SERVICE_UPDATE_ALARM,
-            self.handle_update_alarm,
-            schema=self._expand_schema(
-                {
-                    vol.Required(ATTR_ID): vol.Coerce(int),
-                    vol.Required(ATTR_STATUS): vol.Coerce(str),
-                }
-            ),
         )
 
         self.hass.services.async_register(
@@ -397,23 +424,75 @@ class DopplerServices:
         _LOGGER.debug("Called add_alarm service, sending %s", alarm)
         await call_doppyler_api_across_devices(devices, "add_alarm", alarm)
 
+    async def handle_update_alarm(self, call: ServiceCall) -> None:
+        """Handle update_alarm service."""
+        data = call.data.copy()
+        devices: set[Doppler] = data.pop(ATTR_DEVICES)
+        alarm_id: int = data.pop(ATTR_ID)
+
+        # Get all exisitng alarms for all devices
+        try:
+            existing_alarms_all: list[list[Alarm]] = await asyncio.gather(
+                *(device.get_all_alarms() for device in devices)
+            )
+        except Exception as err:
+            raise HomeAssistantError from err
+
+        # Filter to only the alarms that are being updated
+        existing_alarms = [
+            (
+                device,
+                next(
+                    (
+                        alarm
+                        for alarm_id_, alarm in alarms.items()
+                        if alarm_id_ == alarm_id
+                    ),
+                    None,
+                ),
+            )
+            for device, alarms in zip(devices, existing_alarms_all)
+        ]
+
+        # If the alarm ID was not found on a device, raise an error
+        if devices_missing_alarm := [
+            device for device, alarm in existing_alarms if alarm is None
+        ]:
+            raise HomeAssistantError(
+                f"Alarm with id {data[ATTR_ID]} not found on device(s) {devices_missing_alarm}"
+            )
+
+        # Update the alarm data
+        for _, alarm in existing_alarms:
+            for key, val in data.items():
+                setattr(alarm, key, val)
+
+        _LOGGER.debug("Called update_alarm service, sending %s", existing_alarms)
+        # Iterate through each device and update each alarm
+        results = await asyncio.gather(
+            *(
+                device.update_alarm(alarm_id, alarm)
+                for device, alarm in existing_alarms
+            ),
+            return_exceptions=True,
+        )
+        if errors := [
+            tup for tup in zip(devices, results) if isinstance(tup[1], Exception)
+        ]:
+            lines = [
+                f"{device} - {type(error).__name__}: {error}"
+                for device, error in errors
+            ]
+            if len(lines) > 1:
+                lines.insert(0, f"{len(errors)} error(s):")
+            raise HomeAssistantError("\n".join(lines))
+
     async def handle_delete_alarm(self, call: ServiceCall) -> None:
         """Handle delete_alarm service."""
         data = call.data.copy()
         devices: set[Doppler] = data.pop(ATTR_DEVICES)
         _LOGGER.debug("Called delete_alarm service for id %s", data[ATTR_ID])
         await call_doppyler_api_across_devices(devices, "delete_alarm", data[ATTR_ID])
-
-    async def handle_update_alarm(self, call: ServiceCall) -> None:
-        """Handle update_alarm service."""
-        data = call.data.copy()
-        devices: set[Doppler] = data.pop(ATTR_DEVICES)
-        alarms: dict[Alarm] = {}
-        for device in devices:
-            alarms[device]=await getattr(device, "get_all_alarms")()
-            alarm=alarms[device][data[ATTR_ID]]
-            alarm.status=data[ATTR_STATUS]
-            await getattr(device,"update_alarm")(data[ATTR_ID],alarm) 
 
     async def handle_set_main_display(self, call: ServiceCall) -> None:
         """Handle set_main_display service."""

@@ -16,7 +16,7 @@ set_weather_location:
 
 add_alarm:
   name: Add new alarm
-  description: Sets an Alarm on the Doppler. If the ID is unused, the alarm will be created as new. If the ID is in use, the existing alarm will be replaced.
+  description: Creates an Alarm on the Doppler. If the ID is unused, the alarm will use that ID. If the ID is in use, the new alarm will use the first available ID.
   target:
     device:
       integration: sandman_doppler
@@ -119,9 +119,9 @@ add_alarm:
             - 'Violin.mp3'
             - 'Waves.mp3'
 
-delete_alarm:
-  name: Delete Alarm
-  description: Deletes the selected Alarm
+update_alarm:
+  name: Update existing alarm
+  description: Updates an existing Alarm on the Doppler. If there is no alarm using the provided ID, the call will fail.
   target:
     device:
       integration: sandman_doppler
@@ -137,10 +137,93 @@ delete_alarm:
           min: 1
           max: 255
           mode: box
+    name:
+      name: Alarm Name
+      description: Name of the alarm
+      required: false
+      selector:
+        text:          
+    time:
+      name: Alarm Time
+      description: The time of the alarm to set
+      required: false
+      selector:
+        time:
+    repeat:
+      name: Repeat Days
+      description: Alarm repeats on these days
+      required: false
+      selector:
+        select:
+          multiple: true
+          options:
+            - label: Sunday
+              value: Su
+            - label: Monday
+              value: Mo
+            - label: Tuesday
+              value: Tu
+            - label: Wednesday
+              value: We
+            - label: Thursday
+              value: Th
+            - label: Friday
+              value: Fr
+            - label: Saturday
+              value: Sa
+    color:
+      name: Alarm Color
+      description: Color of the alarm on the clock
+      required: false
+      selector:
+        color_rgb:
+    volume:
+      name: Alarm Volume
+      description: Volume for alarm separate from master volume
+      required: false
+      advanced: true
+      selector:
+        number:
+          min: 0
+          max: 100
+          mode: slider
+    status:
+      name: Alarm Enabled?
+      description: Whether alarm is enabled or disabled
+      required: false
+      selector:
+        boolean:
+    sound:
+      name: Alarm Sound
+      description: MP3 file to play for alarm
+      required: false
+      selector:
+        select:
+          options:
+            - '1980.mp3'
+            - 'Alarming.mp3'
+            - 'Classic.mp3'
+            - 'Dance.mp3'
+            - 'Dialup.mp3'
+            - 'Gentle.mp3'
+            - 'Harp.mp3'
+            - 'Jazz.mp3'
+            - 'Jungle.mp3'
+            - 'Playful.mp3'
+            - 'Purite.mp3'
+            - 'Rainforest.mp3'
+            - 'Ripples.mp3'
+            - 'Rooster.mp3'
+            - 'Sandman.mp3'
+            - 'Stream.mp3'
+            - 'Sub.mp3'
+            - 'Trek.mp3'
+            - 'Violin.mp3'
+            - 'Waves.mp3'
 
-update_alarm:
-  name: Update Alarm Status
-  description: Set, Unsets and Snoozes Alarm
+delete_alarm:
+  name: Delete Alarm
+  description: Deletes the selected Alarm
   target:
     device:
       integration: sandman_doppler
@@ -149,23 +232,13 @@ update_alarm:
   fields:
     id:
       name: Alarm ID
-      description: ID of the alarm to be updated
+      description: ID of the alarm to be deleted
       required: true
       selector:
         number:
           min: 1
           max: 255
           mode: box
-    status:
-      name: Alarm Status
-      description: Set, Unset or Snooze
-      required: true
-      selector:
-        select:
-          options:
-            - 'set'
-            - 'snoozed'
-            - 'unarmed'
 
 set_main_display_text:
   name: Set main display text
