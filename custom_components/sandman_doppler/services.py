@@ -29,7 +29,6 @@ from doppyler.const import (
     ATTR_STATUS,
     ATTR_TEXT,
     ATTR_VOLUME,
-    ATTR_STATUS,
 )
 from doppyler.model.alarm import Alarm, AlarmSource, RepeatDayOfWeek
 from doppyler.model.color import Color
