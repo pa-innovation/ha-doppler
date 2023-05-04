@@ -232,7 +232,7 @@ delete_alarm:
   fields:
     id:
       name: Alarm ID
-      description: ID of the alarm to be set
+      description: ID of the alarm to be deleted
       required: true
       selector:
         number:
