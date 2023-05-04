@@ -1,11 +1,11 @@
 {
   "domain": "sandman_doppler",
   "name": "Sandman Doppler",
-  "codeowners": ["@raman325", "@ckelloug2"],
+  "codeowners": ["@raman325"],
   "config_flow": true,
   "documentation": "https://github.com/pa-innovation/ha-doppler",
   "iot_class": "local_polling",
   "issue_tracker": "https://github.com/pa-innovation/ha-doppler/issues",
-  "requirements": ["doppyler==0.0.19"],
+  "requirements": ["doppyler==0.0.20"],
   "version": "0.0.0"
 }

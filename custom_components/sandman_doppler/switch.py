@@ -250,31 +250,31 @@ class DopplerAlarmSwitch(CoordinatorEntity[DopplerDataUpdateCoordinator], Switch
 
     @property
     def is_on(self) -> bool | None:
-        return True if self.alarm.status=="set" or self.alarm.status == "snoozed" or self.alarm.status=="active" else False
+        return self.alarm.status in ("set", "snoozed", "active")
 
     @property
     def extra_state_attributes(self) -> Mapping[str, Any] | None:
         """Return extra state attributes."""
         return asdict(self.alarm)
 
-    async def _async_update_alarm_status(self, enabled: bool) -> None:
+    async def _async_update_alarm_status(self, status: str) -> None:
         """Update the alarm status."""
-        self.alarm.status = "set" if enabled == True else "unarmed"
+        self.alarm.status = status
         await self.device.update_alarm(self.alarm.id, self.alarm)
         self.async_write_ha_state()
 
-    async_turn_on = functools.partialmethod(_async_update_alarm_status, True)
-    async_turn_off = functools.partialmethod(_async_update_alarm_status, False)
+    async_turn_on = functools.partialmethod(_async_update_alarm_status, "set")
+    async_turn_off = functools.partialmethod(_async_update_alarm_status, "unarmed")
 
     # async def async_turn_on(self, **kwargs) -> None:
     #     """Turn the switch on."""
-    #     self.alarm.enabled = True
+    #     self.alarm.status = "set"
     #     await self.device.update_alarms([self.alarm])
     #     self.async_write_ha_state()
 
     # async def async_turn_off(self, **kwargs) -> None:
     #     """Turn the switch off."""
-    #     self.alarm.enabled = False
+    #     self.alarm.status = "unarmed"
     #     await self.device.update_alarms([self.alarm])
     #     self.async_write_ha_state()
 
