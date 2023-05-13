@@ -89,8 +89,10 @@ add_alarm:
       selector:
         select:
           options:
-            - Enabled
-            - Disabled
+            - label: Enabled
+              value: set
+            - label: Disabled
+              value: unarmed
     sound:
       name: Alarm Sound
       description: MP3 file to play for alarm
@@ -194,9 +196,12 @@ update_alarm:
       selector:
         select:
           options:
-            - Enabled
-            - Disabled
-            - Snoozed
+            - label: Enabled
+              value: set
+            - label: Disabled
+              value: unarmed
+            - label: Snoozed
+              value: snoozed
     sound:
       name: Alarm Sound
       description: MP3 file to play for alarm
