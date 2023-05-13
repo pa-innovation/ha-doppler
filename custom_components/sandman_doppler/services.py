@@ -101,8 +101,8 @@ LIGHT_BAR_SET_SCHEMA = LIGHT_BAR_BLINK_SCHEMA = LIGHT_BAR_BASE_SCHEMA.extend(
     }
 )
 
-VALID_STATUSES = {"set": "Enabled", "unarmed": "Disabled"}
-VALID_STATUSES_WITH_SNOOZE = {**VALID_STATUSES, "snoozed": "Snoozed"}
+VALID_STATUSES = {"Enabled": "set", "Disabled": "unarmed"}
+VALID_STATUSES_WITH_SNOOZE = {**VALID_STATUSES, "Snoozed": "snoozed"}
 
 
 async def call_doppyler_api_across_devices(
