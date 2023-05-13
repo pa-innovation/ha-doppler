@@ -236,7 +236,9 @@ class DopplerServices:
                         vol.Coerce(int), vol.Range(1, 100)
                     ),
                     vol.Required(ATTR_STATUS, default="Enabled"): vol.All(
-                        vol.Title, vol.In(VALID_STATUSES)
+                        vol.Title,
+                        vol.In(VALID_STATUSES.keys()),
+                        lambda x: VALID_STATUSES_WITH_SNOOZE[x],
                     ),
                     vol.Required(ATTR_SOUND): cv.string,
                 }
@@ -261,7 +263,9 @@ class DopplerServices:
                             vol.Coerce(int), vol.Range(1, 100)
                         ),
                         vol.Optional(ATTR_STATUS): vol.All(
-                            vol.Title, vol.In(VALID_STATUSES_WITH_SNOOZE)
+                            vol.Title,
+                            vol.In(VALID_STATUSES_WITH_SNOOZE.keys()),
+                            lambda x: VALID_STATUSES_WITH_SNOOZE[x],
                         ),
                         vol.Optional(ATTR_SOUND): cv.string,
                     }
