@@ -89,8 +89,8 @@ add_alarm:
       selector:
         select:
           options:
-          - 'set'
-          - 'unarmed'
+            - Enabled
+            - Disabled
     sound:
       name: Alarm Sound
       description: MP3 file to play for alarm
@@ -188,11 +188,15 @@ update_alarm:
           max: 100
           mode: slider
     status:
-      name: Alarm Enabled?
-      description: Whether alarm is enabled or disabled
+      name: Alarm Status
+      description: Enable, disable, or snooze alarm
       required: false
       selector:
-        boolean:
+        select:
+          options:
+            - Enabled
+            - Disabled
+            - Snoozed
     sound:
       name: Alarm Sound
       description: MP3 file to play for alarm

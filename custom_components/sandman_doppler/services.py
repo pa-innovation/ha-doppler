@@ -101,6 +101,9 @@ LIGHT_BAR_SET_SCHEMA = LIGHT_BAR_BLINK_SCHEMA = LIGHT_BAR_BASE_SCHEMA.extend(
     }
 )
 
+VALID_STATUSES = {"set": "Enabled", "unarmed": "Disabled"}
+VALID_STATUSES_WITH_SNOOZE = {**VALID_STATUSES, "snoozed": "Snoozed"}
+
 
 async def call_doppyler_api_across_devices(
     devices: set[Doppler], func_name: str, *args, **kwargs
@@ -120,7 +123,7 @@ async def call_doppyler_api_across_devices(
             lines.insert(0, f"{len(errors)} error(s):")
         raise HomeAssistantError("\n".join(lines))
     return results
-    
+
 
 def _validate_colors(data: dict[str, Any]) -> dict[str, Any]:
     """Validate colors in service call dict."""
@@ -232,8 +235,8 @@ class DopplerServices:
                     vol.Required(ATTR_VOLUME): vol.All(
                         vol.Coerce(int), vol.Range(1, 100)
                     ),
-                    vol.Required(ATTR_STATUS): vol.All(
-                        cv.boolean, lambda x: "set" if x else "unarmed"
+                    vol.Required(ATTR_STATUS, default="Enabled"): vol.All(
+                        vol.Title, vol.In(VALID_STATUSES)
                     ),
                     vol.Required(ATTR_SOUND): cv.string,
                 }
@@ -258,7 +261,7 @@ class DopplerServices:
                             vol.Coerce(int), vol.Range(1, 100)
                         ),
                         vol.Optional(ATTR_STATUS): vol.All(
-                            cv.boolean, lambda x: "set" if x else "unarmed"
+                            vol.Title, vol.In(VALID_STATUSES_WITH_SNOOZE)
                         ),
                         vol.Optional(ATTR_SOUND): cv.string,
                     }
