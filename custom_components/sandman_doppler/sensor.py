@@ -78,7 +78,7 @@ SENSOR_ENTITY_DESCRIPTIONS = [
         "Weather: Location",
         name="Weather: Location",
         icon="mdi:earth",
-        entity_category=EntityCategory.CONFIG,
+        entity_category=EntityCategory.DIAGNOSTIC,
         state_key=ATTR_WEATHER,
         state_func=lambda x: x.location,
     ),
