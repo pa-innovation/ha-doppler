@@ -1,8 +1,10 @@
 """The Sandman Doppler integration."""
+
 from __future__ import annotations
 
 import asyncio
 from datetime import timedelta
+import functools
 import logging
 from typing import Any
 
@@ -45,7 +47,7 @@ PLATFORMS = [
 ]
 
 
-async def _get_devices(client: Doppler) -> None:
+async def _get_devices(client: DopplerClient) -> None:
     """Helper function to get devices from cloud."""
     try:
         await client.get_devices()
@@ -121,9 +123,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # and remove device listeners if the list changes
     entry.async_on_unload(
         async_track_time_interval(
-            hass,
-            lambda _: hass.async_create_task(_get_devices(client)),
-            timedelta(minutes=5),
+            hass, functools.partial(_get_devices, client), timedelta(minutes=5)
         )
     )
 
