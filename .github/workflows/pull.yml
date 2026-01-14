@@ -8,7 +8,7 @@ jobs:
     runs-on: "ubuntu-latest"
     name: Validate
     steps:
-        - uses: "actions/checkout@v2"
+        - uses: "actions/checkout@v4"
 
         - name: HACS validation
           uses: "hacs/action@main"
@@ -23,23 +23,28 @@ jobs:
     runs-on: "ubuntu-latest"
     name: Check style formatting
     steps:
-        - uses: "actions/checkout@v2"
-        - uses: "actions/setup-python@v1"
+        - uses: "actions/checkout@v4"
+        - uses: "actions/setup-python@v5"
           with:
             python-version: "3.x"
         - run: python3 -m pip install black
-        - run: black .
+        - run: black --check .
 
   tests:
     runs-on: "ubuntu-latest"
-    name: Run tests
+    name: Run tests (Python ${{ matrix.python-version }})
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.12", "3.13", "3.14"]
     steps:
       - name: Check out code from GitHub
-        uses: "actions/checkout@v2"
-      - name: Setup Python
-        uses: "actions/setup-python@v1"
+        uses: "actions/checkout@v4"
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: "actions/setup-python@v5"
         with:
-          python-version: "3.8"
+          python-version: "${{ matrix.python-version }}"
+          allow-prereleases: true
       - name: Install requirements
         run: python3 -m pip install -r requirements_test.txt
       # - name: Run tests
