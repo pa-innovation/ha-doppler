@@ -1,12 +1,15 @@
 set_weather_location:
   name: Set weather location
   description: Sets the location that weather is retrieved for. To control other weather settings, use the available weather entities.
-  target:
-    device:
-      integration: sandman_doppler
-    entity:
-      integration: sandman_doppler
   fields:
+    device_id:
+      name: Device
+      description: The Sandman Doppler device to target
+      required: true
+      selector:
+        device:
+          integration: sandman_doppler
+          multiple: true
     location:
       name: Location
       description: The location to query weather for.
@@ -17,12 +20,15 @@ set_weather_location:
 add_alarm:
   name: Add new alarm
   description: Creates an Alarm on the Doppler. If the ID is unused, the alarm will use that ID. If the ID is in use, the new alarm will use the first available ID.
-  target:
-    device:
-      integration: sandman_doppler
-    entity:
-      integration: sandman_doppler
   fields:
+    device_id:
+      name: Device
+      description: The Sandman Doppler device to target
+      required: true
+      selector:
+        device:
+          integration: sandman_doppler
+          multiple: true
     id:
       name: Alarm ID
       description: ID of the alarm to be set
@@ -122,12 +128,15 @@ add_alarm:
 update_alarm:
   name: Update existing alarm
   description: Updates an existing Alarm on the Doppler. If there is no alarm using the provided ID, the call will fail.
-  target:
-    device:
-      integration: sandman_doppler
-    entity:
-      integration: sandman_doppler
   fields:
+    device_id:
+      name: Device
+      description: The Sandman Doppler device to target
+      required: true
+      selector:
+        device:
+          integration: sandman_doppler
+          multiple: true
     id:
       name: Alarm ID
       description: ID of the alarm to be set
@@ -228,12 +237,15 @@ update_alarm:
 delete_alarm:
   name: Delete Alarm
   description: Deletes the selected Alarm
-  target:
-    device:
-      integration: sandman_doppler
-    entity:
-      integration: sandman_doppler
   fields:
+    device_id:
+      name: Device
+      description: The Sandman Doppler device to target
+      required: true
+      selector:
+        device:
+          integration: sandman_doppler
+          multiple: true
     id:
       name: Alarm ID
       description: ID of the alarm to be deleted
@@ -247,12 +259,15 @@ delete_alarm:
 set_main_display_text:
   name: Set main display text
   description: Display text on main display
-  target:
-    device:
-      integration: sandman_doppler
-    entity:
-      integration: sandman_doppler
   fields:
+    device_id:
+      name: Device
+      description: The Sandman Doppler device to target
+      required: true
+      selector:
+        device:
+          integration: sandman_doppler
+          multiple: true
     text:
       name: Text
       description: Text to display
@@ -286,12 +301,15 @@ set_main_display_text:
 set_mini_display_number:
   name: Set mini display number
   description: Display a number on the mini display
-  target:
-    device:
-      integration: sandman_doppler
-    entity:
-      integration: sandman_doppler
   fields:
+    device_id:
+      name: Device
+      description: The Sandman Doppler device to target
+      required: true
+      selector:
+        device:
+          integration: sandman_doppler
+          multiple: true
     number:
       name: Number
       description: Number to display on Mini Display
@@ -318,12 +336,15 @@ set_mini_display_number:
 activate_light_bar_set:
   name: Activate the light bar (`set`)
   description: Activates the light bar in `set` mode.
-  target:
-    device:
-      integration: sandman_doppler
-    entity:
-      integration: sandman_doppler
   fields:
+    device_id:
+      name: Device
+      description: The Sandman Doppler device to target
+      required: true
+      selector:
+        device:
+          integration: sandman_doppler
+          multiple: true
     color:
       name: Single Color
       description: Use this option to select a single color. If this is enabled, don't set rainbow to `true`. If color list is enabled, this will be ignored.
@@ -372,12 +393,15 @@ activate_light_bar_set:
 activate_light_bar_set_each:
   name: Activate the light bar (`set-each`)
   description: Activates the light bar in `set-each` mode.
-  target:
-    device:
-      integration: sandman_doppler
-    entity:
-      integration: sandman_doppler
   fields:
+    device_id:
+      name: Device
+      description: The Sandman Doppler device to target
+      required: true
+      selector:
+        device:
+          integration: sandman_doppler
+          multiple: true
     color:
       name: Single Color
       description: Use this option to select a single color. If this is enabled, don't set rainbow to `true`. If color list is enabled, this will be ignored.
@@ -417,12 +441,15 @@ activate_light_bar_set_each:
 activate_light_bar_blink:
   name: Activate the light bar (`blink`)
   description: Activates the light bar in `blink` mode.
-  target:
-    device:
-      integration: sandman_doppler
-    entity:
-      integration: sandman_doppler
   fields:
+    device_id:
+      name: Device
+      description: The Sandman Doppler device to target
+      required: true
+      selector:
+        device:
+          integration: sandman_doppler
+          multiple: true
     color:
       name: Single Color
       description: Use this option to select a single color. If this is enabled, don't set rainbow to `true`. If color list is enabled, this will be ignored.
@@ -471,12 +498,15 @@ activate_light_bar_blink:
 activate_light_bar_pulse:
   name: Activate the light bar (`pulse`)
   description: Activates the light bar in `pulse` mode.
-  target:
-    device:
-      integration: sandman_doppler
-    entity:
-      integration: sandman_doppler
   fields:
+    device_id:
+      name: Device
+      description: The Sandman Doppler device to target
+      required: true
+      selector:
+        device:
+          integration: sandman_doppler
+          multiple: true
     color:
       name: Single Color
       description: Use this option to select a single color. If this is enabled, don't set rainbow to `true`. If color list is enabled, this will be ignored.
@@ -534,12 +564,15 @@ activate_light_bar_pulse:
 activate_light_bar_comet:
   name: Activate the light bar (`comet`)
   description: Activates the light bar in `comet` mode.
-  target:
-    device:
-      integration: sandman_doppler
-    entity:
-      integration: sandman_doppler
   fields:
+    device_id:
+      name: Device
+      description: The Sandman Doppler device to target
+      required: true
+      selector:
+        device:
+          integration: sandman_doppler
+          multiple: true
     color:
       name: Single Color
       description: Use this option to select a single color. If this is enabled, don't set rainbow to `true`. If color list is enabled, this will be ignored.
@@ -607,12 +640,15 @@ activate_light_bar_comet:
 activate_light_bar_sweep:
   name: Activate the light bar (`sweep`)
   description: Activates the light bar in `sweep` mode.
-  target:
-    device:
-      integration: sandman_doppler
-    entity:
-      integration: sandman_doppler
   fields:
+    device_id:
+      name: Device
+      description: The Sandman Doppler device to target
+      required: true
+      selector:
+        device:
+          integration: sandman_doppler
+          multiple: true
     color:
       name: Single Color
       description: Use this option to select a single color. If this is enabled, don't set rainbow to `true`. If color list is enabled, this will be ignored.
@@ -688,12 +724,15 @@ activate_light_bar_sweep:
 set_rainbow_mode:
   name: Put the clock in rainbow mode
   description: Puts the clock in rainbow mode
-  target:
-    device:
-      integration: sandman_doppler
-    entity:
-      integration: sandman_doppler
   fields:
+    device_id:
+      name: Device
+      description: The Sandman Doppler device to target
+      required: true
+      selector:
+        device:
+          integration: sandman_doppler
+          multiple: true
     speed:
       name: "Speed"
       description: "Speed of effect (lower number is faster) or 0 to turn off"
