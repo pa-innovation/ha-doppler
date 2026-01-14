@@ -116,14 +116,19 @@ class DopplerSensor(DopplerEntity[DopplerSensorEntityDescription], SensorEntity)
     @property
     def icon(self) -> str | None:
         """Return the icon for the entity."""
-        if self.ed.icon_func:
+        if self.ed.icon_func and self.native_value is not None:
             return self.ed.icon_func(self.native_value)
         return super().icon
 
     @property
     def native_value(self) -> Any:
         """Return the native value of the sensor."""
-        return self.ed.state_func(self.device_data[self.ed.state_key])
+        if self.ed.state_key is None:
+            return None
+        raw_value = self.device_data.get(self.ed.state_key)
+        if raw_value is None:
+            return None
+        return self.ed.state_func(raw_value)
 
 
 # class DopplerAlarmsSensor(DopplerEntity,SensorEntity):

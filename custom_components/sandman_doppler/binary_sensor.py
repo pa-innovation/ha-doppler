@@ -83,13 +83,15 @@ class DopplerBinarySensor(
     """Doppler Day/Night Binary Sensor class."""
 
     @property
-    def is_on(self) -> bool:
+    def is_on(self) -> bool | None:
         """Return the state of the sensor."""
-        return self.device_data[self.ed.state_key]
+        if self.ed.state_key is None:
+            return None
+        return self.device_data.get(self.ed.state_key)
 
     @property
     def icon(self) -> str | None:
         """Return the icon of the sensor."""
-        if self.ed.icon_lambda:
+        if self.ed.icon_lambda and self.is_on is not None:
             return self.ed.icon_lambda(self.is_on)
         return super().icon

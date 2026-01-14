@@ -90,14 +90,23 @@ class DopplerSiren(DopplerEntity[DopplerSirenEntityDescription], SirenEntity):
     @property
     def available_tones(self) -> list[str]:
         """Return a list of available tones."""
-        return sorted(self.device_data[self.ed.available_tones_key])
+        if self.ed.available_tones_key is None:
+            return []
+        tones = self.device_data.get(self.ed.available_tones_key)
+        if tones is None:
+            return []
+        return sorted(tones)
 
     async def async_turn_on(self, **kwargs) -> None:
         """Turn the siren on."""
         sound: str | None = kwargs.get(ATTR_TONE)
         if sound is None:
-            idx = randint(0, len(self.available_tones) - 1)
-            sound = self.available_tones[idx]
+            tones = self.available_tones
+            if not tones:
+                _LOGGER.warning("No tones available, cannot turn on siren")
+                return
+            idx = randint(0, len(tones) - 1)
+            sound = tones[idx]
             _LOGGER.info("No sound specified, picking a random one: %s", sound)
         volume: int | None = kwargs.get(ATTR_VOLUME_LEVEL)
         await self.ed.turn_on_func(self.device, sound, volume)
