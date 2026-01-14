@@ -47,8 +47,13 @@ PLATFORMS = [
 ]
 
 
-async def _get_devices(client: DopplerClient) -> None:
-    """Helper function to get devices from cloud."""
+async def _get_devices(client: DopplerClient, _now: Any = None) -> None:
+    """Helper function to get devices from cloud.
+
+    Args:
+        client: The Doppler client instance.
+        _now: Optional datetime passed by async_track_time_interval (unused).
+    """
     try:
         await client.get_devices()
     except DopplerException as err:

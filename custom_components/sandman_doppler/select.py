@@ -136,9 +136,13 @@ class DopplerEnumSelect(
         return [normalize_enum_name(enum_val) for enum_val in self.ed.enum_cls]
 
     @property
-    def current_option(self) -> str:
+    def current_option(self) -> str | None:
         """Return the current option."""
-        current_option = self.device_data[self.ed.state_key]
+        if self.ed.state_key is None:
+            return None
+        current_option = self.device_data.get(self.ed.state_key)
+        if current_option is None:
+            return None
         return normalize_enum_name(self.ed.state_func(current_option))
 
     async def async_select_option(self, option: str) -> None:
@@ -159,9 +163,14 @@ class DopplerSelect(DopplerEntity[DopplerSelectEntityDescription], SelectEntity)
         return self.ed.options_func(self.device)
 
     @property
-    def current_option(self) -> str:
+    def current_option(self) -> str | None:
         """Return the current option."""
-        return self.ed.state_func(self.device_data[self.ed.state_key])
+        if self.ed.state_key is None:
+            return None
+        raw_value = self.device_data.get(self.ed.state_key)
+        if raw_value is None:
+            return None
+        return self.ed.state_func(raw_value)
 
     async def async_select_option(self, option: str) -> None:
         """Change the selected option."""

@@ -200,7 +200,9 @@ class BaseDopplerLight(DopplerEntity[DopplerLightEntityDescription], LightEntity
     @property
     def rgb_color(self) -> tuple[int, int, int] | None:
         """Return the rgb color value [int, int, int]."""
-        color: Color | None = self.device_data[self.ed.color_key]
+        if self.ed.color_key is None:
+            return None
+        color: Color | None = self.device_data.get(self.ed.color_key)
         if not color:
             return None
         return (color.red, color.green, color.blue)
@@ -251,7 +253,9 @@ class DopplerLight(BaseDopplerLight):
     @property
     def brightness(self) -> int:
         """Return the brightness of this light between 0..255."""
-        brightness = self.device_data[self.ed.brightness_key]
+        if self.ed.brightness_key is None:
+            return 0
+        brightness = self.device_data.get(self.ed.brightness_key)
         if brightness is not None:
             return brightness * 255 // 100
         return 0

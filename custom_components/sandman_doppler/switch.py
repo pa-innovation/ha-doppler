@@ -195,9 +195,14 @@ class DopplerSwitch(DopplerEntity[DopplerSwitchEntityDescription], SwitchEntity)
     _attr_entity_category = EntityCategory.CONFIG
 
     @property
-    def is_on(self) -> bool:
+    def is_on(self) -> bool | None:
         """Return true if switch is on."""
-        return self.ed.state_func(self.device_data[self.ed.state_key])
+        if self.ed.state_key is None:
+            return None
+        raw_value = self.device_data.get(self.ed.state_key)
+        if raw_value is None:
+            return None
+        return self.ed.state_func(raw_value)
 
     async def async_turn_on(self, **kwargs) -> None:
         """Turn the switch on."""
