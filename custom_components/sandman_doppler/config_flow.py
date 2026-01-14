@@ -1,4 +1,5 @@
 """Adds config flow for Doppler."""
+
 from __future__ import annotations
 
 from doppyler.client import DopplerClient

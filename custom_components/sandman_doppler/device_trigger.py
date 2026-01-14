@@ -1,4 +1,5 @@
 """Provides device triggers for sandman_doppler."""
+
 from __future__ import annotations
 
 from typing import Any

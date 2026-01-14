@@ -1,4 +1,5 @@
 """Global fixtures for sandman_doppler integration."""
+
 from unittest.mock import patch
 
 import pytest

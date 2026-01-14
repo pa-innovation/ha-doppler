@@ -1,4 +1,5 @@
 """HTTP views for Sandman Doppler."""
+
 from __future__ import annotations
 
 from http import HTTPStatus
