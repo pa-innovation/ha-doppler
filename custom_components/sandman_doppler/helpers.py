@@ -1,4 +1,5 @@
 """Helpers for Sandman Doppler Clocks."""
+
 from enum import Enum
 
 

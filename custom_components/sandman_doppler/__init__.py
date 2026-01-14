@@ -95,10 +95,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             hw_version=doppler.device_info.firmware_version,
             name=doppler.name,
         )
-        hass.data[DOMAIN][entry.entry_id][
-            doppler.dsn
-        ] = coordinator = DopplerDataUpdateCoordinator(
-            hass, entry, client, doppler, dev_entry
+        hass.data[DOMAIN][entry.entry_id][doppler.dsn] = coordinator = (
+            DopplerDataUpdateCoordinator(hass, entry, client, doppler, dev_entry)
         )
         hass.async_create_task(coordinator.async_refresh())
 

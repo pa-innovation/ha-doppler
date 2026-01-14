@@ -1,4 +1,5 @@
 """Constants for Sandman Doppler Clocks."""
+
 # Base component constants
 NAME = "Sandman Doppler"
 DOMAIN = "sandman_doppler"

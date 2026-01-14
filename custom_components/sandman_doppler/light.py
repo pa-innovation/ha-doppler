@@ -1,4 +1,5 @@
 """Light platform for Doppler Sandman."""
+
 from __future__ import annotations
 
 from collections.abc import Callable, Coroutine
@@ -55,9 +56,9 @@ class DopplerLightEntityDescription(LightEntityDescription):
     color_key: str | None = None
     set_color_func: Callable[[Doppler, Color], Coroutine[Any, Any, Any]] | None = None
     brightness_key: str | None = None
-    set_brightness_func: Callable[
-        [Doppler, int], Coroutine[Any, Any, int]
-    ] | None = None
+    set_brightness_func: Callable[[Doppler, int], Coroutine[Any, Any, int]] | None = (
+        None
+    )
 
 
 LIGHT_ENTITY_DESCRIPTIONS = [
@@ -146,14 +147,14 @@ def get_sync_light_types(
 
 
 def get_opposite_day_or_night(
-    day_or_night: Literal["day", "night"]
+    day_or_night: Literal["day", "night"],
 ) -> Literal["day", "night"]:
     """Return the opposite day or night."""
     return "day" if day_or_night == "night" else "night"
 
 
 def get_opposite_button_or_display(
-    button_or_display: Literal["button", "display"]
+    button_or_display: Literal["button", "display"],
 ) -> Literal["button", "display"]:
     """Return the opposite button or display."""
     return "button" if button_or_display == "display" else "display"
@@ -208,9 +209,9 @@ class BaseDopplerLight(DopplerEntity[DopplerLightEntityDescription], LightEntity
         """Set brightness on device."""
         brightness *= 100
         brightness //= 255
-        brightness = self.device_data[
-            self.ed.brightness_key
-        ] = await self.ed.set_brightness_func(self.device, brightness)
+        brightness = self.device_data[self.ed.brightness_key] = (
+            await self.ed.set_brightness_func(self.device, brightness)
+        )
         return brightness
 
     async def _async_set_rgb_color(self, rgb_color: list[int]) -> Color:
