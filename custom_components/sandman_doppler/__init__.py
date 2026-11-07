@@ -13,18 +13,14 @@ from doppyler.exceptions import DopplerException
 from doppyler.model.doppler import Doppler
 
 from homeassistant.config_entries import ConfigEntry, ConfigEntryNotReady
-from homeassistant.const import (
-    CONF_EMAIL,
-    CONF_PASSWORD,
-    EVENT_HOMEASSISTANT_STARTED,
-    Platform,
-)
-from homeassistant.core import CoreState, HomeAssistant, callback
+from homeassistant.const import CONF_EMAIL, CONF_PASSWORD, Platform
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import device_registry as dr, entity_registry as er
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.network import get_url
+from homeassistant.helpers.start import async_at_started
 from homeassistant.helpers.typing import ConfigType
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
@@ -130,15 +126,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         )
     )
 
-    # Since getting devies can take some time, we delay querying until after startup
-    # so we don't hold everything up.
-    if hass.state == CoreState.running:
-        hass.async_create_task(_get_devices(client))
-    else:
-        hass.bus.async_listen_once(
-            EVENT_HOMEASSISTANT_STARTED,
-            lambda _: hass.async_create_task(_get_devices(client)),
-        )
+    # Since getting devices can take some time, we delay querying until after startup
+    # so we don't hold everything up. async_at_started runs the job in the event loop,
+    # immediately if HA is already running or once EVENT_HOMEASSISTANT_STARTED fires.
+    async def _async_get_devices_at_start(_hass: HomeAssistant) -> None:
+        await _get_devices(client)
+
+    entry.async_on_unload(async_at_started(hass, _async_get_devices_at_start))
 
     DopplerServices(hass, ent_reg, dev_reg, client).async_register()
 
