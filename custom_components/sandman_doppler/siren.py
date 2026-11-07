@@ -52,7 +52,7 @@ class DopplerSirenEntityDescription(SirenEntityDescription):
 
     available_tones_key: str = None
     turn_on_func: Callable[[Doppler, str, int | None], Coroutine[Any, Any, None]] = None
-    turn_off_func: Callable[[Doppler], Coroutine[Any, Any, None]] = None
+    turn_off_func: Callable[[Doppler, int], Coroutine[Any, Any, None]] = None
 
 
 SIREN_ENTITY_DESCRIPTIONS = [
@@ -62,7 +62,10 @@ SIREN_ENTITY_DESCRIPTIONS = [
         icon="mdi:alarm",
         available_tones_key=ATTR_ALARM_SOUNDS,
         turn_on_func=lambda dev, sound, volume: dev.play_alarm_sound(sound, volume),
-        turn_off_func=lambda dev: dev.stop_alarm_sound(),
+        # Doppler.stop_alarm_sound() sends {"sound": "stop"} without "vol", which
+        # firmware 0.1714 rejects with 404 "alarm not found" (like a play request
+        # without "vol"), so send the stop through play_alarm_sound with a volume.
+        turn_off_func=lambda dev, volume: dev.play_alarm_sound("stop", volume),
     ),
 ]
 
@@ -113,6 +116,11 @@ class DopplerSiren(DopplerEntity[DopplerSirenEntityDescription], SirenEntity):
             return []
         return sorted(tones)
 
+    @property
+    def _clock_volume(self) -> int:
+        """Return the clock's own volume setting (0-100), defaulting to 50."""
+        return int(self.device_data.get(ATTR_VOLUME_LEVEL) or 50)
+
     async def async_turn_on(self, **kwargs) -> None:
         """Turn the siren on."""
         sound: str | None = kwargs.get(ATTR_TONE)
@@ -132,9 +140,9 @@ class DopplerSiren(DopplerEntity[DopplerSirenEntityDescription], SirenEntity):
         if level is not None:
             volume = max(1, min(100, round(level * 100)))
         else:
-            volume = int(self.device_data.get(ATTR_VOLUME_LEVEL) or 50)
+            volume = self._clock_volume
         await _ok_is_success(self.ed.turn_on_func(self.device, sound, volume))
 
     async def async_turn_off(self, **kwargs) -> None:
         """Turn the siren off."""
-        await _ok_is_success(self.ed.turn_off_func(self.device))
+        await _ok_is_success(self.ed.turn_off_func(self.device, self._clock_volume))
