@@ -118,8 +118,13 @@ class DopplerSiren(DopplerEntity[DopplerSirenEntityDescription], SirenEntity):
 
     @property
     def _clock_volume(self) -> int:
-        """Return the clock's own volume setting (0-100), defaulting to 50."""
-        return int(self.device_data.get(ATTR_VOLUME_LEVEL) or 50)
+        """Return the clock's own volume setting (0-100), or 50 if it is unknown.
+
+        A setting of 0 is respected rather than treated as missing.
+        """
+        if (volume := self.device_data.get(ATTR_VOLUME_LEVEL)) is None:
+            return 50
+        return int(volume)
 
     async def async_turn_on(self, **kwargs) -> None:
         """Turn the siren on."""
