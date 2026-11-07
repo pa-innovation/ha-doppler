@@ -9,6 +9,7 @@ from random import randint
 from typing import Any
 
 from doppyler.const import ATTR_ALARM_SOUNDS
+from doppyler.exceptions import InvalidDataReturned
 from doppyler.model.doppler import Doppler
 
 from homeassistant.components.siren import (
@@ -28,6 +29,21 @@ from .const import DOMAIN
 from .entity import DopplerEntity
 
 _LOGGER = logging.getLogger(__name__)
+
+
+async def _ok_is_success(coro: Coroutine[Any, Any, None]) -> None:
+    """Await a sound call, treating a plain-text "OK" reply as success.
+
+    Firmware 0.1714 answers a successful alarms/sounds/play request with
+    HTTP 200 and the body "OK". doppyler raises InvalidDataReturned for any
+    200 reply that isn't JSON, so the call fails even though the sound plays.
+    Any other non-JSON reply still raises.
+    """
+    try:
+        await coro
+    except InvalidDataReturned as err:
+        if not err.args or str(err.args[0]).strip() != "OK":
+            raise
 
 
 @dataclass
@@ -108,9 +124,17 @@ class DopplerSiren(DopplerEntity[DopplerSirenEntityDescription], SirenEntity):
             idx = randint(0, len(tones) - 1)
             sound = tones[idx]
             _LOGGER.info("No sound specified, picking a random one: %s", sound)
-        volume: int | None = kwargs.get(ATTR_VOLUME_LEVEL)
-        await self.ed.turn_on_func(self.device, sound, volume)
+        # The clock needs "vol" as an integer 0-100: a float is rejected
+        # (HTTP 500) and a request without "vol" fails with 404 "alarm not
+        # found". HA's volume_level is 0-1, so scale it, and fall back to the
+        # clock's own volume setting when none is given.
+        level: float | None = kwargs.get(ATTR_VOLUME_LEVEL)
+        if level is not None:
+            volume = max(1, min(100, round(level * 100)))
+        else:
+            volume = int(self.device_data.get(ATTR_VOLUME_LEVEL) or 50)
+        await _ok_is_success(self.ed.turn_on_func(self.device, sound, volume))
 
     async def async_turn_off(self, **kwargs) -> None:
         """Turn the siren off."""
-        await self.ed.turn_off_func(self.device)
+        await _ok_is_success(self.ed.turn_off_func(self.device))
