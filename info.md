@@ -48,8 +48,8 @@ Platform | Description
 [exampleimg]: example.png
 [forum-shield]: https://img.shields.io/badge/community-forum-brightgreen.svg?style=for-the-badge
 [forum]: https://community.home-assistant.io/
-[license]: https://github.com/custom-components/integration_blueprint/blob/main/LICENSE
-[license-shield]: https://img.shields.io/github/license/custom-components/integration_blueprint.svg?style=for-the-badge
+[license]: https://github.com/pa-innovation/ha-doppler/blob/master/LICENSE
+[license-shield]: https://img.shields.io/github/license/pa-innovation/ha-doppler.svg?style=for-the-badge
 [maintenance-shield]: https://img.shields.io/badge/maintainer-Joakim%20Sørensen%20%40ludeeus-blue.svg?style=for-the-badge
 [releases-shield]: https://img.shields.io/github/release/custom-components/integration_blueprint.svg?style=for-the-badge
 [releases]: https://github.com/custom-components/integration_blueprint/releases
