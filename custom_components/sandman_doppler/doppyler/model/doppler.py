@@ -202,12 +202,15 @@ class Doppler:
             ):
                 await self._get_nonce_and_final_key()
 
+            # The clock's local API uses a certificate that can't be verified, so
+            # local requests skip TLS verification (cloud requests don't).
             try:
                 return await self.client.request(
                     f"{self.local_path}/{self.dsn}/{endpoint}",
                     method,
                     data,
                     {"Authorization": f"Bearer {self._final_key}"},
+                    verify_ssl=False,
                 )
             except (ExpiredNonce, UnauthorizedException):
                 if self._nonce_event.is_set():
@@ -218,12 +221,15 @@ class Doppler:
                     method,
                     data,
                     {"Authorization": f"Bearer {self._final_key}"},
+                    verify_ssl=False,
                 )
 
     async def _get_nonce_and_final_key(self):
         """Get the nonce and calculate the final key."""
         self._nonce_event.clear()
-        nonce_json = await self.client.request(f"{self.local_path}/{self.dsn}/nonce")
+        nonce_json = await self.client.request(
+            f"{self.local_path}/{self.dsn}/nonce", verify_ssl=False
+        )
         self._nonce = nonce = nonce_json["nonce"]
         self._nonce_expires = datetime.now() + timedelta(days=1)
         m = hashlib.sha256()

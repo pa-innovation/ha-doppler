@@ -33,6 +33,27 @@ from .model.doppler import Doppler
 
 _LOGGER = logging.getLogger(__name__)
 
+# Keys (compared case-insensitively) whose values must never reach logs or
+# exception messages: the account password, cloud tokens and the clock's local key.
+_REDACTED_KEYS = frozenset({"password", "accesstoken", "refreshtoken", "localkey"})
+_REDACTED = "**REDACTED**"
+
+
+def _redact(value: Any) -> Any:
+    """Return a copy of a request/response body with secret values replaced."""
+    if isinstance(value, dict):
+        return {
+            k: (
+                _REDACTED
+                if isinstance(k, str) and k.lower() in _REDACTED_KEYS
+                else _redact(v)
+            )
+            for k, v in value.items()
+        }
+    if isinstance(value, list):
+        return [_redact(v) for v in value]
+    return value
+
 
 class DopplerClient:
     """Class to interact with Doppler API."""
@@ -94,16 +115,31 @@ class DopplerClient:
         method: str = "GET",
         data: dict = None,
         headers: dict = None,
+        verify_ssl: bool = True,
     ) -> dict:
-        """Make a request to the Doppler API."""
+        """Make a request to the Doppler API.
+
+        TLS certificates are verified unless verify_ssl is False, which is only for
+        the clock's local API (its certificate can't be verified).
+        """
         if self._session:
             return await self._request(
-                self._session, url, method=method, data=data, headers=headers
+                self._session,
+                url,
+                method=method,
+                data=data,
+                headers=headers,
+                verify_ssl=verify_ssl,
             )
 
         async with ClientSession(timeout=self._timeout) as session:
             return await self._request(
-                session, url, method=method, data=data, headers=headers
+                session,
+                url,
+                method=method,
+                data=data,
+                headers=headers,
+                verify_ssl=verify_ssl,
             )
 
     async def _request(
@@ -113,6 +149,7 @@ class DopplerClient:
         method: str = "GET",
         data: dict = None,
         headers: dict = None,
+        verify_ssl: bool = True,
     ) -> dict:
         """
         Make a request to the Doppler API.
@@ -120,7 +157,10 @@ class DopplerClient:
         Session has to be provided.
         """
         resp_data: dict | str
-        _LOGGER.debug("Initiate request via %s %s with %s", method, url, data)
+        # Request and response bodies can carry the account password, tokens and
+        # the clock's local key, so only redacted copies go to logs and exceptions.
+        safe_data = _redact(data)
+        _LOGGER.debug("Initiate request via %s %s with %s", method, url, safe_data)
         try:
             resp = await session.request(
                 method,
@@ -128,7 +168,8 @@ class DopplerClient:
                 json=data,
                 headers={**(headers or {}), **DEFAULT_HEADERS},
                 timeout=self._timeout,
-                ssl=False,
+                # None uses aiohttp's default certificate verification.
+                ssl=None if verify_ssl else False,
             )
         except asyncio.TimeoutError as err:
             raise CantConnectException from err
@@ -138,7 +179,8 @@ class DopplerClient:
             except JSONDecodeError:
                 resp_data = await resp.text()
 
-            _LOGGER.debug("Received via %s %s: %s", method, url, resp_data)
+            safe_resp_data = _redact(resp_data)
+            _LOGGER.debug("Received via %s %s: %s", method, url, safe_resp_data)
 
             if resp.status in (200, 201):
                 if isinstance(resp_data, str):
@@ -146,18 +188,18 @@ class DopplerClient:
                     # answer a successful request with the plain-text body "OK".
                     if resp_data.strip() == "OK":
                         return {}
-                    raise InvalidDataReturned(resp_data, method, url, data)
+                    raise InvalidDataReturned(safe_resp_data, method, url, safe_data)
                 return resp_data
 
             if resp.status == 400:
-                raise BadRequestException(resp_data, method, url, data)
+                raise BadRequestException(safe_resp_data, method, url, safe_data)
             if resp.status in (401, 403):
-                raise UnauthorizedException(resp_data, method, url, data)
+                raise UnauthorizedException(safe_resp_data, method, url, safe_data)
             if resp.status == 410:
-                raise ExpiredNonce(resp_data, method, url, data)
+                raise ExpiredNonce(safe_resp_data, method, url, safe_data)
             if resp.status == 408:
-                raise CantConnectException(resp_data, method, url, data)
-            raise UnknownException(resp_data, method, url, data)
+                raise CantConnectException(safe_resp_data, method, url, safe_data)
+            raise UnknownException(safe_resp_data, method, url, safe_data)
 
     async def get_token(self) -> None:
         """Get token."""
