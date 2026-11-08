@@ -566,4 +566,4 @@ We want feedback, please join our Discord to give us feedback:https://discord.gg
 
 This integration is licensed under the [GNU General Public License v3.0](LICENSE).
 
-It bundles a copy of [`doppyler`](custom_components/sandman_doppler/doppyler/README.md), the Python library for the Sandman Doppler API, which is also GPLv3. The company behind the Sandman Doppler is no longer operating, so the library can no longer be published to PyPI and is maintained here instead.
+It bundles a copy of [`doppyler`](custom_components/sandman_doppler/doppyler/README.md), the Python library for the Sandman Doppler API, which is also GPLv3. The `doppyler` project on PyPI can't currently be published to, so the library is maintained here instead.
