@@ -9,7 +9,6 @@ from random import randint
 from typing import Any
 
 from doppyler.const import ATTR_ALARM_SOUNDS
-from doppyler.exceptions import InvalidDataReturned
 from doppyler.model.doppler import Doppler
 
 from homeassistant.components.siren import (
@@ -31,28 +30,13 @@ from .entity import DopplerEntity
 _LOGGER = logging.getLogger(__name__)
 
 
-async def _ok_is_success(coro: Coroutine[Any, Any, None]) -> None:
-    """Await a sound call, treating a plain-text "OK" reply as success.
-
-    Firmware 0.1714 answers a successful alarms/sounds/play request with
-    HTTP 200 and the body "OK". doppyler raises InvalidDataReturned for any
-    200 reply that isn't JSON, so the call fails even though the sound plays.
-    Any other non-JSON reply still raises.
-    """
-    try:
-        await coro
-    except InvalidDataReturned as err:
-        if not err.args or str(err.args[0]).strip() != "OK":
-            raise
-
-
 @dataclass
 class DopplerSirenEntityDescription(SirenEntityDescription):
     """Class to describe Doppler siren entities."""
 
     available_tones_key: str = None
     turn_on_func: Callable[[Doppler, str, int | None], Coroutine[Any, Any, None]] = None
-    turn_off_func: Callable[[Doppler, int], Coroutine[Any, Any, None]] = None
+    turn_off_func: Callable[[Doppler], Coroutine[Any, Any, None]] = None
 
 
 SIREN_ENTITY_DESCRIPTIONS = [
@@ -62,10 +46,7 @@ SIREN_ENTITY_DESCRIPTIONS = [
         icon="mdi:alarm",
         available_tones_key=ATTR_ALARM_SOUNDS,
         turn_on_func=lambda dev, sound, volume: dev.play_alarm_sound(sound, volume),
-        # Doppler.stop_alarm_sound() sends {"sound": "stop"} without "vol", which
-        # firmware 0.1714 rejects with 404 "alarm not found" (like a play request
-        # without "vol"), so send the stop through play_alarm_sound with a volume.
-        turn_off_func=lambda dev, volume: dev.play_alarm_sound("stop", volume),
+        turn_off_func=lambda dev: dev.stop_alarm_sound(),
     ),
 ]
 
@@ -116,16 +97,6 @@ class DopplerSiren(DopplerEntity[DopplerSirenEntityDescription], SirenEntity):
             return []
         return sorted(tones)
 
-    @property
-    def _clock_volume(self) -> int:
-        """Return the clock's own volume setting (0-100), or 50 if it is unknown.
-
-        A setting of 0 is respected rather than treated as missing.
-        """
-        if (volume := self.device_data.get(ATTR_VOLUME_LEVEL)) is None:
-            return 50
-        return int(volume)
-
     async def async_turn_on(self, **kwargs) -> None:
         """Turn the siren on."""
         sound: str | None = kwargs.get(ATTR_TONE)
@@ -137,17 +108,13 @@ class DopplerSiren(DopplerEntity[DopplerSirenEntityDescription], SirenEntity):
             idx = randint(0, len(tones) - 1)
             sound = tones[idx]
             _LOGGER.info("No sound specified, picking a random one: %s", sound)
-        # The clock needs "vol" as an integer 0-100: a float is rejected
-        # (HTTP 500) and a request without "vol" fails with 404 "alarm not
-        # found". HA's volume_level is 0-1, so scale it, and fall back to the
-        # clock's own volume setting when none is given.
+        # The clock takes "vol" as an integer 0-100, while HA's volume_level is
+        # 0-1, so scale it. With no volume_level, doppyler uses the clock's
+        # current volume setting.
         level: float | None = kwargs.get(ATTR_VOLUME_LEVEL)
-        if level is not None:
-            volume = max(1, min(100, round(level * 100)))
-        else:
-            volume = self._clock_volume
-        await _ok_is_success(self.ed.turn_on_func(self.device, sound, volume))
+        volume = None if level is None else max(1, min(100, round(level * 100)))
+        await self.ed.turn_on_func(self.device, sound, volume)
 
     async def async_turn_off(self, **kwargs) -> None:
         """Turn the siren off."""
-        await _ok_is_success(self.ed.turn_off_func(self.device, self._clock_volume))
+        await self.ed.turn_off_func(self.device)
