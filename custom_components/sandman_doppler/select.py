@@ -10,16 +10,6 @@ import functools
 from typing import Any
 import zoneinfo
 
-from doppyler.const import (
-    ATTR_SOUND_PRESET,
-    ATTR_TIME_MODE,
-    ATTR_TIMEZONE,
-    ATTR_WEATHER,
-)
-from doppyler.model.doppler import Doppler
-from doppyler.model.sound import SoundPreset
-from doppyler.model.weather import WeatherMode
-
 from homeassistant.components.select import SelectEntity, SelectEntityDescription
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
@@ -29,6 +19,15 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import DopplerDataUpdateCoordinator
 from .const import DOMAIN
+from .doppyler.const import (
+    ATTR_SOUND_PRESET,
+    ATTR_TIME_MODE,
+    ATTR_TIMEZONE,
+    ATTR_WEATHER,
+)
+from .doppyler.model.doppler import Doppler
+from .doppyler.model.sound import SoundPreset
+from .doppyler.model.weather import WeatherMode
 from .entity import DopplerEntity
 from .helpers import get_enum_from_name, normalize_enum_name
 

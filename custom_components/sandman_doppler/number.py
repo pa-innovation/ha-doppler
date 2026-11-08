@@ -8,14 +8,6 @@ from datetime import timedelta
 import logging
 from typing import Any
 
-from doppyler.const import (
-    ATTR_DAY_TO_NIGHT_TRANSITION_VALUE,
-    ATTR_NIGHT_TO_DAY_TRANSITION_VALUE,
-    ATTR_TIME_OFFSET,
-    ATTR_VOLUME_LEVEL,
-)
-from doppyler.model.doppler import Doppler
-
 from homeassistant.components.number import (
     NumberEntity,
     NumberEntityDescription,
@@ -30,6 +22,13 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import DopplerDataUpdateCoordinator
 from .const import DOMAIN
+from .doppyler.const import (
+    ATTR_DAY_TO_NIGHT_TRANSITION_VALUE,
+    ATTR_NIGHT_TO_DAY_TRANSITION_VALUE,
+    ATTR_TIME_OFFSET,
+    ATTR_VOLUME_LEVEL,
+)
+from .doppyler.model.doppler import Doppler
 from .entity import DopplerEntity
 
 _LOGGER = logging.getLogger(__name__)

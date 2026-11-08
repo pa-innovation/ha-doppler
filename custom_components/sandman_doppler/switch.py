@@ -8,24 +8,6 @@ import functools
 import logging
 from typing import Any
 
-from doppyler.const import (
-    ATTR_ALEXA_TAP_TO_TALK_TONE_ENABLED,
-    ATTR_ALEXA_USE_ASCENDING_ALARMS,
-    ATTR_ALEXA_WAKE_WORD_TONE_ENABLED,
-    ATTR_COLON_BLINK,
-    ATTR_DISPLAY_SECONDS,
-    ATTR_SOUND_PRESET_MODE,
-    ATTR_SYNC_BUTTON_AND_DISPLAY_BRIGHTNESS,
-    ATTR_SYNC_BUTTON_AND_DISPLAY_COLOR,
-    ATTR_SYNC_DAY_AND_NIGHT_COLOR,
-    ATTR_USE_COLON,
-    ATTR_USE_FADE_TIME,
-    ATTR_USE_LEADING_ZERO,
-    ATTR_WEATHER,
-)
-from doppyler.model.alarm import Alarm
-from doppyler.model.doppler import Doppler
-
 from homeassistant.components.switch import (
     SwitchDeviceClass,
     SwitchEntity,
@@ -44,6 +26,23 @@ from homeassistant.util import slugify
 
 from . import DopplerDataUpdateCoordinator
 from .const import DOMAIN
+from .doppyler.const import (
+    ATTR_ALEXA_TAP_TO_TALK_TONE_ENABLED,
+    ATTR_ALEXA_USE_ASCENDING_ALARMS,
+    ATTR_ALEXA_WAKE_WORD_TONE_ENABLED,
+    ATTR_COLON_BLINK,
+    ATTR_DISPLAY_SECONDS,
+    ATTR_SOUND_PRESET_MODE,
+    ATTR_SYNC_BUTTON_AND_DISPLAY_BRIGHTNESS,
+    ATTR_SYNC_BUTTON_AND_DISPLAY_COLOR,
+    ATTR_SYNC_DAY_AND_NIGHT_COLOR,
+    ATTR_USE_COLON,
+    ATTR_USE_FADE_TIME,
+    ATTR_USE_LEADING_ZERO,
+    ATTR_WEATHER,
+)
+from .doppyler.model.alarm import Alarm
+from .doppyler.model.doppler import Doppler
 from .entity import DopplerEntity
 
 _LOGGER = logging.getLogger(__name__)

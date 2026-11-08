@@ -8,10 +8,6 @@ import functools
 import logging
 from typing import Any
 
-from doppyler.client import DopplerClient
-from doppyler.exceptions import DopplerException
-from doppyler.model.doppler import Doppler
-
 from homeassistant.config_entries import ConfigEntry, ConfigEntryNotReady
 from homeassistant.const import CONF_EMAIL, CONF_PASSWORD, Platform
 from homeassistant.core import HomeAssistant, callback
@@ -25,6 +21,9 @@ from homeassistant.helpers.typing import ConfigType
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 from .const import DOMAIN
+from .doppyler.client import DopplerClient
+from .doppyler.exceptions import DopplerException
+from .doppyler.model.doppler import Doppler
 from .http import DopplerWebhookView
 from .services import DopplerServices
 

@@ -8,21 +8,6 @@ import functools
 import logging
 from typing import Any, Literal
 
-from doppyler.const import (
-    ATTR_DAY_BUTTON_BRIGHTNESS,
-    ATTR_DAY_BUTTON_COLOR,
-    ATTR_DAY_DISPLAY_BRIGHTNESS,
-    ATTR_DAY_DISPLAY_COLOR,
-    ATTR_NIGHT_BUTTON_BRIGHTNESS,
-    ATTR_NIGHT_BUTTON_COLOR,
-    ATTR_NIGHT_DISPLAY_BRIGHTNESS,
-    ATTR_NIGHT_DISPLAY_COLOR,
-    ATTR_SMART_BUTTON_COLOR,
-)
-from doppyler.model.color import Color
-from doppyler.model.doppler import Doppler
-from doppyler.model.smart_button import SmartButtonConfiguration
-
 from homeassistant.components.light import (
     ATTR_BRIGHTNESS,
     ATTR_RGB_COLOR,
@@ -44,6 +29,20 @@ from homeassistant.util import slugify
 
 from . import DopplerDataUpdateCoordinator
 from .const import DOMAIN
+from .doppyler.const import (
+    ATTR_DAY_BUTTON_BRIGHTNESS,
+    ATTR_DAY_BUTTON_COLOR,
+    ATTR_DAY_DISPLAY_BRIGHTNESS,
+    ATTR_DAY_DISPLAY_COLOR,
+    ATTR_NIGHT_BUTTON_BRIGHTNESS,
+    ATTR_NIGHT_BUTTON_COLOR,
+    ATTR_NIGHT_DISPLAY_BRIGHTNESS,
+    ATTR_NIGHT_DISPLAY_COLOR,
+    ATTR_SMART_BUTTON_COLOR,
+)
+from .doppyler.model.color import Color
+from .doppyler.model.doppler import Doppler
+from .doppyler.model.smart_button import SmartButtonConfiguration
 from .entity import DopplerEntity
 
 _LOGGER = logging.getLogger(__name__)

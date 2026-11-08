@@ -8,9 +8,6 @@ import logging
 from random import randint
 from typing import Any
 
-from doppyler.const import ATTR_ALARM_SOUNDS
-from doppyler.model.doppler import Doppler
-
 from homeassistant.components.siren import (
     ATTR_TONE,
     ATTR_VOLUME_LEVEL,
@@ -25,6 +22,8 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import DopplerDataUpdateCoordinator
 from .const import DOMAIN
+from .doppyler.const import ATTR_ALARM_SOUNDS
+from .doppyler.model.doppler import Doppler
 from .entity import DopplerEntity
 
 _LOGGER = logging.getLogger(__name__)
