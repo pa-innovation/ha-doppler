@@ -209,8 +209,12 @@ The Duration is the length of time the effect will be on the display.
 It must be selected or the service cannot be called.
 
 -Speed
-Speed adjusts how fast the Doppler alternates between the colors.  It
-is optional.
+Speed is how long each color is shown, in steps of about half a second,
+so a higher number blinks more slowly (1 is about half a second per
+color, 20 is about 10 seconds). It is optional and defaults to 2, about
+one second per color. 0 doesn't blink. Pick a duration long enough to
+see several colors: with a duration of 10 seconds, a speed of 20 or more
+never gets past the first color.
 
 -Sparkle
 Sparkle turns on a cool sparkle effect when checked and low, medium,

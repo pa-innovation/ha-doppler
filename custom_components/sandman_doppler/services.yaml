@@ -477,8 +477,9 @@ activate_light_bar_blink:
           enable_day: false
     speed:
       name: Speed
-      description: Speed of light bar effect
+      description: How long each color is shown, in steps of about half a second (higher is slower). Defaults to 2, about one second per color; 0 doesn't blink.
       required: false
+      default: 2
       selector:
         number:
           min: 0
