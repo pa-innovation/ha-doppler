@@ -7,9 +7,6 @@ from dataclasses import dataclass
 import logging
 from typing import Any
 
-from doppyler.const import ATTR_LIGHT_SENSOR_VALUE, ATTR_WEATHER, ATTR_WIFI
-from doppyler.model.doppler import Doppler
-
 from homeassistant.components.sensor import (
     SensorDeviceClass,
     SensorEntity,
@@ -26,6 +23,8 @@ from homeassistant.util import dt as dt_util
 
 from . import DopplerDataUpdateCoordinator
 from .const import DOMAIN
+from .doppyler.const import ATTR_LIGHT_SENSOR_VALUE, ATTR_WEATHER, ATTR_WIFI
+from .doppyler.model.doppler import Doppler
 from .entity import DopplerEntity
 
 _LOGGER = logging.getLogger(__name__)

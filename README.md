@@ -561,3 +561,11 @@ We want feedback, please join our Discord to give us feedback:https://discord.gg
 -Updated UI elements
 -Turning off all active alarms via HA
 -Snoozing all active alarms via HA
+
+## License
+
+This integration is licensed under the [GNU General Public License v3.0](LICENSE).
+
+Before the switch to GPLv3, the integration was licensed under MIT. That covers the [integration_blueprint](https://github.com/custom-components/integration_blueprint) template it was created from and the contributions made up to that point, including pa-innovation/ha-doppler#19. Those portions stay under the terms of the MIT License, and its copyright and permission notice is kept in [`LICENSE-MIT`](LICENSE-MIT).
+
+It bundles a copy of [`doppyler`](custom_components/sandman_doppler/doppyler/README.md), the Python library for the Sandman Doppler API, which is also GPLv3. The `doppyler` project on PyPI can't currently be published to, so the library is maintained here instead.

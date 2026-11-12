@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from doppyler.client import DopplerClient
-from doppyler.exceptions import DopplerException
 import voluptuous as vol
 
 from homeassistant import config_entries
@@ -13,6 +11,8 @@ from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .const import DOMAIN
+from .doppyler.client import DopplerClient
+from .doppyler.exceptions import DopplerException
 
 
 class DopplerFlowHandler(config_entries.ConfigFlow, domain=DOMAIN):

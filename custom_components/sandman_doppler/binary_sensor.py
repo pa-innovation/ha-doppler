@@ -6,9 +6,6 @@ from collections.abc import Callable
 from dataclasses import dataclass
 import logging
 
-from doppyler.const import ATTR_CONNECTED_TO_ALEXA, ATTR_IS_IN_DAY_MODE
-from doppyler.model.doppler import Doppler
-
 from homeassistant.components.binary_sensor import (
     BinarySensorDeviceClass,
     BinarySensorEntity,
@@ -22,6 +19,8 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import DopplerDataUpdateCoordinator
 from .const import DOMAIN
+from .doppyler.const import ATTR_CONNECTED_TO_ALEXA, ATTR_IS_IN_DAY_MODE
+from .doppyler.model.doppler import Doppler
 from .entity import DopplerEntity
 
 _LOGGER = logging.getLogger(__name__)

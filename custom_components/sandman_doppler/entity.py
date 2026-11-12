@@ -4,8 +4,6 @@ from __future__ import annotations
 
 from typing import Any, Generic, TypeVar
 
-from doppyler.model.doppler import Doppler
-
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.entity import DeviceInfo, EntityDescription
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
@@ -13,6 +11,7 @@ from homeassistant.util import slugify
 
 from . import DopplerDataUpdateCoordinator
 from .const import DOMAIN
+from .doppyler.model.doppler import Doppler
 
 _EntityDescriptionT = TypeVar("_EntityDescriptionT", bound="EntityDescription")
 
