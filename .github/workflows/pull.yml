@@ -8,7 +8,7 @@ jobs:
     runs-on: "ubuntu-latest"
     name: Validate
     steps:
-        - uses: "actions/checkout@v4"
+        - uses: "actions/checkout@v7"
 
         - name: HACS validation
           uses: "hacs/action@main"
@@ -23,8 +23,8 @@ jobs:
     runs-on: "ubuntu-latest"
     name: Check style formatting
     steps:
-        - uses: "actions/checkout@v4"
-        - uses: "actions/setup-python@v5"
+        - uses: "actions/checkout@v7"
+        - uses: "actions/setup-python@v7"
           with:
             python-version: "3.x"
         - run: python3 -m pip install black
@@ -36,15 +36,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.12", "3.13", "3.14"]
+        # 3.14 is the Python Home Assistant runs on; 3.15 is the latest release.
+        python-version: ["3.14", "3.15"]
     steps:
       - name: Check out code from GitHub
-        uses: "actions/checkout@v4"
+        uses: "actions/checkout@v7"
       - name: Setup Python ${{ matrix.python-version }}
-        uses: "actions/setup-python@v5"
+        uses: "actions/setup-python@v7"
         with:
           python-version: "${{ matrix.python-version }}"
-          allow-prereleases: true
       - name: Install requirements
         run: python3 -m pip install -r requirements_test.txt
       # - name: Run tests
