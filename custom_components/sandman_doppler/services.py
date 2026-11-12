@@ -96,9 +96,21 @@ LIGHT_BAR_BASE_SCHEMA = BASE_SCHEMA.extend(
 )
 LIGHT_BAR_SET_EACH_SCHEMA = LIGHT_BAR_BASE_SCHEMA
 
-LIGHT_BAR_SET_SCHEMA = LIGHT_BAR_BLINK_SCHEMA = LIGHT_BAR_BASE_SCHEMA.extend(
+LIGHT_BAR_SET_SCHEMA = LIGHT_BAR_BASE_SCHEMA.extend(
     {
         vol.Optional(ATTR_SPEED): vol.All(vol.Coerce(int), vol.Range(min=0)),
+    }
+)
+
+# For blink, speed is how long each color is shown, in steps of roughly half a second
+# (higher is slower). The clock treats a missing speed as 0, which doesn't blink, so
+# default to about one second per color.
+DEFAULT_BLINK_SPEED = 2
+LIGHT_BAR_BLINK_SCHEMA = LIGHT_BAR_BASE_SCHEMA.extend(
+    {
+        vol.Optional(ATTR_SPEED, default=DEFAULT_BLINK_SPEED): vol.All(
+            vol.Coerce(int), vol.Range(min=0)
+        ),
     }
 )
 
