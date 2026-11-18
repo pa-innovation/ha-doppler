@@ -104,6 +104,7 @@ NUMBER_ENTITY_DESCRIPTIONS = [
         native_max_value=255,
         native_step=1,
         mode=NumberMode.SLIDER,
+        entity_category=EntityCategory.CONFIG,
         state_key=ATTR_RAINBOW_DISPLAY,
         state_func=lambda x: x.speed,
         set_value_func=lambda dev, val: dev.set_rainbow_configuration(speed=int(val)),

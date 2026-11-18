@@ -50,7 +50,12 @@ from ..const import (
     ATTR_WEATHER_WAKE_UP_TIME,
     ATTR_WIFI,
 )
-from ..exceptions import ExpiredNonce, InvalidAlarmSound, UnauthorizedException
+from ..exceptions import (
+    DopplerException,
+    ExpiredNonce,
+    InvalidAlarmSound,
+    UnauthorizedException,
+)
 from .alarm import Alarm
 from .color import Color
 from .light_bar import LightBarDisplayEffect
@@ -160,6 +165,8 @@ class Doppler:
         self._local_api_semaphore = asyncio.Semaphore(local_api_semaphore_limit)
         self._nonce_event = asyncio.Event()
         self._nonce_event.set()
+        # Serializes the read-modify-write in set_rainbow_configuration
+        self._rainbow_lock = asyncio.Lock()
 
         self.client = client
         self.name = name
@@ -817,11 +824,25 @@ class Doppler:
 
         If either input is None, the clock's current value for it is kept.
         """
-        if speed is None or mode is None:
-            current = await self.get_rainbow_mode()
-            speed = current.speed if speed is None else speed
-            mode = current.mode if mode is None else mode
-        return await self.set_rainbow_mode(RainbowConfiguration(speed, mode))
+        async with self._rainbow_lock:
+            if speed is None or mode is None:
+                current = await self.get_rainbow_mode()
+                speed = current.speed if speed is None else speed
+                mode = current.mode if mode is None else mode
+            return await self.set_rainbow_mode(RainbowConfiguration(speed, mode))
+
+    async def _get_rainbow_mode_for_poll(self) -> RainbowConfiguration | None:
+        """Get the rainbow configuration, or None if the clock can't give it.
+
+        The rainbow endpoint was added to the poll later than the others, so a
+        clock that lacks it or answers oddly leaves the rainbow entities unknown
+        instead of failing every entity.
+        """
+        try:
+            return await self.get_rainbow_mode()
+        except (DopplerException, ValueError, TypeError) as err:
+            _LOGGER.debug("Rainbow display state unavailable: %s", type(err).__name__)
+            return None
 
     async def get_smart_button_color(self, button_num: int) -> Color:
         """Get the color of the specified smart button."""
@@ -927,7 +948,7 @@ class Doppler:
             (ATTR_NIGHT_DISPLAY_COLOR, self.get_night_display_color()),
             (ATTR_NIGHT_BUTTON_COLOR, self.get_night_button_color()),
             (ATTR_WEATHER, self.get_weather_configuration()),
-            (ATTR_RAINBOW_DISPLAY, self.get_rainbow_mode()),
+            (ATTR_RAINBOW_DISPLAY, self._get_rainbow_mode_for_poll()),
             (ATTR_WEATHER_WAKE_UP_TIME, self.get_weather_wake_up_time()),
             (ATTR_CONNECTED_TO_ALEXA, self.get_is_connected_to_alexa()),
             (

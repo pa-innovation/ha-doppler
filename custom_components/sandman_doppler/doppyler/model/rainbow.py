@@ -20,7 +20,7 @@ class RainbowDict(TypedDict):
     """Representation of rainbow mode"""
 
     speed: int
-    mode: RainbowMode
+    mode: RainbowMode | str
 
 
 @dataclass
