@@ -188,9 +188,14 @@ class DopplerClient:
             ) from err
         else:
             try:
-                resp_data = await resp.json(content_type=None)
-            except JSONDecodeError:
-                resp_data = await resp.text()
+                try:
+                    resp_data = await resp.json(content_type=None)
+                except JSONDecodeError:
+                    resp_data = await resp.text()
+            except (asyncio.TimeoutError, ClientError, UnicodeDecodeError) as err:
+                raise CantConnectException(
+                    f"{type(err).__name__} reading reply to {method} {url}"
+                ) from err
 
             safe_resp_data = _redact(resp_data)
             _LOGGER.debug("Received via %s %s: %s", method, url, safe_resp_data)

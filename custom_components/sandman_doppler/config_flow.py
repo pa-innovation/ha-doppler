@@ -184,8 +184,9 @@ class DopplerFlowHandler(ConfigFlow, domain=DOMAIN):
         """Return true if a clock with this DSN already belongs to another entry."""
         dev_reg = dr.async_get(self.hass)
         for device in dev_reg.devices.values():
-            for domain, identifier in device.identifiers:
-                if domain == DOMAIN and identifier.lower() == dsn.lower():
+            for ident in device.identifiers:
+                # Other integrations may use identifiers that aren't 2-tuples.
+                if ident[0] == DOMAIN and str(ident[1]).lower() == dsn.lower():
                     return any(
                         (entry := self.hass.config_entries.async_get_entry(entry_id))
                         and entry.domain == DOMAIN
@@ -200,6 +201,8 @@ class DopplerFlowHandler(ConfigFlow, domain=DOMAIN):
 
         Returns (error key, None) on failure or (None, serial as the clock reports it).
         """
+        if not data[CONF_LOCAL_KEY].isascii():
+            return "invalid_local_key", None
         session = async_get_clientsession(self.hass)
         client = DopplerClient(None, None, client_session=session)
         try:
