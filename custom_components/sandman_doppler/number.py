@@ -25,6 +25,7 @@ from .const import DOMAIN
 from .doppyler.const import (
     ATTR_DAY_TO_NIGHT_TRANSITION_VALUE,
     ATTR_NIGHT_TO_DAY_TRANSITION_VALUE,
+    ATTR_RAINBOW_DISPLAY,
     ATTR_TIME_OFFSET,
     ATTR_VOLUME_LEVEL,
 )
@@ -94,6 +95,19 @@ NUMBER_ENTITY_DESCRIPTIONS = [
         entity_category=EntityCategory.CONFIG,
         state_key=ATTR_NIGHT_TO_DAY_TRANSITION_VALUE,
         set_value_func=lambda dev, val: dev.set_night_to_day_transition_value(val),
+    ),
+    DopplerNumberEntityDescription(
+        "Rainbow: Speed",
+        name="Rainbow: Speed",
+        icon="mdi:looks",
+        native_min_value=0,
+        native_max_value=255,
+        native_step=1,
+        mode=NumberMode.SLIDER,
+        entity_category=EntityCategory.CONFIG,
+        state_key=ATTR_RAINBOW_DISPLAY,
+        state_func=lambda x: x.speed,
+        set_value_func=lambda dev, val: dev.set_rainbow_configuration(speed=int(val)),
     ),
 ]
 
