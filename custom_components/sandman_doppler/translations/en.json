@@ -2,13 +2,14 @@
   "config": {
     "step": {
       "user": {
-        "title": "Sandman Doppler",
+        "title": "Add a Sandman Doppler",
         "menu_options": {
           "cloud": "Sandman account (cloud login)",
           "local": "One clock on this network (no cloud)"
         }
       },
       "cloud": {
+        "title": "Sandman account",
         "data": {
           "email": "Email",
           "password": "Password"
@@ -16,23 +17,44 @@
       },
       "local": {
         "title": "Doppler on this network",
-        "description": "Control one clock directly, without Sandman's servers. The serial number is the clock's network name (for example Doppler-1a2b3c4d). The local key is stored on the clock itself.",
+        "description": "Control one clock directly, without Sandman's servers.",
         "data": {
           "name": "Name",
           "host": "Host or IP address",
           "port": "Port",
           "dsn": "Serial number (DSN)",
           "local_key": "Local key"
+        },
+        "data_description": {
+          "host": "The clock's address on your network. A DHCP reservation keeps it stable.",
+          "port": "The clock's local API port (5443).",
+          "dsn": "The clock's network name, for example Doppler-1a2b3c4d.",
+          "local_key": "The key stored on the clock (LOCALKEY in /data/doppler.db)."
+        }
+      },
+      "reconfigure": {
+        "title": "Change the clock's address or key",
+        "data": {
+          "host": "Host or IP address",
+          "port": "Port",
+          "local_key": "Local key"
+        },
+        "data_description": {
+          "local_key": "Leave empty to keep the current key."
         }
       }
     },
     "error": {
       "auth": "Email/Password is wrong.",
-      "cannot_connect": "Can't reach the clock, or it reported a different serial number.",
-      "invalid_local_key": "The clock rejected the local key."
+      "cannot_connect": "Can't reach the clock.",
+      "invalid_local_key": "The clock rejected the local key.",
+      "wrong_device": "The clock at that address has a different serial number."
     },
     "abort": {
-      "already_configured": "Account is already configured"
+      "already_configured": "This account or clock is already configured.",
+      "already_configured_device": "This clock is already set up in another Sandman Doppler entry.",
+      "reconfigure_successful": "The clock's settings were updated.",
+      "reconfigure_cloud_unsupported": "Only clocks added on the local network can be reconfigured here."
     }
   },
   "device_automation": {

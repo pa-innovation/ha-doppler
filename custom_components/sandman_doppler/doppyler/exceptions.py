@@ -36,6 +36,10 @@ class InvalidDataReturned(DopplerException):
     """Raise when HTTP response is OK but the data returned is invalid."""
 
 
+class SerialMismatch(DopplerException):
+    """Raise when a clock reports a different serial number (DSN) than expected."""
+
+
 class InvalidAlarmSound(DopplerException):
     """Raise when invalid alarm sound is specified."""
 

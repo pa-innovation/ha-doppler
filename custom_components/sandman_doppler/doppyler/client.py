@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 from json import JSONDecodeError
 from typing import Any, Callable
 
-from aiohttp import ClientSession, ClientTimeout
+from aiohttp import ClientError, ClientSession, ClientTimeout
 
 from .const import (
     BASE_SANDMAN_API_URL,
@@ -26,10 +26,21 @@ from .exceptions import (
     DopplerException,
     ExpiredNonce,
     InvalidDataReturned,
+    SerialMismatch,
     UnauthorizedException,
     UnknownException,
 )
-from .model.doppler import Doppler
+from .model.doppler import Doppler, DopplerDeviceInfo
+
+# Fields of the clock's `device` reply (see DopplerDeviceInfo)
+_DEVICE_INFO_KEYS = (
+    "serialNum",
+    "mfgrName",
+    "modelNum",
+    "firmware",
+    "hardware",
+    "software",
+)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -60,8 +71,8 @@ class DopplerClient:
 
     def __init__(
         self,
-        email: str,
-        password: str,
+        email: str | None,
+        password: str | None,
         timeout: int = DEFAULT_TIMEOUT,
         client_session: ClientSession | None = None,
         local_control: bool = True,
@@ -171,8 +182,10 @@ class DopplerClient:
                 # None uses aiohttp's default certificate verification.
                 ssl=None if verify_ssl else False,
             )
-        except asyncio.TimeoutError as err:
-            raise CantConnectException from err
+        except (asyncio.TimeoutError, ClientError) as err:
+            raise CantConnectException(
+                f"{type(err).__name__} on {method} {url}"
+            ) from err
         else:
             try:
                 resp_data = await resp.json(content_type=None)
@@ -330,23 +343,24 @@ class DopplerClient:
             )
 
     async def add_local_device(
-        self, dsn: str, name: str, host: str, port: int, local_key: str
+        self,
+        dsn: str,
+        name: str,
+        host: str,
+        port: int,
+        local_key: str,
+        notify: bool = True,
     ) -> Doppler:
         """Add a clock that is controlled only on the local network.
 
         Needs no Sandman account or cloud: the clock's local key is supplied by the
         caller (it is stored on the clock itself) and the device info comes from the
-        clock's own `device` endpoint. Raises DopplerException (or an aiohttp error)
-        if the clock can't be reached or rejects the key.
+        clock's own `device` endpoint. Raises a DopplerException if the clock can't
+        be reached, rejects the key or reports another serial number. With
+        notify=False the device-added listeners are not called.
         """
-        placeholder: dict[str, str] = {
-            "serialNum": dsn,
-            "mfgrName": "",
-            "modelNum": "",
-            "firmware": "",
-            "hardware": "",
-            "software": "",
-        }
+        placeholder: dict[str, str] = dict.fromkeys(_DEVICE_INFO_KEYS, "")
+        placeholder["serialNum"] = dsn
         local_info = {"localkey": local_key, "ipAddie": host, "port": port}
         doppler = Doppler(
             self,
@@ -356,16 +370,33 @@ class DopplerClient:
             True,
             self._local_api_semaphore_limit,
         )
-        device_info = await doppler._call_local_api("device")
-        if device_info.get("serialNum") != dsn:
-            raise BadRequestException(
+        try:
+            device_info = await doppler.get_device_info()
+        except BadRequestException as err:
+            # The clock answers 400 DOPPLER_ID_NOT_FOUND ("Illegal DSN") when the
+            # serial in the URL isn't its own; the check is case-sensitive.
+            if "DOPPLER_ID_NOT_FOUND" in str(err):
+                raise SerialMismatch(
+                    "the clock does not have this serial number", "GET", "nonce", None
+                ) from err
+            raise
+        if not isinstance(device_info, dict) or any(
+            key not in device_info for key in _DEVICE_INFO_KEYS
+        ):
+            raise InvalidDataReturned(
+                "device info is missing fields", "GET", "device", None
+            )
+        if str(device_info["serialNum"]).lower() != dsn.lower():
+            raise SerialMismatch(
                 "clock reported a different serial number", "GET", "device", None
             )
-        doppler.device_info.update(device_info)
+        # Keep the serial exactly as the clock reports it.
+        doppler.device_info = DopplerDeviceInfo(device_info)
+        dsn = doppler.dsn
 
         is_new = dsn not in self.devices
         self.devices[dsn] = doppler
-        if is_new:
+        if is_new and notify:
             self._call_listeners(doppler, self._added_listeners)
         return doppler
 
