@@ -247,9 +247,7 @@ class Doppler:
                 ) from err
             self._nonce = nonce
             self._nonce_expires = datetime.now() + timedelta(days=1)
-            self._final_key = (
-                f"{nonce}|{base64.b64encode(m.digest()).decode('ascii')}"
-            )
+            self._final_key = f"{nonce}|{base64.b64encode(m.digest()).decode('ascii')}"
         finally:
             # Release waiting calls even if the nonce request failed; otherwise every
             # later call to this clock would wait forever.
