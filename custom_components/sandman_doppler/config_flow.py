@@ -183,15 +183,12 @@ class DopplerFlowHandler(ConfigFlow, domain=DOMAIN):
     def _dsn_in_other_entry(self, dsn: str) -> bool:
         """Return true if a clock with this DSN already belongs to another entry."""
         dev_reg = dr.async_get(self.hass)
-        for device in dev_reg.devices.values():
-            for ident in device.identifiers:
-                # Other integrations may use identifiers that aren't 2-tuples.
-                if ident[0] == DOMAIN and str(ident[1]).lower() == dsn.lower():
-                    return any(
-                        (entry := self.hass.config_entries.async_get_entry(entry_id))
-                        and entry.domain == DOMAIN
-                        for entry_id in device.config_entries
-                    )
+        for entry in self.hass.config_entries.async_entries(DOMAIN):
+            for device in dr.async_entries_for_config_entry(dev_reg, entry.entry_id):
+                for ident in device.identifiers:
+                    # Other integrations may use identifiers that aren't 2-tuples.
+                    if ident[0] == DOMAIN and str(ident[1]).lower() == dsn.lower():
+                        return True
         return False
 
     async def _check_local_clock(
