@@ -5,6 +5,11 @@ NAME = "Sandman Doppler"
 DOMAIN = "sandman_doppler"
 
 ATTR_DSN = "dsn"
+
+# Local-only entries (no Sandman account): the clock is reached directly on the LAN
+CONF_DSN = "dsn"
+CONF_LOCAL_KEY = "local_key"
+DEFAULT_LOCAL_PORT = 5443
 ATTR_BUTTON = "button"
 CONF_SUBTYPE = "subtype"
 

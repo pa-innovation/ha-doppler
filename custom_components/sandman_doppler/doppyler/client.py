@@ -329,6 +329,46 @@ class DopplerClient:
                 self._local_api_semaphore_limit,
             )
 
+    async def add_local_device(
+        self, dsn: str, name: str, host: str, port: int, local_key: str
+    ) -> Doppler:
+        """Add a clock that is controlled only on the local network.
+
+        Needs no Sandman account or cloud: the clock's local key is supplied by the
+        caller (it is stored on the clock itself) and the device info comes from the
+        clock's own `device` endpoint. Raises DopplerException (or an aiohttp error)
+        if the clock can't be reached or rejects the key.
+        """
+        placeholder: dict[str, str] = {
+            "serialNum": dsn,
+            "mfgrName": "",
+            "modelNum": "",
+            "firmware": "",
+            "hardware": "",
+            "software": "",
+        }
+        local_info = {"localkey": local_key, "ipAddie": host, "port": port}
+        doppler = Doppler(
+            self,
+            name,
+            placeholder,
+            local_info,
+            True,
+            self._local_api_semaphore_limit,
+        )
+        device_info = await doppler._call_local_api("device")
+        if device_info.get("serialNum") != dsn:
+            raise BadRequestException(
+                "clock reported a different serial number", "GET", "device", None
+            )
+        doppler.device_info.update(device_info)
+
+        is_new = dsn not in self.devices
+        self.devices[dsn] = doppler
+        if is_new:
+            self._call_listeners(doppler, self._added_listeners)
+        return doppler
+
     async def get_devices(self) -> dict[str, Doppler]:
         """Get all devices for account."""
         data = (await self._call_copilot_api(THINGS_URL)).get("things", [])

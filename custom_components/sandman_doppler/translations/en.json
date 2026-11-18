@@ -2,14 +2,34 @@
   "config": {
     "step": {
       "user": {
+        "title": "Sandman Doppler",
+        "menu_options": {
+          "cloud": "Sandman account (cloud login)",
+          "local": "One clock on this network (no cloud)"
+        }
+      },
+      "cloud": {
         "data": {
           "email": "Email",
           "password": "Password"
         }
+      },
+      "local": {
+        "title": "Doppler on this network",
+        "description": "Control one clock directly, without Sandman's servers. The serial number is the clock's network name (for example Doppler-1a2b3c4d). The local key is stored on the clock itself.",
+        "data": {
+          "name": "Name",
+          "host": "Host or IP address",
+          "port": "Port",
+          "dsn": "Serial number (DSN)",
+          "local_key": "Local key"
+        }
       }
     },
     "error": {
-      "auth": "Email/Password is wrong."
+      "auth": "Email/Password is wrong.",
+      "cannot_connect": "Can't reach the clock, or it reported a different serial number.",
+      "invalid_local_key": "The clock rejected the local key."
     },
     "abort": {
       "already_configured": "Account is already configured"

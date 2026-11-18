@@ -9,7 +9,16 @@ import logging
 from typing import Any
 
 from homeassistant.config_entries import ConfigEntry, ConfigEntryNotReady
-from homeassistant.const import CONF_EMAIL, CONF_PASSWORD, Platform
+import aiohttp
+
+from homeassistant.const import (
+    CONF_EMAIL,
+    CONF_HOST,
+    CONF_NAME,
+    CONF_PASSWORD,
+    CONF_PORT,
+    Platform,
+)
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import device_registry as dr, entity_registry as er
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
@@ -20,7 +29,7 @@ from homeassistant.helpers.start import async_at_started
 from homeassistant.helpers.typing import ConfigType
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
-from .const import DOMAIN
+from .const import CONF_DSN, CONF_LOCAL_KEY, DOMAIN
 from .doppyler.client import DopplerClient
 from .doppyler.exceptions import DopplerException
 from .doppyler.model.doppler import Doppler
@@ -65,8 +74,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up config entry."""
     hass.data.setdefault(DOMAIN, {}).setdefault(entry.entry_id, {})
 
-    email = entry.data[CONF_EMAIL]
-    password = entry.data[CONF_PASSWORD]
+    # Local-only entries (no Sandman account) have a host instead of an email.
+    local_only = CONF_HOST in entry.data
+    email = entry.data.get(CONF_EMAIL)
+    password = entry.data.get(CONF_PASSWORD)
 
     session = async_get_clientsession(hass)
     client = DopplerClient(
@@ -111,6 +122,22 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     entry.async_on_unload(client.on_device_added(async_on_device_added))
     entry.async_on_unload(client.on_device_removed(async_on_device_removed))
+
+    if local_only:
+        try:
+            await client.add_local_device(
+                entry.data[CONF_DSN],
+                entry.data[CONF_NAME],
+                entry.data[CONF_HOST],
+                entry.data[CONF_PORT],
+                entry.data[CONF_LOCAL_KEY],
+            )
+        except (DopplerException, aiohttp.ClientError, OSError) as err:
+            raise ConfigEntryNotReady(
+                f"Can't reach the Doppler at {entry.data[CONF_HOST]}"
+            ) from err
+        DopplerServices(hass, ent_reg, dev_reg, client).async_register()
+        return True
 
     try:
         await client.get_token()
