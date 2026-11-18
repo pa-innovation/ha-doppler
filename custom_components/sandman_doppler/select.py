@@ -20,12 +20,14 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from . import DopplerDataUpdateCoordinator
 from .const import DOMAIN
 from .doppyler.const import (
+    ATTR_RAINBOW_DISPLAY,
     ATTR_SOUND_PRESET,
     ATTR_TIME_MODE,
     ATTR_TIMEZONE,
     ATTR_WEATHER,
 )
 from .doppyler.model.doppler import Doppler
+from .doppyler.model.rainbow import RainbowMode
 from .doppyler.model.sound import SoundPreset
 from .doppyler.model.weather import WeatherMode
 from .entity import DopplerEntity
@@ -92,6 +94,17 @@ ENUM_SELECT_ENTITY_DESCRIPTIONS = [
         state_key=ATTR_WEATHER,
         state_func=lambda x: x.mode,
         set_value_func=lambda dev, val: dev.set_weather_configuration(mode=val),
+    ),
+    DopplerEnumSelectEntityDescription(
+        "Rainbow: Mode",
+        name="Rainbow: Mode",
+        icon="mdi:theme-light-dark",
+        entity_category=EntityCategory.CONFIG,
+        enum_cls=RainbowMode,
+        state_key=ATTR_RAINBOW_DISPLAY,
+        # None (unknown state) when the clock reports a mode this library lacks.
+        state_func=lambda x: x.mode if isinstance(x.mode, RainbowMode) else None,
+        set_value_func=lambda dev, val: dev.set_rainbow_configuration(mode=val),
     ),
 ]
 
@@ -168,7 +181,9 @@ class DopplerEnumSelect(
         current_option = self.device_data.get(self.ed.state_key)
         if current_option is None:
             return None
-        return normalize_enum_name(self.ed.state_func(current_option))
+        if (enum_val := self.ed.state_func(current_option)) is None:
+            return None
+        return normalize_enum_name(enum_val)
 
     async def async_select_option(self, option: str) -> None:
         """Change the selected option."""

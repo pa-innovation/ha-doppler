@@ -31,6 +31,7 @@ from ..const import (
     ATTR_NIGHT_DISPLAY_BRIGHTNESS,
     ATTR_NIGHT_DISPLAY_COLOR,
     ATTR_NIGHT_TO_DAY_TRANSITION_VALUE,
+    ATTR_RAINBOW_DISPLAY,
     ATTR_SMART_BUTTON_COLOR,
     ATTR_SOUND_PRESET,
     ATTR_SOUND_PRESET_MODE,
@@ -808,6 +809,20 @@ class Doppler:
         rainbow_mode = await self._call_api("software/use-rainbow-display", "GET")
         return RainbowConfiguration.from_dict(rainbow_mode)
 
+    async def set_rainbow_configuration(
+        self, speed: int | None = None, mode: RainbowMode | None = None
+    ) -> RainbowConfiguration:
+        """
+        Set the rainbow display's speed and/or mode.
+
+        If either input is None, the clock's current value for it is kept.
+        """
+        if speed is None or mode is None:
+            current = await self.get_rainbow_mode()
+            speed = current.speed if speed is None else speed
+            mode = current.mode if mode is None else mode
+        return await self.set_rainbow_mode(RainbowConfiguration(speed, mode))
+
     async def get_smart_button_color(self, button_num: int) -> Color:
         """Get the color of the specified smart button."""
         smart_button_config = await self.get_smart_button_configuration(button_num)
@@ -912,6 +927,7 @@ class Doppler:
             (ATTR_NIGHT_DISPLAY_COLOR, self.get_night_display_color()),
             (ATTR_NIGHT_BUTTON_COLOR, self.get_night_button_color()),
             (ATTR_WEATHER, self.get_weather_configuration()),
+            (ATTR_RAINBOW_DISPLAY, self.get_rainbow_mode()),
             (ATTR_WEATHER_WAKE_UP_TIME, self.get_weather_wake_up_time()),
             (ATTR_CONNECTED_TO_ALEXA, self.get_is_connected_to_alexa()),
             (

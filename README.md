@@ -108,6 +108,9 @@ Read/Write entities:
 
 -Weather settings (currently you can only add location via service or the app)
 
+
+-Rainbow display: speed (0 turns it off; lower numbers cycle faster) and mode (day, night or both)
+
 Read only:
 -Day or night mode indicator
 

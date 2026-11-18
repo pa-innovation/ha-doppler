@@ -28,7 +28,7 @@ class RainbowConfiguration:
     """Rainbow class."""
 
     speed: int
-    mode: RainbowMode
+    mode: RainbowMode | str
 
     def to_dict(self) -> RainbowDict:
         return RainbowDict(speed=self.speed, mode=self.mode)
@@ -39,4 +39,10 @@ class RainbowConfiguration:
             raise ValueError("Dictionary is missing speed value")
         if "mode" not in rainbow_dict:
             raise ValueError("Dictionary is missing mode value")
-        return RainbowConfiguration(rainbow_dict["speed"], rainbow_dict["mode"])
+        mode = rainbow_dict["mode"]
+        try:
+            mode = RainbowMode(mode)
+        except ValueError:
+            # Keep a value this library doesn't know, so it is sent back unchanged.
+            _LOGGER.debug("Unknown rainbow mode from the clock: %s", mode)
+        return RainbowConfiguration(int(rainbow_dict["speed"]), mode)
