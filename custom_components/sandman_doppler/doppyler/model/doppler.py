@@ -49,7 +49,12 @@ from ..const import (
     ATTR_WEATHER_WAKE_UP_TIME,
     ATTR_WIFI,
 )
-from ..exceptions import ExpiredNonce, InvalidAlarmSound, UnauthorizedException
+from ..exceptions import (
+    ExpiredNonce,
+    InvalidAlarmSound,
+    InvalidDataReturned,
+    UnauthorizedException,
+)
 from .alarm import Alarm
 from .color import Color
 from .light_bar import LightBarDisplayEffect
@@ -227,16 +232,26 @@ class Doppler:
     async def _get_nonce_and_final_key(self):
         """Get the nonce and calculate the final key."""
         self._nonce_event.clear()
-        nonce_json = await self.client.request(
-            f"{self.local_path}/{self.dsn}/nonce", verify_ssl=False
-        )
-        self._nonce = nonce = nonce_json["nonce"]
-        self._nonce_expires = datetime.now() + timedelta(days=1)
-        m = hashlib.sha256()
-        m.update(nonce.encode("ascii"))
-        m.update(self.local_info.local_key.encode("ascii"))
-        self._final_key = f"{nonce}|{base64.b64encode(m.digest()).decode('ascii')}"
-        self._nonce_event.set()
+        try:
+            nonce_json = await self.client.request(
+                f"{self.local_path}/{self.dsn}/nonce", verify_ssl=False
+            )
+            try:
+                nonce = nonce_json["nonce"]
+                m = hashlib.sha256()
+                m.update(nonce.encode("ascii"))
+                m.update(self.local_info.local_key.encode("ascii"))
+            except (KeyError, TypeError, AttributeError, UnicodeEncodeError) as err:
+                raise InvalidDataReturned(
+                    "unusable nonce reply or local key", "GET", "nonce", None
+                ) from err
+            self._nonce = nonce
+            self._nonce_expires = datetime.now() + timedelta(days=1)
+            self._final_key = f"{nonce}|{base64.b64encode(m.digest()).decode('ascii')}"
+        finally:
+            # Release waiting calls even if the nonce request failed; otherwise every
+            # later call to this clock would wait forever.
+            self._nonce_event.set()
 
     async def _call_api(
         self, endpoint: str, method: str = "GET", data: dict = None
@@ -263,6 +278,10 @@ class Doppler:
                 self._loop.create_task(listener(alarm))
             else:
                 listener(alarm)
+
+    async def get_device_info(self) -> DeviceInfoDict:
+        """Get the clock's device info (serial, maker, model, versions)."""
+        return await self._call_api("device")
 
     async def get_wifi_status(self) -> WifiStatus:
         """Get the status of the WiFi on the device."""

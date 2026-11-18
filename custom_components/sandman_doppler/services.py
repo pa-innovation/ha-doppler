@@ -166,6 +166,15 @@ class DopplerServices:
         self.client = client
 
     @callback
+    def _find_doppler(self, dsn: str) -> Any:
+        """Return the loaded Doppler with this DSN from any config entry."""
+        for entry_data in self.hass.data.get(DOMAIN, {}).values():
+            coordinator = entry_data.get(dsn) if isinstance(entry_data, dict) else None
+            if coordinator is not None and hasattr(coordinator, "doppler"):
+                return coordinator.doppler
+        return self.client.devices.get(dsn)
+
+    @callback
     def get_dopplers_from_targets(self, data: dict[str, Any]) -> dict[str, Any]:
         """Get dopplers from service targets."""
         devices: set[Doppler] = set()
@@ -197,7 +206,10 @@ class DopplerServices:
                     "Sandman Doppler device"
                 )
                 continue
-            devices.add(self.client.devices[identifier[1]])
+            if (doppler := self._find_doppler(identifier[1])) is None:
+                _LOGGER.warning("Doppler %s is not loaded; skipping it", identifier[1])
+                continue
+            devices.add(doppler)
 
         if not devices:
             raise vol.Invalid("No devices found in given targets!")
